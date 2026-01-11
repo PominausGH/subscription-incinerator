@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^7.2.0",
     "bullmq": "^5.66.4",
     "ioredis": "^5.9.1",
