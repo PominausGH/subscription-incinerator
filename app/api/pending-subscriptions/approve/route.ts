@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
 
     const { pendingId } = await req.json()
 
-    if (!pendingId) {
-      return NextResponse.json({ error: 'Missing pendingId' }, { status: 400 })
+    if (!pendingId || typeof pendingId !== 'string' || !pendingId.trim()) {
+      return NextResponse.json({ error: 'Invalid pendingId' }, { status: 400 })
     }
 
     // Get pending subscription
@@ -30,40 +30,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Already processed' }, { status: 400 })
     }
 
-    // Create subscription from pending
-    const subscription = await db.subscription.create({
-      data: {
-        userId: pending.userId,
-        serviceName: pending.serviceName,
-        status: pending.isTrial ? 'trial' : 'active',
-        amount: pending.amount,
-        currency: pending.currency,
-        trialEndsAt: pending.trialEndsAt,
-        nextBillingDate: pending.nextBillingDate,
-        detectedFrom: 'email_scan',
-        rawEmailData: pending.rawEmailData,
-      }
+    // Create subscription and mark as approved in a transaction
+    const result = await db.$transaction(async (tx) => {
+      // Create subscription from pending
+      const subscription = await tx.subscription.create({
+        data: {
+          userId: pending.userId,
+          serviceName: pending.serviceName,
+          status: pending.isTrial ? 'trial' : 'active',
+          amount: pending.amount,
+          currency: pending.currency,
+          trialEndsAt: pending.trialEndsAt,
+          nextBillingDate: pending.nextBillingDate,
+          detectedFrom: 'email_scan',
+          rawEmailData: pending.rawEmailData,
+        }
+      })
+
+      // Mark pending as approved
+      await tx.pendingSubscription.update({
+        where: { id: pendingId },
+        data: { status: 'approved' }
+      })
+
+      return subscription
     })
 
-    // Schedule reminders
+    // Schedule reminders (outside transaction)
     try {
-      if (subscription.trialEndsAt) {
-        await scheduleTrialReminders(subscription)
+      if (result.trialEndsAt) {
+        await scheduleTrialReminders(result)
       }
-      if (subscription.nextBillingDate) {
-        await scheduleBillingReminders(subscription)
+      if (result.nextBillingDate) {
+        await scheduleBillingReminders(result)
       }
     } catch (error) {
       console.error('Failed to schedule reminders:', error)
     }
 
-    // Mark pending as approved
-    await db.pendingSubscription.update({
-      where: { id: pendingId },
-      data: { status: 'approved' }
-    })
-
-    return NextResponse.json({ success: true, subscriptionId: subscription.id })
+    return NextResponse.json({ success: true, subscriptionId: result.id })
   } catch (error) {
     console.error('Approve pending subscription error:', error)
     return NextResponse.json(

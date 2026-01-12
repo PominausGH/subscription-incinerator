@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
 
     const { pendingId } = await req.json()
 
-    if (!pendingId) {
-      return NextResponse.json({ error: 'Missing pendingId' }, { status: 400 })
+    if (!pendingId || typeof pendingId !== 'string' || !pendingId.trim()) {
+      return NextResponse.json({ error: 'Invalid pendingId' }, { status: 400 })
     }
 
     // Get pending subscription
