@@ -1,9 +1,16 @@
 import { db } from '@/lib/db/client'
 import { getCurrentUser } from '@/lib/session'
 import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription-form'
+import { SubscriptionCard } from '@/components/subscriptions/subscription-card'
+import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
+
+  const userWithEmail = await db.user.findUnique({
+    where: { id: user.id },
+    select: { emailProvider: true, oauthTokens: true },
+  })
 
   const subscriptions = await db.subscription.findMany({
     where: { userId: user.id },
@@ -13,10 +20,17 @@ export default async function DashboardPage() {
   return (
     <div className="px-4 sm:px-0">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Track and manage your subscriptions
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Track and manage your subscriptions
+            </p>
+          </div>
+          <ScanEmailsButton
+            isGmailConnected={userWithEmail?.emailProvider === 'gmail' && userWithEmail?.oauthTokens !== null}
+          />
+        </div>
       </div>
 
       <div className="mb-8">
@@ -33,36 +47,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {subscriptions.map((sub) => (
-              <div key={sub.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold">{sub.serviceName}</h3>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    sub.status === 'trial' ? 'bg-yellow-100 text-yellow-800' :
-                    sub.status === 'active' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {sub.status}
-                  </span>
-                </div>
-
-                {sub.amount && (
-                  <p className="text-2xl font-bold mb-2">
-                    ${sub.amount.toString()}/{sub.billingCycle}
-                  </p>
-                )}
-
-                {sub.trialEndsAt && (
-                  <p className="text-sm text-gray-600">
-                    Trial ends: {new Date(sub.trialEndsAt).toLocaleDateString()}
-                  </p>
-                )}
-
-                {sub.nextBillingDate && (
-                  <p className="text-sm text-gray-600">
-                    Next billing: {new Date(sub.nextBillingDate).toLocaleDateString()}
-                  </p>
-                )}
-              </div>
+              <SubscriptionCard key={sub.id} subscription={sub} />
             ))}
           </div>
         )}
