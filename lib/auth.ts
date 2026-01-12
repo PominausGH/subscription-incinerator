@@ -38,6 +38,7 @@ export const {
     signIn: "/login",
     verifyRequest: "/verify-request",
     error: "/error",
+    newUser: "/dashboard",
   },
   providers: [
     Resend({

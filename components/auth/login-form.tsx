@@ -16,7 +16,7 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const result = await signIn('email', { email, redirect: false })
+      const result = await signIn('resend', { email, redirect: false })
       if (result?.error) {
         setError('Failed to send magic link. Please try again.')
         setIsSuccess(false)

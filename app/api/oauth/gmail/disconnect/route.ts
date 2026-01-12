@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { removeRecurringScan } from '@/lib/queue/scan-queue'
+import { Prisma } from '@prisma/client'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     await db.user.update({
       where: { id: userId },
       data: {
-        oauthTokens: null,
+        oauthTokens: Prisma.JsonNull,
         emailProvider: null,
       },
     })

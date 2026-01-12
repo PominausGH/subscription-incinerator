@@ -3,21 +3,25 @@ import { cn } from "@/lib/utils"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline' | 'ghost'
+  variant?: 'default' | 'outline' | 'ghost' | 'destructive'
+  size?: 'default' | 'sm' | 'lg'
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', ...props }, ref) => {
+  ({ className, variant = 'default', size = 'default', ...props }, ref) => {
     return (
       <button
         className={cn(
           "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           "disabled:opacity-50 disabled:pointer-events-none",
-          "px-4 py-2",
+          size === 'default' && "px-4 py-2",
+          size === 'sm' && "px-3 py-1.5 text-xs",
+          size === 'lg' && "px-6 py-3 text-base",
           variant === 'default' && "bg-blue-600 text-white hover:bg-blue-700",
           variant === 'outline' && "border border-gray-300 bg-white hover:bg-gray-50",
           variant === 'ghost' && "hover:bg-gray-100",
+          variant === 'destructive' && "bg-red-600 text-white hover:bg-red-700",
           className
         )}
         ref={ref}

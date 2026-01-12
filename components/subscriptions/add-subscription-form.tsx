@@ -12,7 +12,7 @@ export function AddSubscriptionForm() {
   const [formData, setFormData] = useState({
     serviceName: '',
     status: 'active' as 'trial' | 'active',
-    billingCycle: 'monthly' as 'monthly' | 'yearly' | 'custom',
+    billingCycle: 'monthly' as 'monthly' | 'fortnightly' | 'yearly' | 'custom',
     amount: '',
     currency: 'USD',
     trialEndsAt: '',
@@ -100,7 +100,7 @@ export function AddSubscriptionForm() {
             id="status"
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as 'trial' | 'active' })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="trial">Free Trial</option>
             <option value="active">Active</option>
@@ -128,10 +128,11 @@ export function AddSubscriptionForm() {
           <select
             id="billingCycle"
             value={formData.billingCycle}
-            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'monthly' | 'yearly' | 'custom' })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'monthly' | 'fortnightly' | 'yearly' | 'custom' })}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="monthly">Monthly</option>
+            <option value="fortnightly">Fortnightly</option>
             <option value="yearly">Yearly</option>
             <option value="custom">Custom</option>
           </select>
@@ -145,11 +146,47 @@ export function AddSubscriptionForm() {
             id="currency"
             value={formData.currency}
             onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British Pound</option>
+            <option value="AUD">AUD - Australian Dollar</option>
+            <option value="CAD">CAD - Canadian Dollar</option>
+            <option value="JPY">JPY - Japanese Yen</option>
+            <option value="CNY">CNY - Chinese Yuan</option>
+            <option value="INR">INR - Indian Rupee</option>
+            <option value="BRL">BRL - Brazilian Real</option>
+            <option value="MXN">MXN - Mexican Peso</option>
+            <option value="CHF">CHF - Swiss Franc</option>
+            <option value="SEK">SEK - Swedish Krona</option>
+            <option value="NOK">NOK - Norwegian Krone</option>
+            <option value="DKK">DKK - Danish Krone</option>
+            <option value="PLN">PLN - Polish Zloty</option>
+            <option value="NZD">NZD - New Zealand Dollar</option>
+            <option value="SGD">SGD - Singapore Dollar</option>
+            <option value="HKD">HKD - Hong Kong Dollar</option>
+            <option value="KRW">KRW - South Korean Won</option>
+            <option value="TRY">TRY - Turkish Lira</option>
+            <option value="RUB">RUB - Russian Ruble</option>
+            <option value="ZAR">ZAR - South African Rand</option>
+            <option value="AED">AED - UAE Dirham</option>
+            <option value="SAR">SAR - Saudi Riyal</option>
+            <option value="THB">THB - Thai Baht</option>
+            <option value="MYR">MYR - Malaysian Ringgit</option>
+            <option value="IDR">IDR - Indonesian Rupiah</option>
+            <option value="PHP">PHP - Philippine Peso</option>
+            <option value="VND">VND - Vietnamese Dong</option>
+            <option value="ILS">ILS - Israeli Shekel</option>
+            <option value="CZK">CZK - Czech Koruna</option>
+            <option value="HUF">HUF - Hungarian Forint</option>
+            <option value="ARS">ARS - Argentine Peso</option>
+            <option value="CLP">CLP - Chilean Peso</option>
+            <option value="COP">COP - Colombian Peso</option>
+            <option value="EGP">EGP - Egyptian Pound</option>
+            <option value="NGN">NGN - Nigerian Naira</option>
+            <option value="PKR">PKR - Pakistani Rupee</option>
+            <option value="BDT">BDT - Bangladeshi Taka</option>
           </select>
         </div>
 

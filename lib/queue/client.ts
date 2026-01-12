@@ -13,17 +13,19 @@ connection.on('connect', () => {
   console.log('Redis connected successfully')
 })
 
-export const queues = {
-  reminders: new Queue('reminders', {
-    connection,
-    defaultJobOptions: {
-      attempts: 5,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-      removeOnComplete: 1000,
-      removeOnFail: 5000,
+export const reminderQueue = new Queue('reminders', {
+  connection,
+  defaultJobOptions: {
+    attempts: 5,
+    backoff: {
+      type: 'exponential',
+      delay: 2000,
     },
-  }),
+    removeOnComplete: 1000,
+    removeOnFail: 5000,
+  },
+})
+
+export const queues = {
+  reminders: reminderQueue,
 }

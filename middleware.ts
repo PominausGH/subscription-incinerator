@@ -18,6 +18,11 @@ export default auth((req) => {
     pathname.startsWith(route)
   );
 
+  // Redirect authenticated users away from login page to dashboard
+  if (pathname === "/login" && req.auth) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   if (isProtectedRoute && !req.auth) {
     // Redirect to sign in page if not authenticated
     const signInUrl = new URL("/login", req.url);
