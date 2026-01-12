@@ -36,7 +36,7 @@ export async function sendReminderEmail(reminder: ReminderWithRelations) {
 
   // Send email
   const { data, error } = await resend.emails.send({
-    from: 'reminders@subincinerator.com',
+    from: 'Subscription Incinerator <reminders@subincinerator.com>',
     to: user.email,
     subject: template.subject,
     html: template.html,

@@ -15,7 +15,7 @@ export function getTrialEndingEmailTemplate(reminder: ReminderWithRelations) {
     (subscription.trialEndsAt!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
-  const subject = `🔥 Your ${subscription.serviceName} trial ends in ${daysUntilEnd} ${daysUntilEnd === 1 ? 'day' : 'days'}!`
+  const subject = `Trial ending soon: ${subscription.serviceName}`
 
   const html = `
 <!DOCTYPE html>
@@ -111,7 +111,7 @@ export function getBillingUpcomingEmailTemplate(reminder: ReminderWithRelations)
     (subscription.nextBillingDate!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
-  const subject = `💳 ${subscription.serviceName} billing in ${daysUntilBilling} ${daysUntilBilling === 1 ? 'day' : 'days'}`
+  const subject = `Upcoming charge: ${subscription.serviceName}`
 
   const html = `
 <!DOCTYPE html>
