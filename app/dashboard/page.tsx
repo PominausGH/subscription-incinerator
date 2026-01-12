@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/session'
 import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription-form'
 import { SubscriptionCard } from '@/components/subscriptions/subscription-card'
 import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
+import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -10,6 +11,24 @@ export default async function DashboardPage() {
   const userWithEmail = await db.user.findUnique({
     where: { id: user.id },
     select: { emailProvider: true, oauthTokens: true },
+  })
+
+  const pendingSubscriptions = await db.pendingSubscription.findMany({
+    where: {
+      userId: user.id,
+      status: 'pending'
+    },
+    orderBy: { confidence: 'desc' },
+    select: {
+      id: true,
+      serviceName: true,
+      confidence: true,
+      amount: true,
+      currency: true,
+      nextBillingDate: true,
+      emailFrom: true,
+      emailDate: true
+    }
   })
 
   const subscriptions = await db.subscription.findMany({
@@ -32,6 +51,10 @@ export default async function DashboardPage() {
           />
         </div>
       </div>
+
+      {pendingSubscriptions.length > 0 && (
+        <PendingSubscriptionsSection pending={pendingSubscriptions} />
+      )}
 
       <div className="mb-8">
         <AddSubscriptionForm />
