@@ -63,14 +63,25 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
       existingSubscriptions.map(s => `${s.serviceName}-${s.amount}`)
     )
 
+    // Fetch existing pending subscriptions upfront to avoid N+1 queries
+    const existingPending = await db.pendingSubscription.findMany({
+      where: { userId, status: 'pending' },
+      select: { emailId: true, serviceName: true, amount: true },
+    })
+
+    const existingPendingEmails = new Set(existingPending.map(p => p.emailId))
+    const existingPendingKeys = new Set(
+      existingPending.map(p => `${p.serviceName}-${p.amount}`)
+    )
+
     let createdCount = 0
     let pendingCount = 0
 
     for (const detection of uniqueDetections) {
       const key = `${detection.service}-${detection.amount}`
 
-      // Skip if already exists
-      if (existingKeys.has(key)) {
+      // Skip if already exists OR is pending
+      if (existingKeys.has(key) || existingPendingKeys.has(key)) {
         continue
       }
 
@@ -106,15 +117,13 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
         createdCount++
       } else if (detection.confidence >= 0.4) {
         // Medium confidence (40-80%) - create pending for review
-        const existingPending = await db.pendingSubscription.findFirst({
-          where: {
-            userId,
-            emailId: detection.rawData.emailId,
-            status: 'pending'
-          }
-        })
+        // Skip if already exists by emailId
+        if (existingPendingEmails.has(detection.rawData.emailId)) {
+          console.log(`Skipping duplicate pending for email ${detection.rawData.emailId}`)
+          continue
+        }
 
-        if (!existingPending) {
+        try {
           const expiresAt = new Date()
           expiresAt.setDate(expiresAt.getDate() + 30) // 30 days from now
 
@@ -137,6 +146,9 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
             }
           })
           pendingCount++
+        } catch (error) {
+          console.error(`Failed to create pending subscription for ${detection.service}:`, error)
+          // Continue processing other detections
         }
       }
     }
