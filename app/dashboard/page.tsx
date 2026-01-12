@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     select: { emailProvider: true, oauthTokens: true },
   })
 
-  const pendingSubscriptions = await db.pendingSubscription.findMany({
+  const pendingSubscriptionsRaw = await db.pendingSubscription.findMany({
     where: {
       userId: user.id,
       status: 'pending'
@@ -30,6 +30,13 @@ export default async function DashboardPage() {
       emailDate: true
     }
   })
+
+  // Convert Decimal types to numbers for client components
+  const pendingSubscriptions = pendingSubscriptionsRaw.map(item => ({
+    ...item,
+    confidence: Number(item.confidence),
+    amount: item.amount ? Number(item.amount) : null
+  }))
 
   const subscriptions = await db.subscription.findMany({
     where: { userId: user.id },

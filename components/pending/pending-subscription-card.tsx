@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
 interface PendingSubscriptionCardProps {
@@ -17,9 +18,12 @@ interface PendingSubscriptionCardProps {
 }
 
 export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) {
+  const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleApprove() {
+    setError(null)
     setIsProcessing(true)
 
     try {
@@ -30,20 +34,21 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
       })
 
       if (response.ok) {
-        window.location.reload()
+        router.refresh()
       } else {
         const data = await response.json()
-        alert(data.error || 'Failed to approve subscription')
+        setError(data.error || 'Failed to approve subscription')
         setIsProcessing(false)
       }
     } catch (error) {
       console.error('Approve error:', error)
-      alert('Failed to approve subscription')
+      setError('Failed to approve subscription')
       setIsProcessing(false)
     }
   }
 
   async function handleDismiss() {
+    setError(null)
     setIsProcessing(true)
 
     try {
@@ -54,20 +59,20 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
       })
 
       if (response.ok) {
-        window.location.reload()
+        router.refresh()
       } else {
         const data = await response.json()
-        alert(data.error || 'Failed to dismiss subscription')
+        setError(data.error || 'Failed to dismiss subscription')
         setIsProcessing(false)
       }
     } catch (error) {
       console.error('Dismiss error:', error)
-      alert('Failed to dismiss subscription')
+      setError('Failed to dismiss subscription')
       setIsProcessing(false)
     }
   }
 
-  const confidencePercent = Math.round((item.confidence as any) * 100)
+  const confidencePercent = Math.round(item.confidence * 100)
   const formattedDate = new Date(item.emailDate).toLocaleDateString()
   const formattedBillingDate = item.nextBillingDate
     ? new Date(item.nextBillingDate).toLocaleDateString()
@@ -96,6 +101,10 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
           From: {item.emailFrom} · {formattedDate}
         </div>
       </div>
+
+      {error && (
+        <p className="text-sm text-red-600 mb-2">{error}</p>
+      )}
 
       <div className="flex gap-2 ml-4">
         <Button
