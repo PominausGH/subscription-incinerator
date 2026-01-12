@@ -17,11 +17,15 @@ export async function GET(
       )
     }
 
-    const subscriptionId = params.id
+    const { id } = params
+
+    if (!id || typeof id !== 'string' || id.trim() === '') {
+      return NextResponse.json({ error: 'Invalid subscription ID' }, { status: 400 })
+    }
 
     // Fetch subscription and check ownership
     const subscription = await db.subscription.findUnique({
-      where: { id: subscriptionId },
+      where: { id },
       select: {
         id: true,
         userId: true,

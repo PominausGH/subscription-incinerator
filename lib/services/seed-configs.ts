@@ -31,7 +31,9 @@ const adapter = new PrismaPg(pool)
 // Create a fresh client with the adapter
 const db = new PrismaClient({
   adapter,
-  log: ['query', 'error', 'warn'],
+  log: process.env.NODE_ENV === 'development'
+    ? ['query', 'error', 'warn']
+    : ['error'],
 })
 
 const serviceConfigs = [

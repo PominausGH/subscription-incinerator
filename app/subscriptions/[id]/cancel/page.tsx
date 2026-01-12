@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { db } from '@/lib/db/client'
 import { CancellationWizard } from '@/components/subscriptions/cancellation-wizard'
@@ -11,6 +11,11 @@ interface CancelPageProps {
 
 export default async function CancelPage({ params }: CancelPageProps) {
   const user = await getCurrentUser()
+
+  // Explicit check for clarity (getCurrentUser redirects if not authenticated)
+  if (!user) {
+    redirect('/login')
+  }
 
   const subscription = await db.subscription.findUnique({
     where: { id: params.id },

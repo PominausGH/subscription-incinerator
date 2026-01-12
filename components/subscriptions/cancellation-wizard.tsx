@@ -81,7 +81,10 @@ export function CancellationWizard({ subscriptionId }: CancellationWizardProps) 
           <img
             src={instructions.logoUrl}
             alt={`${instructions.serviceName} logo`}
-            className="w-12 h-12 rounded"
+            className="h-8 w-auto"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none'
+            }}
           />
         )}
         <div>
