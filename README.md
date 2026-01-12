@@ -11,6 +11,15 @@ A modern subscription tracking application built with Next.js 14, helping users 
 - **Responsive UI**: Modern, mobile-first design with Tailwind CSS
 - **Database**: Robust data persistence with Prisma ORM and PostgreSQL
 
+### Email Scanning & Pending Subscriptions
+
+- Connect Gmail to automatically scan for subscription emails
+- High-confidence detections (80%+) auto-create subscriptions
+- Medium-confidence detections (40-80%) appear as pending subscriptions for manual review
+- Approve or dismiss pending subscriptions from the dashboard
+- Automatic cleanup of pending items after 30 days
+- Background scanning runs every 3 days
+
 ## 🛠️ Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
