@@ -32,11 +32,16 @@ export async function POST(req: NextRequest) {
     })
 
     // Schedule reminders
-    if (subscription.trialEndsAt) {
-      await scheduleTrialReminders(subscription)
-    }
-    if (subscription.nextBillingDate) {
-      await scheduleBillingReminders(subscription)
+    try {
+      if (subscription.trialEndsAt) {
+        await scheduleTrialReminders(subscription)
+      }
+      if (subscription.nextBillingDate) {
+        await scheduleBillingReminders(subscription)
+      }
+    } catch (error) {
+      console.error('Failed to schedule reminders:', error)
+      // Continue - subscription created successfully even if scheduling failed
     }
 
     return NextResponse.json(subscription, { status: 201 })
