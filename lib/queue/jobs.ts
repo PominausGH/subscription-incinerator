@@ -13,4 +13,8 @@ export interface ScanInboxJob {
   fullScan: boolean // true = scan last 90 days, false = scan last 30 days
 }
 
-export type JobData = SendReminderJob | ScanInboxJob
+export interface CleanupPendingJob {
+  // Empty payload - cleanup runs on schedule
+}
+
+export type JobData = SendReminderJob | ScanInboxJob | CleanupPendingJob

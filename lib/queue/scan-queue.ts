@@ -1,9 +1,9 @@
 import { Queue } from 'bullmq'
 import { connection } from './client'
-import { ScanInboxJob } from './jobs'
+import { ScanInboxJob, CleanupPendingJob, JobData } from './jobs'
 
-export const scanQueue = new Queue<ScanInboxJob>('email-scanning', {
-  connection,
+export const scanQueue = new Queue<JobData>('email-scanning', {
+  connection: connection as any, // Type cast needed due to ioredis version mismatch between app and bullmq
   defaultJobOptions: {
     attempts: 3,
     backoff: {

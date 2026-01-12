@@ -10,7 +10,7 @@ const reminderWorker = new Worker<SendReminderJob>(
   async (job) => {
     await processReminderJob(job)
   },
-  { connection }
+  { connection: connection as any } // Type cast needed due to ioredis version mismatch
 )
 
 const scanWorker = new Worker<ScanInboxJob | {}>(
@@ -22,7 +22,7 @@ const scanWorker = new Worker<ScanInboxJob | {}>(
       await processScanJob(job as Job<ScanInboxJob>)
     }
   },
-  { connection }
+  { connection: connection as any } // Type cast needed due to ioredis version mismatch
 )
 
 reminderWorker.on('completed', (job) => {

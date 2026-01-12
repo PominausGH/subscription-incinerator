@@ -8,7 +8,7 @@ type Subscription = {
   id: string
   serviceName: string
   status: string
-  billingCycle: string
+  billingCycle: string | null
   amount: number | null
   trialEndsAt: Date | null
   nextBillingDate: Date | null
@@ -55,7 +55,7 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
       {subscription.amount && (
         <p className="text-2xl font-bold mb-2">
-          ${subscription.amount.toString()}/{subscription.billingCycle}
+          ${subscription.amount.toString()}{subscription.billingCycle ? `/${subscription.billingCycle}` : ''}
         </p>
       )}
 

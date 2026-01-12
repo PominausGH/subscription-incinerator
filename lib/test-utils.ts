@@ -1,25 +1,37 @@
 import { User, Subscription } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 export const mockUser: User = {
   id: '1',
   email: 'test@example.com',
+  emailVerified: null,
   name: 'Test User',
   createdAt: new Date(),
   updatedAt: new Date(),
+  oauthTokens: null,
+  emailProvider: null,
+  tier: 'free',
+  notificationPreferences: { email: true, push: true, sms: false },
+  phoneNumber: null,
+  phoneVerified: false,
+  stripeCustomerId: null,
 }
 
 export const mockSubscription: Subscription = {
   id: '1',
   userId: '1',
-  name: 'Netflix',
-  amount: 15.99,
+  serviceName: 'Netflix',
+  status: 'active',
+  billingCycle: 'monthly',
+  amount: new Prisma.Decimal(15.99),
   currency: 'USD',
-  billingCycle: 'MONTHLY',
+  trialEndsAt: null,
   nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-  category: 'Entertainment',
-  status: 'ACTIVE',
-  isTrialing: true,
-  trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+  cancellationUrl: null,
+  autoCancelEnabled: false,
+  detectedFrom: 'manual',
+  rawEmailData: null,
+  externalId: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 }

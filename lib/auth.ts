@@ -30,7 +30,7 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as any, // Type cast needed due to @auth/core version mismatch between packages
   session: {
     strategy: "database",
   },

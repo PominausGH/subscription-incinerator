@@ -14,7 +14,7 @@ connection.on('connect', () => {
 })
 
 export const reminderQueue = new Queue('reminders', {
-  connection,
+  connection: connection as any, // Type cast needed due to ioredis version mismatch between app and bullmq
   defaultJobOptions: {
     attempts: 5,
     backoff: {

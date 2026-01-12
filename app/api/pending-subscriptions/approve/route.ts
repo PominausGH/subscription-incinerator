@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/notifications/schedule-reminders'
+import { Prisma } from '@prisma/client'
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
           trialEndsAt: pending.trialEndsAt,
           nextBillingDate: pending.nextBillingDate,
           detectedFrom: 'email_scan',
-          rawEmailData: pending.rawEmailData,
+          rawEmailData: pending.rawEmailData as Prisma.InputJsonValue,
         }
       })
 

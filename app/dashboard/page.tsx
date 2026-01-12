@@ -38,10 +38,16 @@ export default async function DashboardPage() {
     amount: item.amount ? Number(item.amount) : null
   }))
 
-  const subscriptions = await db.subscription.findMany({
+  const subscriptionsRaw = await db.subscription.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
   })
+
+  // Convert Decimal types to numbers for client components
+  const subscriptions = subscriptionsRaw.map(sub => ({
+    ...sub,
+    amount: sub.amount ? Number(sub.amount) : null
+  }))
 
   return (
     <div className="px-4 sm:px-0">
