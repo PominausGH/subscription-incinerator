@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { createSubscriptionSchema } from '@/lib/validations/subscription'
+import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/reminders/scheduler'
 import { z } from 'zod'
 
 export async function POST(req: NextRequest) {
@@ -29,6 +30,14 @@ export async function POST(req: NextRequest) {
         detectedFrom: 'manual',
       },
     })
+
+    // Schedule reminders
+    if (subscription.trialEndsAt) {
+      await scheduleTrialReminders(subscription)
+    }
+    if (subscription.nextBillingDate) {
+      await scheduleBillingReminders(subscription)
+    }
 
     return NextResponse.json(subscription, { status: 201 })
   } catch (error) {
