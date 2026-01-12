@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import { db } from '@/lib/db/client'
-import { addScanJob } from '@/lib/queue/scan-queue'
+import { addScanJob, scheduleRecurringScan } from '@/lib/queue/scan-queue'
 
 export async function GET(req: NextRequest) {
   try {
@@ -50,6 +50,9 @@ export async function GET(req: NextRequest) {
       userId,
       fullScan: true,
     })
+
+    // Schedule recurring scan every 3 days
+    await scheduleRecurringScan(userId)
 
     return NextResponse.redirect(
       new URL('/dashboard?connected=gmail', req.url)
