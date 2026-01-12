@@ -12,6 +12,7 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
 
   try {
     // Get user with OAuth tokens
+    console.log('Step 1: Fetching user from database...')
     const user = await db.user.findUnique({
       where: { id: userId },
     })
@@ -19,21 +20,26 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
     if (!user || !user.oauthTokens) {
       throw new Error('User not found or Gmail not connected')
     }
+    console.log('✓ User found')
 
     const tokens = user.oauthTokens as any
 
     // Create Gmail client
+    console.log('Step 2: Creating Gmail client...')
     const oauth2Client = createGmailClient(tokens.accessToken, tokens.refreshToken)
+    console.log('✓ Gmail client created')
 
     // Determine date range
     const afterDate = new Date()
     afterDate.setDate(afterDate.getDate() - (fullScan ? 90 : 30))
+    console.log(`Step 3: Fetching messages after ${afterDate.toISOString()}...`)
 
     // Fetch messages
     const messages = await fetchGmailMessages(oauth2Client, {
       maxResults: fullScan ? 500 : 100,
       afterDate,
     })
+    console.log(`✓ Fetched ${messages.length} messages`)
 
     console.log(`Fetched ${messages.length} messages for user ${userId}`)
 
@@ -99,14 +105,43 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
 
         createdCount++
       } else if (detection.confidence >= 0.4) {
-        // Medium confidence - create as pending (could add a PendingSubscription table)
-        // For now, just log it
-        console.log('Pending subscription detection:', detection.service, detection.confidence)
-        pendingCount++
+        // Medium confidence (40-80%) - create pending for review
+        const existingPending = await db.pendingSubscription.findFirst({
+          where: {
+            userId,
+            emailId: detection.rawData.emailId,
+            status: 'pending'
+          }
+        })
+
+        if (!existingPending) {
+          const expiresAt = new Date()
+          expiresAt.setDate(expiresAt.getDate() + 30) // 30 days from now
+
+          await db.pendingSubscription.create({
+            data: {
+              userId,
+              serviceName: detection.service,
+              confidence: detection.confidence,
+              amount: detection.amount,
+              currency: detection.currency,
+              isTrial: detection.isTrial,
+              trialEndsAt: detection.trialEndsAt,
+              nextBillingDate: detection.nextBillingDate,
+              emailId: detection.rawData.emailId,
+              emailSubject: detection.rawData.subject,
+              emailFrom: detection.rawData.from,
+              emailDate: detection.rawData.date,
+              rawEmailData: detection.rawData,
+              expiresAt
+            }
+          })
+          pendingCount++
+        }
       }
     }
 
-    console.log(`Scan complete for user ${userId}: ${createdCount} created, ${pendingCount} pending`)
+    console.log(`Scan complete for user ${userId}: ${createdCount} auto-created, ${pendingCount} pending review`)
 
     return {
       messagesScanned: messages.length,
