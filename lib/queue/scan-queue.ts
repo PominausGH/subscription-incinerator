@@ -43,3 +43,17 @@ export async function removeRecurringScan(userId: string) {
     await job.remove()
   }
 }
+
+export async function scheduleCleanupJob() {
+  return await scanQueue.add(
+    'cleanup-pending',
+    {},
+    {
+      jobId: 'cleanup-pending-daily',
+      repeat: {
+        every: 24 * 60 * 60 * 1000 // Daily
+      },
+      removeOnComplete: true,
+    }
+  )
+}

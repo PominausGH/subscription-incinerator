@@ -1,6 +1,7 @@
-import { Worker } from 'bullmq'
+import { Worker, Job } from 'bullmq'
 import { processReminderJob } from './processors/reminder-sender'
 import { processScanJob } from './processors/email-scanner'
+import { cleanupExpiredPending } from './processors/cleanup-pending'
 import { SendReminderJob, ScanInboxJob } from '@/lib/queue/jobs'
 import { connection } from '@/lib/queue/client'
 
@@ -12,10 +13,14 @@ const reminderWorker = new Worker<SendReminderJob>(
   { connection }
 )
 
-const scanWorker = new Worker<ScanInboxJob>(
+const scanWorker = new Worker<ScanInboxJob | {}>(
   'email-scanning',
   async (job) => {
-    await processScanJob(job)
+    if (job.name === 'cleanup-pending') {
+      await cleanupExpiredPending()
+    } else {
+      await processScanJob(job as Job<ScanInboxJob>)
+    }
   },
   { connection }
 )
@@ -28,8 +33,12 @@ reminderWorker.on('failed', (job, err) => {
   console.error(`Reminder job ${job?.id} failed:`, err)
 })
 
-scanWorker.on('completed', (job) => {
-  console.log(`Scan job ${job.id} completed`)
+scanWorker.on('completed', async (job) => {
+  if (job.name === 'cleanup-pending') {
+    console.log('Cleanup job completed')
+  } else {
+    console.log(`Scan job ${job.id} completed`)
+  }
 })
 
 scanWorker.on('failed', (job, err) => {
@@ -37,6 +46,12 @@ scanWorker.on('failed', (job, err) => {
 })
 
 console.log('Workers started successfully')
+
+// Schedule cleanup job on startup
+import { scheduleCleanupJob } from '@/lib/queue/scan-queue'
+scheduleCleanupJob().then(() => {
+  console.log('Cleanup job scheduled')
+}).catch(console.error)
 
 // Graceful shutdown
 async function shutdown(signal: string) {
