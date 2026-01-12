@@ -1,11 +1,7 @@
 import { Worker } from 'bullmq'
-import { Redis } from 'ioredis'
 import { processReminderJob } from './processors/reminder-sender'
 import { SendReminderJob } from '@/lib/queue/jobs'
-
-const connection = new Redis(process.env.REDIS_URL!, {
-  maxRetriesPerRequest: null,
-})
+import { connection } from '@/lib/queue/client'
 
 const reminderWorker = new Worker<SendReminderJob>(
   'reminders',
@@ -26,8 +22,12 @@ reminderWorker.on('failed', (job, err) => {
 console.log('Workers started successfully')
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, closing workers...')
+async function shutdown(signal: string) {
+  console.log(`${signal} received, closing workers...`)
   await reminderWorker.close()
+  await connection.quit()
   process.exit(0)
-})
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))

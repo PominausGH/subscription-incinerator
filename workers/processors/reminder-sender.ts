@@ -28,18 +28,41 @@ export async function processReminderJob(job: Job<SendReminderJob>) {
     return
   }
 
-  // Send email notification
-  await sendReminderEmail(reminder)
+  try {
+    // Update status to 'processing' before sending email
+    await db.reminder.update({
+      where: { id: reminderId },
+      data: {
+        status: 'processing',
+      },
+    })
 
-  // Update reminder status
-  await db.reminder.update({
-    where: { id: reminderId },
-    data: {
-      status: 'sent',
-      sentAt: new Date(),
-      channelsUsed: ['email'],
-    },
-  })
+    // Send email notification
+    await sendReminderEmail(reminder)
 
-  console.log(`Reminder ${reminderId} sent successfully`)
+    // Update reminder status to 'sent' after success
+    await db.reminder.update({
+      where: { id: reminderId },
+      data: {
+        status: 'sent',
+        sentAt: new Date(),
+        channelsUsed: ['email'],
+      },
+    })
+
+    console.log(`Reminder ${reminderId} sent successfully`)
+  } catch (error) {
+    // Update reminder status to 'failed' on error
+    await db.reminder.update({
+      where: { id: reminderId },
+      data: {
+        status: 'failed',
+      },
+    })
+
+    console.error(`Reminder ${reminderId} failed:`, error)
+
+    // Re-throw error for BullMQ retry logic
+    throw error
+  }
 }

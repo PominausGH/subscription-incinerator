@@ -1,8 +1,16 @@
 import { Queue } from 'bullmq'
 import { Redis } from 'ioredis'
 
-const connection = new Redis(process.env.REDIS_URL!, {
+export const connection = new Redis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: null,
+})
+
+connection.on('error', (err) => {
+  console.error('Redis connection error:', err)
+})
+
+connection.on('connect', () => {
+  console.log('Redis connected successfully')
 })
 
 export const queues = {
