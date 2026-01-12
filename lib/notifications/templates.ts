@@ -7,12 +7,36 @@ export type ReminderWithRelations = Reminder & {
 }
 
 /**
+ * Escape HTML special characters to prevent XSS attacks
+ */
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }
+  return text.replace(/[&<>"']/g, (m) => map[m])
+}
+
+/**
+ * Get APP_URL with fallback to localhost for development
+ */
+const APP_URL = process.env.APP_URL || 'http://localhost:3000'
+
+/**
  * Email template for trial ending reminders
  */
 export function getTrialEndingEmailTemplate(reminder: ReminderWithRelations) {
   const { subscription } = reminder
+
+  if (!subscription.trialEndsAt) {
+    throw new Error('trialEndsAt is required for trial_ending reminder')
+  }
+
   const daysUntilEnd = Math.ceil(
-    (subscription.trialEndsAt!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (subscription.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   const subject = `Trial ending soon: ${subscription.serviceName}`
@@ -43,17 +67,17 @@ export function getTrialEndingEmailTemplate(reminder: ReminderWithRelations) {
           <tr>
             <td style="padding: 40px 30px;">
               <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
-                Hi ${subscription.user.name || 'there'},
+                Hi ${escapeHtml(subscription.user.name || 'there')},
               </p>
 
               <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
                 <p style="margin: 0; font-size: 16px; line-height: 24px; color: #991b1b; font-weight: 600;">
-                  Your <strong>${subscription.serviceName}</strong> trial ends in <strong>${daysUntilEnd} ${daysUntilEnd === 1 ? 'day' : 'days'}</strong>!
+                  Your <strong>${escapeHtml(subscription.serviceName)}</strong> trial ends in <strong>${daysUntilEnd} ${daysUntilEnd === 1 ? 'day' : 'days'}</strong>!
                 </p>
               </div>
 
               <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
-                After your trial ends on <strong>${subscription.trialEndsAt!.toLocaleDateString()}</strong>, you'll be charged <strong>${subscription.currency} ${subscription.amount?.toString() || '0'}/${subscription.billingCycle || 'month'}</strong>.
+                After your trial ends on <strong>${escapeHtml(subscription.trialEndsAt.toLocaleDateString())}</strong>, you'll be charged <strong>${escapeHtml(subscription.currency)} ${escapeHtml(subscription.amount?.toString() || '0')}/${escapeHtml(subscription.billingCycle || 'month')}</strong>.
               </p>
 
               <p style="margin: 0 0 30px; font-size: 16px; line-height: 24px; color: #374151;">
@@ -64,14 +88,14 @@ export function getTrialEndingEmailTemplate(reminder: ReminderWithRelations) {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding-bottom: 12px;">
-                    <a href="${subscription.cancellationUrl || `${process.env.APP_URL}/dashboard`}" style="display: block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);">
-                      Cancel ${subscription.serviceName}
+                    <a href="${escapeHtml(subscription.cancellationUrl || `${APP_URL}/dashboard`)}" style="display: block; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);">
+                      Cancel ${escapeHtml(subscription.serviceName)}
                     </a>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <a href="${process.env.APP_URL}/dashboard" style="display: block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center;">
+                    <a href="${APP_URL}/dashboard" style="display: block; background-color: #f3f4f6; color: #374151; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center;">
                       View Dashboard
                     </a>
                   </td>
@@ -107,8 +131,13 @@ export function getTrialEndingEmailTemplate(reminder: ReminderWithRelations) {
  */
 export function getBillingUpcomingEmailTemplate(reminder: ReminderWithRelations) {
   const { subscription } = reminder
+
+  if (!subscription.nextBillingDate) {
+    throw new Error('nextBillingDate is required for billing_upcoming reminder')
+  }
+
   const daysUntilBilling = Math.ceil(
-    (subscription.nextBillingDate!.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (subscription.nextBillingDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   const subject = `Upcoming charge: ${subscription.serviceName}`
@@ -139,17 +168,17 @@ export function getBillingUpcomingEmailTemplate(reminder: ReminderWithRelations)
           <tr>
             <td style="padding: 40px 30px;">
               <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
-                Hi ${subscription.user.name || 'there'},
+                Hi ${escapeHtml(subscription.user.name || 'there')},
               </p>
 
               <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
                 <p style="margin: 0; font-size: 16px; line-height: 24px; color: #1e40af; font-weight: 600;">
-                  Your <strong>${subscription.serviceName}</strong> subscription renews in <strong>${daysUntilBilling} ${daysUntilBilling === 1 ? 'day' : 'days'}</strong>.
+                  Your <strong>${escapeHtml(subscription.serviceName)}</strong> subscription renews in <strong>${daysUntilBilling} ${daysUntilBilling === 1 ? 'day' : 'days'}</strong>.
                 </p>
               </div>
 
               <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
-                You'll be charged <strong>${subscription.currency} ${subscription.amount?.toString() || '0'}</strong> on <strong>${subscription.nextBillingDate!.toLocaleDateString()}</strong>.
+                You'll be charged <strong>${escapeHtml(subscription.currency)} ${escapeHtml(subscription.amount?.toString() || '0')}</strong> on <strong>${escapeHtml(subscription.nextBillingDate.toLocaleDateString())}</strong>.
               </p>
 
               <p style="margin: 0 0 30px; font-size: 16px; line-height: 24px; color: #374151;">
@@ -160,7 +189,7 @@ export function getBillingUpcomingEmailTemplate(reminder: ReminderWithRelations)
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td>
-                    <a href="${process.env.APP_URL}/dashboard" style="display: block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);">
+                    <a href="${APP_URL}/dashboard" style="display: block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);">
                       View Dashboard
                     </a>
                   </td>
