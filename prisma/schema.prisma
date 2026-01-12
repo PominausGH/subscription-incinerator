@@ -6,6 +6,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum SubscriptionType {
+  PERSONAL
+  BUSINESS
+}
+
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -37,6 +42,7 @@ model User {
   pushSubscriptions    PushSubscription[]
   accounts             Account[]
   sessions             Session[]
+  categories           Category[]
 
   @@map("users")
 }
@@ -81,6 +87,22 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String?  @map("user_id")
+  isPreset  Boolean  @default(false) @map("is_preset")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user          User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@map("categories")
+}
+
 model Subscription {
   id          String   @id @default(uuid())
   userId      String   @map("user_id")
@@ -98,6 +120,8 @@ model Subscription {
   autoCancelEnabled  Boolean  @default(false) @map("auto_cancel_enabled")
 
   detectedFrom  String? @map("detected_from") // 'email_scan', 'manual', 'api'
+  type          SubscriptionType @default(PERSONAL)
+  categoryId    String?          @map("category_id")
   rawEmailData  Json?   @map("raw_email_data")
   externalId    String? @map("external_id")
 
@@ -106,6 +130,7 @@ model Subscription {
 
   // Relations
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   reminders            Reminder[]
   cancellationAttempts CancellationAttempt[]
 
