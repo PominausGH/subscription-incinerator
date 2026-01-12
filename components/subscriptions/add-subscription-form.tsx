@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input'
 export function AddSubscriptionForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     serviceName: '',
     status: 'active' as 'trial' | 'active',
-    billingCycle: 'monthly' as 'monthly' | 'yearly',
+    billingCycle: 'monthly' as 'monthly' | 'yearly' | 'custom',
     amount: '',
+    currency: 'USD',
     trialEndsAt: '',
     nextBillingDate: '',
     cancellationUrl: '',
@@ -21,6 +23,7 @@ export function AddSubscriptionForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
 
     try {
       const payload = {
@@ -28,6 +31,7 @@ export function AddSubscriptionForm() {
         status: formData.status,
         billingCycle: formData.billingCycle,
         amount: formData.amount ? parseFloat(formData.amount) : undefined,
+        currency: formData.currency,
         trialEndsAt: formData.trialEndsAt ? new Date(formData.trialEndsAt).toISOString() : undefined,
         nextBillingDate: formData.nextBillingDate ? new Date(formData.nextBillingDate).toISOString() : undefined,
         cancellationUrl: formData.cancellationUrl || undefined,
@@ -51,13 +55,14 @@ export function AddSubscriptionForm() {
         status: 'active',
         billingCycle: 'monthly',
         amount: '',
+        currency: 'USD',
         trialEndsAt: '',
         nextBillingDate: '',
         cancellationUrl: '',
       })
     } catch (error) {
       console.error('Submit error:', error)
-      alert('Failed to add subscription')
+      setError('Failed to add subscription. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -66,6 +71,12 @@ export function AddSubscriptionForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
       <h3 className="text-lg font-medium">Add Subscription</h3>
+
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -117,11 +128,28 @@ export function AddSubscriptionForm() {
           <select
             id="billingCycle"
             value={formData.billingCycle}
-            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'monthly' | 'yearly' })}
+            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'monthly' | 'yearly' | 'custom' })}
             className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
           >
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+            Currency
+          </label>
+          <select
+            id="currency"
+            value={formData.currency}
+            onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
           </select>
         </div>
 
