@@ -1,15 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
-import { Transaction, RecurringGroup } from '@/lib/bank-import/types'
+import { scheduleBillingReminders } from '@/lib/reminders/scheduler'
+import { z } from 'zod'
 
-interface ConfirmRequest {
-  fileName: string
-  selectedGroups: RecurringGroup[]
-  selectedTransactions: Transaction[]
-  totalTransactions: number
-  recurringDetected: number
-}
+// Zod schema for transaction validation
+const transactionSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  description: z.string(),
+  amount: z.number(),
+  balance: z.number().optional(),
+  normalizedDate: z.coerce.date(),
+  merchantName: z.string(),
+  serviceName: z.string().nullable(),
+  confidence: z.number(),
+  matchSource: z.enum(['alias_db', 'ai', 'none']),
+})
+
+// Zod schema for recurring group validation
+const recurringGroupSchema = z.object({
+  merchantName: z.string(),
+  serviceName: z.string().nullable(),
+  transactions: z.array(transactionSchema),
+  amount: z.number(),
+  billingCycle: z.enum(['weekly', 'monthly', 'yearly', 'unknown']),
+  confidence: z.number(),
+})
+
+// Zod schema for the confirm request
+const confirmRequestSchema = z.object({
+  fileName: z.string().min(1, 'File name is required'),
+  selectedGroups: z.array(recurringGroupSchema),
+  selectedTransactions: z.array(transactionSchema),
+  totalTransactions: z.number().int().nonnegative(),
+  recurringDetected: z.number().int().nonnegative(),
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,8 +48,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const body: ConfirmRequest = await req.json()
-    const { fileName, selectedGroups, selectedTransactions, totalTransactions, recurringDetected } = body
+    const body = await req.json()
+    const validated = confirmRequestSchema.parse(body)
+    const { fileName, selectedGroups, selectedTransactions, totalTransactions, recurringDetected } = validated
 
     // Combine selections (groups + individual transactions)
     const subscriptionsToCreate: Array<{
@@ -100,6 +127,18 @@ export async function POST(req: NextRequest) {
       return subscriptions
     })
 
+    // Schedule billing reminders for created subscriptions (outside transaction)
+    try {
+      for (const subscription of createdSubscriptions) {
+        if (subscription.nextBillingDate) {
+          await scheduleBillingReminders(subscription)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to schedule reminders:', error)
+      // Continue - subscriptions created successfully even if scheduling failed
+    }
+
     return NextResponse.json({
       success: true,
       subscriptionsCreated: createdSubscriptions.length,
@@ -107,6 +146,17 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Bank import confirm error:', error)
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: 'VALIDATION_ERROR',
+          message: 'Invalid request data',
+          details: error.errors
+        },
+        { status: 400 }
+      )
+    }
 
     return NextResponse.json(
       {
