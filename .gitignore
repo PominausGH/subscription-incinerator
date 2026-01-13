@@ -37,3 +37,6 @@ next-env.d.ts
 prisma/migrations/*_init
 
 /app/generated/prisma
+
+# worktrees
+.worktrees/
