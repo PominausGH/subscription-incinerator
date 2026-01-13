@@ -11,7 +11,9 @@ export async function findMerchantAlias(description: string): Promise<{ serviceN
   const aliases = await db.merchantAlias.findMany()
 
   for (const alias of aliases) {
-    const pattern = alias.bankPattern.replace(/\*/g, '.*')
+    // Escape regex metacharacters except *, then convert * to .*
+    const escaped = alias.bankPattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+    const pattern = escaped.replace(/\*/g, '.*')
     const regex = new RegExp(`^${pattern}`, 'i')
     if (regex.test(normalized)) {
       return { serviceName: alias.serviceName }

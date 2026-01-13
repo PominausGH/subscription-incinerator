@@ -75,6 +75,20 @@ describe('findMerchantAlias', () => {
     const result = await findMerchantAlias('netflix.com 800-123-4567')
     expect(result?.serviceName).toBe('Netflix')
   })
+
+  it('escapes regex metacharacters in patterns', async () => {
+    mockFindMany.mockResolvedValue([
+      { id: '1', bankPattern: 'APPLE.COM/BILL*', serviceName: 'Apple Services' }
+    ])
+
+    // Should match literal dot
+    const result = await findMerchantAlias('APPLE.COM/BILL 12345')
+    expect(result?.serviceName).toBe('Apple Services')
+
+    // Should NOT match where dot is replaced by other char (regex . matches any)
+    const noMatch = await findMerchantAlias('APPLEXCOM/BILL 12345')
+    expect(noMatch).toBeNull()
+  })
 })
 
 describe('matchMerchantWithAI', () => {
