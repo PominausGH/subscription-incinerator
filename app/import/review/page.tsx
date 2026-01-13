@@ -24,12 +24,18 @@ export default function ReviewPage() {
       return
     }
 
-    const parsed: ImportData = JSON.parse(stored)
-    setData(parsed)
+    try {
+      const parsed: ImportData = JSON.parse(stored)
+      setData(parsed)
 
-    // Pre-select all recurring groups
-    const groupIds = new Set(parsed.recurringGroups.map((_, i) => `group-${i}`))
-    setSelectedGroups(groupIds)
+      // Pre-select all recurring groups
+      const groupIds = new Set(parsed.recurringGroups.map((_, i) => `group-${i}`))
+      setSelectedGroups(groupIds)
+    } catch (e) {
+      console.error('Failed to parse import data:', e)
+      sessionStorage.removeItem('bankImportResult')
+      router.push('/import')
+    }
   }, [router])
 
   if (!data) {

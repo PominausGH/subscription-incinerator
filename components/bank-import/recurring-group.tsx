@@ -20,7 +20,11 @@ export function RecurringGroupCard({ group, selected, onToggle }: RecurringGroup
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onToggle}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+      aria-pressed={selected}
       className={`
         p-4 border rounded-lg cursor-pointer transition-colors
         ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}

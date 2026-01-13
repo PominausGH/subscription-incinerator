@@ -38,12 +38,14 @@ export function TransactionList({
           placeholder="Search transactions..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search transactions"
           className="flex-1 px-4 py-2 border rounded-lg"
         />
 
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as typeof filter)}
+          aria-label="Filter transactions"
           className="px-4 py-2 border rounded-lg"
         >
           <option value="debits">Debits only</option>
@@ -56,7 +58,10 @@ export function TransactionList({
         {filtered.map((txn) => (
           <div
             key={txn.id}
+            role="button"
+            tabIndex={0}
             onClick={() => onToggle(txn.id)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(txn.id); } }}
             className={`
               p-3 flex items-center gap-3 cursor-pointer hover:bg-gray-50
               ${selectedIds.has(txn.id) ? 'bg-blue-50' : ''}
