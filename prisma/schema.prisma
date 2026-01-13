@@ -43,6 +43,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   categories           Category[]
+  bankImports          BankImport[]
 
   @@map("users")
 }
@@ -123,6 +124,7 @@ model Subscription {
   type          SubscriptionType @default(PERSONAL)
   categoryId    String?          @map("category_id")
   rawEmailData  Json?   @map("raw_email_data")
+  bankTransactionData Json? @map("bank_transaction_data")
   externalId    String? @map("external_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -248,4 +250,29 @@ model PushSubscription {
 
   @@index([userId, active])
   @@map("push_subscriptions")
+}
+
+model BankImport {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  fileName  String   @map("file_name")
+
+  totalTransactions    Int @map("total_transactions")
+  recurringDetected    Int @map("recurring_detected")
+  subscriptionsCreated Int @map("subscriptions_created")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("bank_imports")
+}
+
+model MerchantAlias {
+  id          String @id @default(uuid())
+  bankPattern String @unique @map("bank_pattern")
+  serviceName String @map("service_name")
+
+  @@map("merchant_aliases")
 }
