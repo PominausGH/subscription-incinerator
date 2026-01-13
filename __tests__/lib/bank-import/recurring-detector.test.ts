@@ -55,6 +55,32 @@ describe('detectRecurringCharges', () => {
     expect(result).toHaveLength(1)
     expect(result[0].billingCycle).toBe('yearly')
   })
+
+  it('detects weekly recurring charges', () => {
+    const transactions: Transaction[] = [
+      createTransaction('2026-01-13', 'MEAL SUBSCRIPTION', -29.99, 'HelloFresh'),
+      createTransaction('2026-01-06', 'MEAL SUBSCRIPTION', -29.99, 'HelloFresh'),
+      createTransaction('2025-12-30', 'MEAL SUBSCRIPTION', -29.99, 'HelloFresh'),
+      createTransaction('2025-12-23', 'MEAL SUBSCRIPTION', -29.99, 'HelloFresh'),
+    ]
+
+    const result = detectRecurringCharges(transactions)
+
+    expect(result).toHaveLength(1)
+    expect(result[0].serviceName).toBe('HelloFresh')
+    expect(result[0].billingCycle).toBe('weekly')
+    expect(result[0].amount).toBeCloseTo(29.99)
+  })
+
+  it('skips transactions without merchant or service name', () => {
+    const transactions: Transaction[] = [
+      { ...createTransaction('2026-01-15', '', -15.99), merchantName: '', serviceName: null },
+      { ...createTransaction('2025-12-15', '', -15.99), merchantName: '', serviceName: null },
+    ]
+
+    const result = detectRecurringCharges(transactions)
+    expect(result).toHaveLength(0)
+  })
 })
 
 describe('analyzePattern', () => {

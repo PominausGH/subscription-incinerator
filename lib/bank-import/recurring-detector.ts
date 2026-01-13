@@ -19,7 +19,8 @@ function detectCycle(intervals: number[]): BillingCycle {
 
   const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length
 
-  if (avg >= 5 && avg <= 9) return 'weekly'
+  if (avg >= 6 && avg <= 8) return 'weekly'
+  if (avg >= 12 && avg <= 16) return 'unknown' // bi-weekly (no BillingCycle type yet)
   if (avg >= 26 && avg <= 35) return 'monthly'
   if (avg >= 350 && avg <= 380) return 'yearly'
   return 'unknown'
@@ -69,6 +70,7 @@ function groupByMerchant(transactions: Transaction[]): Record<string, Transactio
 
   for (const txn of transactions) {
     const key = txn.serviceName || txn.merchantName
+    if (!key) continue // Skip transactions without a grouping key
     if (!groups[key]) {
       groups[key] = []
     }
