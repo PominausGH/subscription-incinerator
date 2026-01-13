@@ -22,6 +22,7 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
       'text/csv': ['.csv']
     },
     maxFiles: 1,
+    maxSize: 5 * 1024 * 1024, // 5MB
     disabled: isLoading
   })
 
@@ -29,6 +30,9 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
     <div className="w-full max-w-xl mx-auto">
       <div
         {...getRootProps()}
+        role="button"
+        aria-label="Upload CSV file"
+        aria-disabled={isLoading}
         className={`
           border-2 border-dashed rounded-lg p-12 text-center cursor-pointer
           transition-colors duration-200
@@ -43,7 +47,11 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
 
           {isLoading ? (
             <div>
-              <div className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mb-2" />
+              <div
+                className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mb-2"
+                role="status"
+                aria-label="Loading"
+              />
               <p className="text-gray-600">Processing your statement...</p>
             </div>
           ) : isDragActive ? (
@@ -62,7 +70,7 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
       </div>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div role="alert" className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-600">{error}</p>
           <div className="mt-2 text-sm text-red-500">
             <p>Tips:</p>

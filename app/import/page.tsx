@@ -36,6 +36,7 @@ export default function ImportPage() {
       }))
       router.push('/import/review')
     } catch (err) {
+      console.error('Upload error:', err)
       setError('Failed to upload file. Please try again.')
     } finally {
       setIsLoading(false)
