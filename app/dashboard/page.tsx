@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { db } from '@/lib/db/client'
 import { getCurrentUser } from '@/lib/session'
 import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription-form'
@@ -59,9 +60,17 @@ export default async function DashboardPage() {
               Track and manage your subscriptions
             </p>
           </div>
-          <ScanEmailsButton
-            isGmailConnected={userWithEmail?.emailProvider === 'gmail' && userWithEmail?.oauthTokens !== null}
-          />
+          <div className="flex items-center gap-2">
+            <Link
+              href="/import"
+              className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            >
+              <span>Import Bank Statement</span>
+            </Link>
+            <ScanEmailsButton
+              isGmailConnected={userWithEmail?.emailProvider === 'gmail' && userWithEmail?.oauthTokens !== null}
+            />
+          </div>
         </div>
       </div>
 
