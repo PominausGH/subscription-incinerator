@@ -57,3 +57,7 @@ export const {
   },
   trustHost: true,
 });
+
+export function isPremium(user: { tier?: string | null } | null): boolean {
+  return user?.tier === 'premium'
+}
