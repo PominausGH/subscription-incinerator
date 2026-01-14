@@ -2,16 +2,27 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { UpgradePrompt } from '@/components/upgrade-prompt'
 
 interface GmailConnectionCardProps {
   isConnected: boolean
   userEmail: string
+  userTier: string
 }
 
-export function GmailConnectionCard({ isConnected, userEmail }: GmailConnectionCardProps) {
+export function GmailConnectionCard({ isConnected, userEmail, userTier }: GmailConnectionCardProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
   const [scanMessage, setScanMessage] = useState('')
+
+  if (userTier !== 'premium') {
+    return (
+      <UpgradePrompt
+        feature="Gmail Scanning"
+        description="Automatically detect subscriptions from your Gmail inbox. Upgrade to premium to unlock this feature."
+      />
+    )
+  }
 
   async function handleConnect() {
     window.location.href = '/api/oauth/gmail'

@@ -35,6 +35,7 @@ export default async function SettingsPage() {
           <GmailConnectionCard
             isConnected={isGmailConnected}
             userEmail={user?.email || ''}
+            userTier={session.user.tier}
           />
         </section>
       </div>
