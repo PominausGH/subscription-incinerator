@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { auth, isPremium } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { addScanJob } from '@/lib/queue/scan-queue'
 
@@ -9,6 +9,14 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check premium tier
+    if (!isPremium({ tier: session.user.tier })) {
+      return NextResponse.json(
+        { error: 'Premium subscription required for email scanning' },
+        { status: 403 }
+      )
     }
 
     const userId = session.user.id
