@@ -8,6 +8,8 @@ if (typeof process !== 'undefined' && !process.env.NEXT_RUNTIME) {
 }
 
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -16,8 +18,8 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
   const isEdge = process.env.NEXT_RUNTIME === 'edge'
 
-  // Use Accelerate connection for all contexts when available
-  const accelerateUrl = process.env.DATABASE_URL_ACCELERATE || process.env.DATABASE_URL
+  // Use Accelerate connection when available
+  const accelerateUrl = process.env.DATABASE_URL_ACCELERATE
 
   // In Prisma 7, when using prisma+postgres:// URLs (Prisma Accelerate/Postgres),
   // pass it as accelerateUrl instead of the datasource url
@@ -28,9 +30,13 @@ function createPrismaClient() {
     }).$extends(require('@prisma/extension-accelerate').withAccelerate()) as PrismaClient
   }
 
-  // Fallback to regular connection
+  // Use pg adapter for direct PostgreSQL connection
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  const adapter = new PrismaPg(pool)
+
   return new PrismaClient({
     log: !isEdge && process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    adapter,
   })
 }
 

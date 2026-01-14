@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
           userId: pending.userId,
           serviceName: pending.serviceName,
           status: pending.isTrial ? 'trial' : 'active',
+          billingCycle: pending.billingCycle,
           amount: pending.amount,
           currency: pending.currency,
           trialEndsAt: pending.trialEndsAt,

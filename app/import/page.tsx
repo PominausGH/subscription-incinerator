@@ -49,7 +49,7 @@ export default function ImportPage() {
         <h1 className="text-2xl font-bold mb-2">Import Bank Statement</h1>
         <p className="text-gray-600 mb-8">
           Upload your bank statement CSV to automatically detect subscriptions.
-          We'll analyze your transactions and find recurring charges.
+          We&apos;ll analyze your transactions and find recurring charges.
         </p>
 
         <UploadDropzone
@@ -61,9 +61,9 @@ export default function ImportPage() {
         <div className="mt-8 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-medium mb-2">How to export your bank statement:</h3>
           <ol className="list-decimal list-inside text-sm text-gray-600 space-y-1">
-            <li>Log in to your bank's website or app</li>
+            <li>Log in to your bank&apos;s website or app</li>
             <li>Navigate to your account transactions</li>
-            <li>Look for "Download" or "Export" option</li>
+            <li>Look for &quot;Download&quot; or &quot;Export&quot; option</li>
             <li>Select CSV format (not PDF)</li>
             <li>Choose date range (3+ months recommended)</li>
           </ol>

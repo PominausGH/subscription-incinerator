@@ -32,6 +32,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to get tokens' }, { status: 500 })
     }
 
+    // Get the Gmail email address for this account
+    oauth2Client.setCredentials(tokens)
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client })
+    const profile = await gmail.users.getProfile({ userId: 'me' })
+    const gmailEmail = profile.data.emailAddress || ''
+
     // Store tokens (encrypted in production)
     await db.user.update({
       where: { id: userId },
@@ -40,6 +46,7 @@ export async function GET(req: NextRequest) {
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
           expiryDate: tokens.expiry_date,
+          email: gmailEmail, // Store the connected Gmail address
         },
         emailProvider: 'gmail',
       },

@@ -9,13 +9,17 @@ interface PendingSubscriptionsSectionProps {
     confidence: number
     amount: number | null
     currency: string
+    billingCycle: string | null
     nextBillingDate: Date | null
     emailFrom: string
     emailDate: Date
+    emailId: string
+    emailSubject: string
   }>
+  gmailEmail?: string
 }
 
-export function PendingSubscriptionsSection({ pending }: PendingSubscriptionsSectionProps) {
+export function PendingSubscriptionsSection({ pending, gmailEmail }: PendingSubscriptionsSectionProps) {
   if (pending.length === 0) {
     return null
   }
@@ -35,7 +39,7 @@ export function PendingSubscriptionsSection({ pending }: PendingSubscriptionsSec
 
       <div className="space-y-3">
         {pending.map(item => (
-          <PendingSubscriptionCard key={item.id} item={item} />
+          <PendingSubscriptionCard key={item.id} item={item} gmailEmail={gmailEmail} />
         ))}
       </div>
 

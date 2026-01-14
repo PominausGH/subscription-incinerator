@@ -70,7 +70,12 @@ export function AddSubscriptionForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-medium">Add Subscription</h3>
+      <div>
+        <h3 className="text-lg font-medium">Add Subscription Manually</h3>
+        <p className="text-sm text-gray-500 mt-1">
+          Track a subscription that wasn&apos;t detected automatically. Common examples: Netflix, Spotify, ChatGPT Plus, Claude Pro, GitHub Copilot, Adobe Creative Cloud, Microsoft 365, etc.
+        </p>
+      </div>
 
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
@@ -227,12 +232,16 @@ export function AddSubscriptionForm() {
             onChange={(e) => setFormData({ ...formData, cancellationUrl: e.target.value })}
             placeholder="https://example.com/cancel"
           />
+          <p className="text-xs text-gray-400 mt-1">Link to cancel the subscription (optional)</p>
         </div>
       </div>
 
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? 'Adding...' : 'Add Subscription'}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Adding...' : 'Add Subscription'}
+        </Button>
+        <p className="text-xs text-gray-400">Only service name is required</p>
+      </div>
     </form>
   )
 }

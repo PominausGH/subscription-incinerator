@@ -147,10 +147,11 @@ model PendingSubscription {
   userId      String   @map("user_id")
 
   // Detection data
-  serviceName String   @map("service_name")
-  confidence  Decimal  @db.Decimal(3, 2)
-  amount      Decimal? @db.Decimal(10, 2)
-  currency    String   @default("USD")
+  serviceName  String   @map("service_name")
+  confidence   Decimal  @db.Decimal(3, 2)
+  amount       Decimal? @db.Decimal(10, 2)
+  currency     String   @default("USD")
+  billingCycle String?  @map("billing_cycle")
 
   isTrial         Boolean   @default(false) @map("is_trial")
   trialEndsAt     DateTime? @map("trial_ends_at")

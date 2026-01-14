@@ -11,16 +11,25 @@ interface PendingSubscriptionCardProps {
     confidence: number
     amount: number | null
     currency: string
+    billingCycle: string | null
     nextBillingDate: Date | null
     emailFrom: string
     emailDate: Date
+    emailId: string
+    emailSubject: string
   }
+  gmailEmail?: string
 }
 
-export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) {
+const currencySymbols: Record<string, string> = {
+  USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$', NZD: 'NZ$', JPY: '¥', CHF: 'CHF '
+}
+
+export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptionCardProps) {
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const currencySymbol = currencySymbols[item.currency] || item.currency + ' '
 
   async function handleApprove() {
     setError(null)
@@ -78,6 +87,11 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
     ? new Date(item.nextBillingDate).toLocaleDateString()
     : null
 
+  // Gmail link to view the original email (uses authuser param to open correct account)
+  const gmailLink = gmailEmail
+    ? `https://mail.google.com/mail/u/?authuser=${encodeURIComponent(gmailEmail)}#inbox/${item.emailId}`
+    : `https://mail.google.com/mail/u/0/#inbox/${item.emailId}`
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:border-blue-300 transition-colors">
       <div className="flex-1">
@@ -88,9 +102,17 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
           </span>
         </div>
 
-        {item.amount && (
+        {(item.amount || item.billingCycle) && (
           <div className="mt-1 text-sm text-gray-600">
-            {item.currency}{item.amount.toString()}
+            {item.amount && (
+              <>
+                {currencySymbol}{item.amount.toFixed(2)}
+                {item.billingCycle && <span className="text-gray-500">/{item.billingCycle === 'yearly' ? 'year' : item.billingCycle === 'fortnightly' ? '2wks' : 'mo'}</span>}
+              </>
+            )}
+            {!item.amount && item.billingCycle && (
+              <span className="capitalize">{item.billingCycle}</span>
+            )}
             {formattedBillingDate && (
               <> · Next billing: {formattedBillingDate}</>
             )}
@@ -100,6 +122,19 @@ export function PendingSubscriptionCard({ item }: PendingSubscriptionCardProps) 
         <div className="mt-1 text-xs text-gray-500">
           From: {item.emailFrom} · {formattedDate}
         </div>
+
+        <a
+          href={gmailLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
+          title={item.emailSubject}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          View original email
+        </a>
       </div>
 
       {error && (

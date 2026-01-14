@@ -76,7 +76,7 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
             <p>Tips:</p>
             <ul className="list-disc list-inside">
               <li>Export as CSV, not PDF</li>
-              <li>Use "Download transactions" option</li>
+              <li>Use &quot;Download transactions&quot; option</li>
               <li>Try a shorter date range</li>
             </ul>
           </div>
