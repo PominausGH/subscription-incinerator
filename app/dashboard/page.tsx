@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { db } from '@/lib/db/client'
 import { getCurrentUser } from '@/lib/session'
@@ -5,6 +6,8 @@ import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription
 import { SubscriptionCard } from '@/components/subscriptions/subscription-card'
 import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
 import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
+import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
+import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -26,9 +29,12 @@ export default async function DashboardPage() {
       confidence: true,
       amount: true,
       currency: true,
+      billingCycle: true,
       nextBillingDate: true,
       emailFrom: true,
-      emailDate: true
+      emailDate: true,
+      emailId: true,
+      emailSubject: true
     }
   })
 
@@ -38,6 +44,9 @@ export default async function DashboardPage() {
     confidence: Number(item.confidence),
     amount: item.amount ? Number(item.amount) : null
   }))
+
+  // Get connected Gmail email for correct account linking
+  const gmailEmail = (userWithEmail?.oauthTokens as any)?.email || ''
 
   const subscriptionsRaw = await db.subscription.findMany({
     where: { userId: user.id },
@@ -52,6 +61,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="px-4 sm:px-0">
+      <Suspense fallback={null}>
+        <UpgradeSuccessToast />
+      </Suspense>
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div>
@@ -75,8 +87,13 @@ export default async function DashboardPage() {
       </div>
 
       {pendingSubscriptions.length > 0 && (
-        <PendingSubscriptionsSection pending={pendingSubscriptions} />
+        <PendingSubscriptionsSection pending={pendingSubscriptions} gmailEmail={gmailEmail} />
       )}
+
+      {/* Spending Analytics */}
+      <div className="mb-8">
+        <SpendingAnalytics subscriptions={subscriptions} />
+      </div>
 
       <div className="mb-8">
         <AddSubscriptionForm />
