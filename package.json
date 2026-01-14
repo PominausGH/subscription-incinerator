@@ -21,6 +21,7 @@
     "@prisma/extension-accelerate": "^3.0.1",
     "bullmq": "^5.66.4",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.26.2",
     "googleapis": "^170.0.0",
     "ioredis": "^5.9.1",
     "next": "^14.2.0",
