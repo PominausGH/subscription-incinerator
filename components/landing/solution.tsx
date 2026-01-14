@@ -16,7 +16,7 @@ export function Solution() {
         >
           <div className="text-6xl mb-6">🔥</div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Burn the Subscriptions You Don't Need
+            Burn the Subscriptions You Don&apos;t Need
           </h2>
           <p className="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
             Subscription Incinerator scans your emails and bank statements, finds every

@@ -36,10 +36,10 @@ export function FinalCTA() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Stop Paying for Subscriptions You Don't Use
+            Stop Paying for Subscriptions You Don&apos;t Use
           </h2>
           <p className="text-xl text-fire-100 mb-8">
-            Join thousands of users who've taken control of their subscriptions.
+            Join thousands of users who&apos;ve taken control of their subscriptions.
           </p>
           <Link
             href="/login"

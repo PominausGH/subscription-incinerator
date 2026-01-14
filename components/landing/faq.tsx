@@ -77,7 +77,7 @@ export function FAQ() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Questions? We've Got Answers
+            Questions? We&apos;ve Got Answers
           </h2>
         </motion.div>
 

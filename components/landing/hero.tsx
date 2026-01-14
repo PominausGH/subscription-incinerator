@@ -46,7 +46,7 @@ export function Hero() {
               <span className="text-fire-500">Again</span>
             </h1>
             <p className="mt-6 text-lg text-gray-400 leading-relaxed">
-              We've all been there. That Netflix trial you meant to cancel. The gym
+              We&apos;ve all been there. That Netflix trial you meant to cancel. The gym
               membership you forgot about. Subscription Incinerator tracks them all
               and reminds you before you get charged.
             </p>
