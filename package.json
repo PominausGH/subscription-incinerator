@@ -19,6 +19,7 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.1.0",
     "@prisma/extension-accelerate": "^3.0.1",
+    "@radix-ui/react-popover": "^1.1.15",
     "bullmq": "^5.66.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
