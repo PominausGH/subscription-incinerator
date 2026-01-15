@@ -20,9 +20,21 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
   )
   const [saving, setSaving] = useState(false)
   const [pushSupported, setPushSupported] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
 
   useEffect(() => {
     setPushSupported('Notification' in window && 'serviceWorker' in navigator)
+  }, [])
+
+  useEffect(() => {
+    // Check if already subscribed
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.pushManager.getSubscription().then((subscription) => {
+          setPushEnabled(!!subscription)
+        })
+      })
+    }
   }, [])
 
   const handleChannelToggle = (channel: 'email' | 'push') => {
@@ -57,6 +69,39 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
           : [...prev.defaults.billing, timing],
       },
     }))
+  }
+
+  const handleEnablePush = async () => {
+    try {
+      // Register service worker
+      const registration = await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+
+      // Request permission
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        alert('Push notifications permission denied')
+        return
+      }
+
+      // Subscribe to push
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      })
+
+      // Send subscription to server
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscription.toJSON()),
+      })
+
+      setPushEnabled(true)
+      handleChannelToggle('push')
+    } catch (error) {
+      console.error('Failed to enable push notifications:', error)
+    }
   }
 
   const handleSave = async () => {
@@ -99,13 +144,21 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
               type="checkbox"
               checked={preferences.channels.push}
               onChange={() => handleChannelToggle('push')}
-              disabled={!pushSupported}
+              disabled={!pushSupported || !pushEnabled}
               className="rounded border-gray-300 text-orange-600 focus:ring-orange-500 disabled:opacity-50"
             />
-            <span className="text-sm text-gray-700">
-              Browser notifications
-              {!pushSupported && ' (not supported)'}
-            </span>
+            <span className="text-sm text-gray-700">Browser notifications</span>
+            {pushSupported && !pushEnabled && (
+              <button
+                onClick={handleEnablePush}
+                className="ml-2 text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200"
+              >
+                Enable
+              </button>
+            )}
+            {!pushSupported && (
+              <span className="text-xs text-gray-400">(not supported)</span>
+            )}
           </label>
         </div>
       </div>
