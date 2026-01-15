@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditSubscriptionModal } from './edit-subscription-modal'
+import { ReminderPopover } from './reminder-popover'
+import { ReminderSettings } from '@/lib/notifications/types'
 
 type Subscription = {
   id: string
@@ -15,6 +17,7 @@ type Subscription = {
   trialEndsAt: Date | null
   nextBillingDate: Date | null
   cancellationUrl: string | null
+  reminderSettings: ReminderSettings | null
 }
 
 export function SubscriptionCard({ subscription }: { subscription: Subscription }) {
@@ -54,20 +57,38 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
   const hasNoData = !subscription.amount && !subscription.nextBillingDate && !subscription.billingCycle
 
+  const handleReminderUpdate = async (settings: ReminderSettings | null) => {
+    await fetch(`/api/subscriptions/${subscription.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reminderSettings: settings }),
+    })
+  }
+
   return (
     <>
       <div className="bg-white rounded-lg shadow p-6 relative">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-gray-900">{subscription.serviceName}</h3>
-          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-            subscription.status === 'trial' ? 'bg-yellow-100 text-yellow-800' :
-            subscription.status === 'active' ? 'bg-green-100 text-green-800' :
-            subscription.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {subscription.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <ReminderPopover
+              subscriptionId={subscription.id}
+              subscriptionName={subscription.serviceName}
+              isTrialSubscription={!!subscription.trialEndsAt}
+              currentSettings={subscription.reminderSettings as ReminderSettings | null}
+              defaultTimings={subscription.trialEndsAt ? ['24h', '1h'] : ['7d', '1d']}
+              onUpdate={handleReminderUpdate}
+            />
+            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+              subscription.status === 'trial' ? 'bg-yellow-100 text-yellow-800' :
+              subscription.status === 'active' ? 'bg-green-100 text-green-800' :
+              subscription.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+              'bg-gray-100 text-gray-800'
+            }`}>
+              {subscription.status}
+            </span>
+          </div>
         </div>
 
         {/* Price */}
