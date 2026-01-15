@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { redirect } from 'next/navigation'
 import { GmailConnectionCard } from '@/components/settings/gmail-connection-card'
+import { NotificationSettings } from '@/components/settings/notification-settings'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -16,6 +17,7 @@ export default async function SettingsPage() {
       email: true,
       emailProvider: true,
       oauthTokens: true,
+      notificationPreferences: true,
     },
   })
 
@@ -36,6 +38,16 @@ export default async function SettingsPage() {
             isConnected={isGmailConnected}
             userEmail={user?.email || ''}
             userTier={session.user.tier}
+          />
+        </section>
+
+        <section className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Notification Preferences</h2>
+          <p className="text-gray-600 mb-6">
+            Choose when and how you want to be reminded about upcoming renewals.
+          </p>
+          <NotificationSettings
+            initialPreferences={user?.notificationPreferences as any}
           />
         </section>
       </div>

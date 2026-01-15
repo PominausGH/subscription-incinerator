@@ -8,6 +8,7 @@ import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
 import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
 import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
 import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
+import { ReminderSettings } from '@/lib/notifications/types'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -53,10 +54,11 @@ export default async function DashboardPage() {
     orderBy: { createdAt: 'desc' },
   })
 
-  // Convert Decimal types to numbers for client components
+  // Convert Decimal types to numbers and JSON to typed objects for client components
   const subscriptions = subscriptionsRaw.map(sub => ({
     ...sub,
-    amount: sub.amount ? Number(sub.amount) : null
+    amount: sub.amount ? Number(sub.amount) : null,
+    reminderSettings: sub.reminderSettings as unknown as ReminderSettings | null
   }))
 
   return (
