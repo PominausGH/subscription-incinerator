@@ -6,7 +6,7 @@ import { DETECTION_RULES, getCurrencyCode } from './patterns'
  * e.g., "Noreply <billing@acme.com>" -> "Acme"
  * e.g., "Stripe <receipts@stripe.com>" -> "Stripe"
  */
-function extractServiceNameFromSender(from: string): string {
+export function extractServiceNameFromSender(from: string): string {
   // Try to get display name first (part before < if exists)
   const displayNameMatch = from.match(/^([^<]+)</);
   if (displayNameMatch) {
@@ -102,6 +102,23 @@ function extractBillingCycle(subject: string, body: string): string | null {
   for (const pattern of fortnightlyPatterns) {
     if (pattern.test(text)) {
       return 'fortnightly'
+    }
+  }
+
+  // Check for weekly
+  const weeklyPatterns = [
+    /\$[\d.]+\s*\/\s*(?:week|wk)/i,
+    /\$[\d.]+\s*(?:per|a)\s*week/i,
+    /\$[\d.]+\s*weekly/i,
+    /weekly\s*(?:plan|subscription|membership|fee|charge)/i,
+    /billed\s*weekly/i,
+    /(?:per|a|every)\s*week/i,
+    /each\s*week/i,
+  ]
+
+  for (const pattern of weeklyPatterns) {
+    if (pattern.test(text)) {
+      return 'weekly'
     }
   }
 
@@ -277,4 +294,155 @@ export function deduplicateDetections(detections: DetectionResult[]): DetectionR
   }
 
   return unique
+}
+
+/**
+ * Analyze emails for recurring monthly patterns from the same sender.
+ * This detects subscriptions by frequency rather than just content matching.
+ */
+export interface FrequencyDetectionResult extends DetectionResult {
+  emailCount: number
+  averageIntervalDays: number
+}
+
+export function detectRecurringEmails(messages: GmailMessage[]): FrequencyDetectionResult[] {
+  // Group emails by sender domain
+  const emailsBySender = new Map<string, GmailMessage[]>()
+
+  for (const msg of messages) {
+    const domain = extractDomainFromEmail(msg.from)
+    if (!domain || isTransactionalDomain(domain)) continue
+
+    const existing = emailsBySender.get(domain) || []
+    existing.push(msg)
+    emailsBySender.set(domain, existing)
+  }
+
+  const detections: FrequencyDetectionResult[] = []
+
+  for (const [domain, emails] of Array.from(emailsBySender.entries())) {
+    // Need at least 2 emails to detect a pattern
+    if (emails.length < 2) continue
+
+    // Sort by date
+    const sorted = emails.sort((a, b) => a.date.getTime() - b.date.getTime())
+
+    // Calculate intervals between emails
+    const intervals: number[] = []
+    for (let i = 1; i < sorted.length; i++) {
+      const daysDiff = (sorted[i].date.getTime() - sorted[i - 1].date.getTime()) / (1000 * 60 * 60 * 24)
+      intervals.push(daysDiff)
+    }
+
+    // Check for weekly pattern (5-9 days between emails)
+    const weeklyIntervals = intervals.filter(d => d >= 5 && d <= 9)
+    const isWeeklyPattern = weeklyIntervals.length >= 2 && weeklyIntervals.length >= intervals.length * 0.5
+
+    // Check for fortnightly pattern (12-16 days between emails)
+    const fortnightlyIntervals = intervals.filter(d => d >= 12 && d <= 16)
+    const isFortnightlyPattern = fortnightlyIntervals.length >= 1 && fortnightlyIntervals.length >= intervals.length * 0.5
+
+    // Check for monthly pattern (25-35 days between emails)
+    const monthlyIntervals = intervals.filter(d => d >= 25 && d <= 35)
+    const isMonthlyPattern = monthlyIntervals.length >= 1 && monthlyIntervals.length >= intervals.length * 0.5
+
+    // Check for yearly pattern (350-380 days)
+    const yearlyIntervals = intervals.filter(d => d >= 350 && d <= 380)
+    const isYearlyPattern = yearlyIntervals.length >= 1
+
+    if (!isWeeklyPattern && !isFortnightlyPattern && !isMonthlyPattern && !isYearlyPattern) continue
+
+    // Use the most recent email for detection details
+    const latestEmail = sorted[sorted.length - 1]
+    const averageInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length
+
+    // Try to extract price from the most recent email
+    let amount: number | null = null
+    let currency = 'USD'
+    const priceMatch = latestEmail.body.match(/(?:\$|USD\s*|€|EUR\s*|£|GBP\s*|A\$|AUD\s*)(\d+\.?\d{0,2})/i)
+    if (priceMatch) {
+      amount = parseFloat(priceMatch[1])
+      const currencyMatch = latestEmail.body.match(/(\$|USD|€|EUR|£|GBP|AUD|A\$)/i)
+      if (currencyMatch) {
+        currency = getCurrencyCode(currencyMatch[1])
+      }
+    }
+
+    // Calculate confidence based on pattern strength
+    let confidence = 0.5
+    if (emails.length >= 3) confidence += 0.1
+    if (emails.length >= 6) confidence += 0.1
+    if (monthlyIntervals.length === intervals.length) confidence += 0.1 // Perfect monthly pattern
+    if (amount) confidence += 0.1
+
+    const serviceName = extractServiceNameFromSender(latestEmail.from)
+
+    detections.push({
+      service: serviceName,
+      confidence: Math.min(confidence, 0.95),
+      isTrial: false,
+      amount,
+      currency,
+      billingCycle: isYearlyPattern ? 'yearly' : isMonthlyPattern ? 'monthly' : isFortnightlyPattern ? 'fortnightly' : 'weekly',
+      trialEndsAt: null,
+      nextBillingDate: estimateNextBillingDate(sorted, isYearlyPattern ? 365 : isMonthlyPattern ? 30 : isFortnightlyPattern ? 14 : 7),
+      rawData: {
+        emailId: latestEmail.id,
+        subject: latestEmail.subject,
+        from: latestEmail.from,
+        date: latestEmail.date,
+        bodySnippet: createBodySnippet(latestEmail.body),
+      },
+      emailCount: emails.length,
+      averageIntervalDays: Math.round(averageInterval),
+    })
+  }
+
+  return detections
+}
+
+function extractDomainFromEmail(from: string): string | null {
+  const match = from.match(/@([^>\s]+)/)
+  if (!match) return null
+
+  // Get the main domain (e.g., "stripe.com" from "mail.stripe.com")
+  const parts = match[1].toLowerCase().split('.')
+  if (parts.length >= 2) {
+    return parts.slice(-2).join('.')
+  }
+  return match[1].toLowerCase()
+}
+
+function isTransactionalDomain(domain: string): boolean {
+  // Skip common transactional/notification domains that aren't subscriptions
+  const skipDomains = [
+    'gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com',
+    'googlemail.com', 'icloud.com', 'me.com', 'mac.com',
+    'facebook.com', 'twitter.com', 'linkedin.com', 'instagram.com',
+    'google.com', // Too broad, covered by specific services
+    'facebookmail.com', 'pinterest.com',
+  ]
+  return skipDomains.includes(domain)
+}
+
+function estimateNextBillingDate(emails: GmailMessage[], intervalDays: number): Date | null {
+  if (emails.length === 0) return null
+
+  const lastEmail = emails[emails.length - 1]
+  const nextDate = new Date(lastEmail.date)
+  nextDate.setDate(nextDate.getDate() + intervalDays)
+
+  // Only return future dates
+  if (nextDate > new Date()) {
+    return nextDate
+  }
+
+  // If estimated date is in the past, calculate from now
+  const now = new Date()
+  const daysSinceLastEmail = (now.getTime() - lastEmail.date.getTime()) / (1000 * 60 * 60 * 24)
+  const cyclesElapsed = Math.ceil(daysSinceLastEmail / intervalDays)
+  const nextFromNow = new Date(lastEmail.date)
+  nextFromNow.setDate(nextFromNow.getDate() + (cyclesElapsed * intervalDays))
+
+  return nextFromNow
 }

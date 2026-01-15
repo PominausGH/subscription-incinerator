@@ -2,7 +2,7 @@ import { Job } from 'bullmq'
 import { ScanInboxJob } from '@/lib/queue/jobs'
 import { db } from '@/lib/db/client'
 import { createGmailClient, fetchGmailMessages } from '@/lib/email/gmail-client'
-import { detectSubscription, deduplicateDetections } from '@/lib/email/scanner'
+import { detectSubscription, deduplicateDetections, detectRecurringEmails } from '@/lib/email/scanner'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/notifications/schedule-reminders'
 
 export async function processScanJob(job: Job<ScanInboxJob>) {
@@ -34,24 +34,54 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
     afterDate.setDate(afterDate.getDate() - (fullScan ? 90 : 30))
     console.log(`Step 3: Fetching messages after ${afterDate.toISOString()}...`)
 
-    // Fetch messages
-    const messages = await fetchGmailMessages(oauth2Client, {
+    // Fetch subscription-related messages (pattern matching)
+    const subscriptionMessages = await fetchGmailMessages(oauth2Client, {
       maxResults: fullScan ? 500 : 100,
       afterDate,
     })
-    console.log(`✓ Fetched ${messages.length} messages`)
+    console.log(`✓ Fetched ${subscriptionMessages.length} subscription-related messages`)
+
+    // Fetch broader set for frequency analysis (receipts, invoices, confirmations)
+    const frequencyDate = new Date()
+    frequencyDate.setDate(frequencyDate.getDate() - (fullScan ? 180 : 90)) // Longer range for frequency detection
+
+    const frequencyMessages = await fetchGmailMessages(oauth2Client, {
+      maxResults: fullScan ? 300 : 150,
+      afterDate: frequencyDate,
+      query: 'from:noreply OR from:no-reply OR from:billing OR from:receipts OR from:invoice OR subject:receipt OR subject:invoice OR subject:payment OR subject:confirmation OR subject:"your order"',
+    })
+    console.log(`✓ Fetched ${frequencyMessages.length} messages for frequency analysis`)
+
+    // Merge and deduplicate by email ID
+    const seenIds = new Set<string>()
+    const messages = []
+    for (const msg of [...subscriptionMessages, ...frequencyMessages]) {
+      if (!seenIds.has(msg.id)) {
+        seenIds.add(msg.id)
+        messages.push(msg)
+      }
+    }
+    console.log(`✓ Total unique messages: ${messages.length}`)
 
     console.log(`Fetched ${messages.length} messages for user ${userId}`)
 
-    // Detect subscriptions
-    const detections = messages
+    // Detect subscriptions using pattern matching
+    const patternDetections = messages
       .map(msg => detectSubscription(msg))
       .filter(d => d !== null) as any[]
 
-    console.log(`Found ${detections.length} potential subscriptions`)
+    console.log(`Found ${patternDetections.length} potential subscriptions via pattern matching`)
+
+    // Detect subscriptions using frequency analysis (monthly recurring emails)
+    const frequencyDetections = detectRecurringEmails(messages)
+    console.log(`Found ${frequencyDetections.length} potential subscriptions via frequency analysis`)
+
+    // Merge both detection methods
+    const allDetections = [...patternDetections, ...frequencyDetections]
+    console.log(`Total: ${allDetections.length} potential subscriptions`)
 
     // Deduplicate
-    const uniqueDetections = deduplicateDetections(detections)
+    const uniqueDetections = deduplicateDetections(allDetections)
 
     // Check for existing subscriptions to avoid duplicates
     const existingSubscriptions = await db.subscription.findMany({
@@ -159,7 +189,7 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
 
     return {
       messagesScanned: messages.length,
-      detectionsFound: detections.length,
+      detectionsFound: allDetections.length,
       subscriptionsCreated: createdCount,
       subscriptionsPending: pendingCount,
     }

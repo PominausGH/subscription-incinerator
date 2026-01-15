@@ -15,6 +15,7 @@ export const mockUser: User = {
   phoneNumber: null,
   phoneVerified: false,
   stripeCustomerId: null,
+  homeCurrency: 'USD',
 }
 
 export const mockSubscription: Subscription = {

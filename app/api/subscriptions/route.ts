@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
         trialEndsAt: validated.trialEndsAt ? new Date(validated.trialEndsAt) : null,
         nextBillingDate: validated.nextBillingDate ? new Date(validated.nextBillingDate) : null,
         cancellationUrl: validated.cancellationUrl,
+        categoryId: validated.categoryId,
         detectedFrom: 'manual',
       },
     })

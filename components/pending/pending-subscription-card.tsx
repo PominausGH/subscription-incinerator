@@ -103,11 +103,11 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
         </div>
 
         {(item.amount || item.billingCycle) && (
-          <div className="mt-1 text-sm text-gray-600">
+          <div className="mt-1 text-sm text-gray-800">
             {item.amount && (
               <>
                 {currencySymbol}{item.amount.toFixed(2)}
-                {item.billingCycle && <span className="text-gray-500">/{item.billingCycle === 'yearly' ? 'year' : item.billingCycle === 'fortnightly' ? '2wks' : 'mo'}</span>}
+                {item.billingCycle && <span className="text-gray-700">/{item.billingCycle === 'yearly' ? 'year' : item.billingCycle === 'monthly' ? 'mo' : item.billingCycle === 'fortnightly' ? '2wks' : 'wk'}</span>}
               </>
             )}
             {!item.amount && item.billingCycle && (
@@ -119,7 +119,7 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
           </div>
         )}
 
-        <div className="mt-1 text-xs text-gray-500">
+        <div className="mt-1 text-xs text-gray-700">
           From: {item.emailFrom} · {formattedDate}
         </div>
 

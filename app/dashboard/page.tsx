@@ -8,14 +8,19 @@ import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
 import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
 import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
 import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
-import { ReminderSettings } from '@/lib/notifications/types'
+import { SubscriptionTypeFilter } from '@/components/subscriptions/subscription-type-filter'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>
+}) {
+  const { type: typeFilter } = await searchParams
   const user = await getCurrentUser()
 
   const userWithEmail = await db.user.findUnique({
     where: { id: user.id },
-    select: { emailProvider: true, oauthTokens: true },
+    select: { emailProvider: true, oauthTokens: true, homeCurrency: true },
   })
 
   const pendingSubscriptionsRaw = await db.pendingSubscription.findMany({
@@ -50,15 +55,23 @@ export default async function DashboardPage() {
   const gmailEmail = (userWithEmail?.oauthTokens as any)?.email || ''
 
   const subscriptionsRaw = await db.subscription.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      ...(typeFilter === 'personal' ? { type: 'PERSONAL' } : {}),
+      ...(typeFilter === 'business' ? { type: 'BUSINESS' } : {}),
+    },
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   })
 
-  // Convert Decimal types to numbers and JSON to typed objects for client components
+  // Convert Decimal types to numbers for client components
   const subscriptions = subscriptionsRaw.map(sub => ({
     ...sub,
-    amount: sub.amount ? Number(sub.amount) : null,
-    reminderSettings: sub.reminderSettings as unknown as ReminderSettings | null
+    amount: sub.amount ? Number(sub.amount) : null
   }))
 
   return (
@@ -94,7 +107,7 @@ export default async function DashboardPage() {
 
       {/* Spending Analytics */}
       <div className="mb-8">
-        <SpendingAnalytics subscriptions={subscriptions} />
+        <SpendingAnalytics subscriptions={subscriptions} homeCurrency={userWithEmail?.homeCurrency || 'USD'} />
       </div>
 
       <div className="mb-8">
@@ -102,7 +115,10 @@ export default async function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Your Subscriptions ({subscriptions.length})</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Your Subscriptions ({subscriptions.length})</h2>
+          <SubscriptionTypeFilter currentFilter={typeFilter} />
+        </div>
 
         {subscriptions.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">

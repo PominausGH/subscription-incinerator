@@ -1,24 +1,48 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { getCategoryIcon } from '@/lib/categories/presets'
+
+type Category = {
+  id: string
+  name: string
+  isPreset: boolean
+}
 
 export function AddSubscriptionForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
   const [formData, setFormData] = useState({
     serviceName: '',
     status: 'active' as 'trial' | 'active',
-    billingCycle: 'monthly' as 'monthly' | 'fortnightly' | 'yearly' | 'custom',
+    billingCycle: 'monthly' as 'weekly' | 'fortnightly' | 'monthly' | 'yearly' | 'custom',
     amount: '',
     currency: 'USD',
     trialEndsAt: '',
     nextBillingDate: '',
     cancellationUrl: '',
+    categoryId: '',
   })
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -35,6 +59,7 @@ export function AddSubscriptionForm() {
         trialEndsAt: formData.trialEndsAt ? new Date(formData.trialEndsAt).toISOString() : undefined,
         nextBillingDate: formData.nextBillingDate ? new Date(formData.nextBillingDate).toISOString() : undefined,
         cancellationUrl: formData.cancellationUrl || undefined,
+        categoryId: formData.categoryId || undefined,
       }
 
       const response = await fetch('/api/subscriptions', {
@@ -59,6 +84,7 @@ export function AddSubscriptionForm() {
         trialEndsAt: '',
         nextBillingDate: '',
         cancellationUrl: '',
+        categoryId: '',
       })
     } catch (error) {
       console.error('Submit error:', error)
@@ -98,6 +124,25 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+            Category
+          </label>
+          <select
+            id="category"
+            value={formData.categoryId}
+            onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select category...</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {getCategoryIcon(cat.name)} {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
@@ -133,11 +178,12 @@ export function AddSubscriptionForm() {
           <select
             id="billingCycle"
             value={formData.billingCycle}
-            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'monthly' | 'fortnightly' | 'yearly' | 'custom' })}
+            onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'weekly' | 'fortnightly' | 'monthly' | 'yearly' | 'custom' })}
             className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="monthly">Monthly</option>
+            <option value="weekly">Weekly</option>
             <option value="fortnightly">Fortnightly</option>
+            <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
             <option value="custom">Custom</option>
           </select>

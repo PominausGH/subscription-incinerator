@@ -13,7 +13,7 @@ export async function PATCH(
     }
 
     const { id: subscriptionId } = await params
-    const { reminderSettings, ...otherFields } = await req.json()
+    const body = await req.json()
 
     // First, verify the subscription belongs to the user
     const subscription = await db.subscription.findUnique({
@@ -32,15 +32,16 @@ export async function PATCH(
     const updated = await db.subscription.update({
       where: { id: subscriptionId },
       data: {
-        serviceName: otherFields.serviceName,
-        status: otherFields.status,
-        billingCycle: otherFields.billingCycle,
-        amount: otherFields.amount,
-        currency: otherFields.currency,
-        trialEndsAt: otherFields.trialEndsAt ? new Date(otherFields.trialEndsAt) : null,
-        nextBillingDate: otherFields.nextBillingDate ? new Date(otherFields.nextBillingDate) : null,
-        cancellationUrl: otherFields.cancellationUrl,
-        ...(reminderSettings !== undefined && { reminderSettings }),
+        serviceName: body.serviceName,
+        status: body.status,
+        billingCycle: body.billingCycle,
+        amount: body.amount,
+        currency: body.currency,
+        trialEndsAt: body.trialEndsAt ? new Date(body.trialEndsAt) : null,
+        nextBillingDate: body.nextBillingDate ? new Date(body.nextBillingDate) : null,
+        cancellationUrl: body.cancellationUrl,
+        type: body.type,
+        categoryId: body.categoryId,
       },
     })
 

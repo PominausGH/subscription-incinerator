@@ -1,9 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { getCategoryIcon } from '@/lib/categories/presets'
+
+type Category = {
+  id: string
+  name: string
+  isPreset: boolean
+}
 
 type Subscription = {
   id: string
@@ -15,6 +22,8 @@ type Subscription = {
   trialEndsAt: Date | null
   nextBillingDate: Date | null
   cancellationUrl: string | null
+  type: 'PERSONAL' | 'BUSINESS'
+  categoryId: string | null
 }
 
 interface EditSubscriptionModalProps {
@@ -27,6 +36,24 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          setCategories(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
+    if (isOpen) {
+      fetchCategories()
+    }
+  }, [isOpen])
 
   const formatDateForInput = (date: Date | null) => {
     if (!date) return ''
@@ -43,6 +70,8 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
     trialEndsAt: formatDateForInput(subscription.trialEndsAt),
     nextBillingDate: formatDateForInput(subscription.nextBillingDate),
     cancellationUrl: subscription.cancellationUrl || '',
+    type: subscription.type || 'PERSONAL',
+    categoryId: subscription.categoryId || '',
   })
 
   async function onSubmit(e: React.FormEvent) {
@@ -60,6 +89,8 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
         trialEndsAt: formData.trialEndsAt ? new Date(formData.trialEndsAt).toISOString() : null,
         nextBillingDate: formData.nextBillingDate ? new Date(formData.nextBillingDate).toISOString() : null,
         cancellationUrl: formData.cancellationUrl || null,
+        type: formData.type,
+        categoryId: formData.categoryId || null,
       }
 
       const response = await fetch(`/api/subscriptions/${subscription.id}`, {
@@ -107,16 +138,37 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
             </div>
           )}
 
-          <div>
-            <label htmlFor="serviceName" className="block text-sm font-medium text-gray-700 mb-1">
-              Service Name
-            </label>
-            <Input
-              id="serviceName"
-              value={formData.serviceName}
-              onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="serviceName" className="block text-sm font-medium text-gray-700 mb-1">
+                Service Name
+              </label>
+              <Input
+                id="serviceName"
+                value={formData.serviceName}
+                onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                id="category"
+                value={formData.categoryId}
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">No category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {getCategoryIcon(cat.name)} {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -171,21 +223,37 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
             </div>
 
             <div>
-              <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-700 mb-1">
-                Billing Cycle
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                Type
               </label>
               <select
-                id="billingCycle"
-                value={formData.billingCycle}
-                onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value })}
+                id="type"
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'PERSONAL' | 'BUSINESS' })}
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
               >
-                <option value="monthly">Monthly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="yearly">Yearly</option>
-                <option value="custom">Custom</option>
+                <option value="PERSONAL">Personal</option>
+                <option value="BUSINESS">Business</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-700 mb-1">
+              Billing Cycle
+            </label>
+            <select
+              id="billingCycle"
+              value={formData.billingCycle}
+              onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value })}
+              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
+            >
+              <option value="weekly">Weekly</option>
+              <option value="fortnightly">Fortnightly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+              <option value="custom">Custom</option>
+            </select>
           </div>
 
           {formData.status === 'trial' && (

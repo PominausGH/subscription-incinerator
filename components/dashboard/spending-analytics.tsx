@@ -1,6 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
+import { getCurrencySymbol } from '@/lib/currency/exchange-rates'
 
 type Subscription = {
   id: string
@@ -9,48 +11,133 @@ type Subscription = {
   billingCycle: string | null
   amount: number | null
   currency: string
+  type: 'PERSONAL' | 'BUSINESS'
 }
 
 interface SpendingAnalyticsProps {
   subscriptions: Subscription[]
+  homeCurrency: string
 }
+
+type FilterType = 'all' | 'personal' | 'business'
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
 
-export function SpendingAnalytics({ subscriptions }: SpendingAnalyticsProps) {
+export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnalyticsProps) {
+  const [filter, setFilter] = useState<FilterType>('all')
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({})
+  const [ratesLoading, setRatesLoading] = useState(true)
+
+  // Fetch exchange rates on mount
+  useEffect(() => {
+    async function fetchRates() {
+      try {
+        const response = await fetch(`/api/exchange-rates?base=${homeCurrency}`)
+        if (response.ok) {
+          const data = await response.json()
+          setExchangeRates(data.rates || {})
+        }
+      } catch (error) {
+        console.error('Failed to fetch exchange rates:', error)
+      } finally {
+        setRatesLoading(false)
+      }
+    }
+    fetchRates()
+  }, [homeCurrency])
+
+  // Convert amount to home currency
+  const convertToHomeCurrency = (amount: number, fromCurrency: string): number => {
+    if (fromCurrency === homeCurrency) return amount
+    const rate = exchangeRates[fromCurrency]
+    if (!rate) return amount // Fallback if rate not found
+    return amount / rate
+  }
+
+  const symbol = getCurrencySymbol(homeCurrency)
+
+  // Filter by type first
+  const filteredByType = subscriptions.filter(s => {
+    if (filter === 'all') return true
+    if (filter === 'personal') return s.type === 'PERSONAL'
+    if (filter === 'business') return s.type === 'BUSINESS'
+    return true
+  })
+
   // Filter active subscriptions with amounts
-  const activeWithAmount = subscriptions.filter(
+  const activeWithAmount = filteredByType.filter(
     s => s.status === 'active' && s.amount && s.amount > 0
   )
 
   if (activeWithAmount.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Spending Overview</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold">Spending Overview</h2>
+          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                filter === 'all'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilter('personal')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                filter === 'personal'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Personal
+            </button>
+            <button
+              onClick={() => setFilter('business')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                filter === 'business'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Business
+            </button>
+          </div>
+        </div>
         <p className="text-gray-500 text-sm">
-          Add prices to your subscriptions to see spending analytics.
+          {filter === 'all'
+            ? 'Add prices to your subscriptions to see spending analytics.'
+            : `No ${filter} subscriptions with prices found.`}
         </p>
       </div>
     )
   }
 
-  // Calculate monthly cost for each subscription
+  // Calculate monthly cost for each subscription (converted to home currency)
   const monthlyData = activeWithAmount.map(sub => {
     let monthlyAmount = sub.amount || 0
 
-    // Convert to monthly if yearly
+    // Convert to home currency first
+    monthlyAmount = convertToHomeCurrency(monthlyAmount, sub.currency)
+
+    // Then convert to monthly based on billing cycle
     if (sub.billingCycle === 'yearly') {
       monthlyAmount = monthlyAmount / 12
     } else if (sub.billingCycle === 'fortnightly') {
       monthlyAmount = monthlyAmount * 2.17 // ~2.17 fortnights per month
+    } else if (sub.billingCycle === 'weekly') {
+      monthlyAmount = monthlyAmount * 4.33 // ~4.33 weeks per month
     }
 
     return {
       name: sub.serviceName,
       amount: Math.round(monthlyAmount * 100) / 100,
       originalAmount: sub.amount,
+      originalCurrency: sub.currency,
       billingCycle: sub.billingCycle || 'monthly',
-      currency: sub.currency
     }
   }).sort((a, b) => b.amount - a.amount)
 
@@ -58,24 +145,46 @@ export function SpendingAnalytics({ subscriptions }: SpendingAnalyticsProps) {
   const totalMonthly = monthlyData.reduce((sum, item) => sum + item.amount, 0)
   const totalYearly = totalMonthly * 12
 
-  // Get primary currency (most common)
-  const currencyCount = activeWithAmount.reduce((acc, sub) => {
-    acc[sub.currency] = (acc[sub.currency] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-  const primaryCurrency = Object.entries(currencyCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'USD'
-
-  const currencySymbol: Record<string, string> = {
-    USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$'
-  }
-  const symbol = currencySymbol[primaryCurrency] || primaryCurrency + ' '
-
   // Data for pie chart
   const pieData = monthlyData.slice(0, 8) // Top 8 for readability
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold mb-6">Spending Overview</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold">Spending Overview</h2>
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              filter === 'all'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('personal')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              filter === 'personal'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Personal
+          </button>
+          <button
+            onClick={() => setFilter('business')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              filter === 'business'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Business
+          </button>
+        </div>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -175,7 +284,10 @@ export function SpendingAnalytics({ subscriptions }: SpendingAnalyticsProps) {
                     {item.name}
                   </td>
                   <td className="text-right py-2 text-gray-600">
-                    {symbol}{item.originalAmount?.toFixed(2)}
+                    {getCurrencySymbol(item.originalCurrency)}{item.originalAmount?.toFixed(2)}
+                    {item.originalCurrency !== homeCurrency && (
+                      <span className="text-xs text-gray-400 ml-1">({item.originalCurrency})</span>
+                    )}
                   </td>
                   <td className="text-right py-2 text-gray-500 capitalize">
                     {item.billingCycle}

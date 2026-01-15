@@ -36,6 +36,9 @@ model User {
   // Stripe
   stripeCustomerId String? @unique @map("stripe_customer_id")
 
+  // Currency preferences
+  homeCurrency    String  @default("USD") @map("home_currency")
+
   // Relations
   subscriptions        Subscription[]
   pendingSubscriptions PendingSubscription[]

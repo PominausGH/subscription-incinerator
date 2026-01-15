@@ -55,47 +55,69 @@ export async function fetchGmailMessages(
     return []
   }
 
-  // Fetch full message details
+  const messageIds = listResponse.data.messages.filter(m => m.id).map(m => m.id!)
+  console.log(`  Found ${messageIds.length} message IDs, fetching details in batches...`)
+
+  // Fetch messages in parallel batches of 10 for speed
+  const BATCH_SIZE = 10
   const messages: GmailMessage[] = []
 
-  for (const message of listResponse.data.messages) {
-    if (!message.id) continue
+  for (let i = 0; i < messageIds.length; i += BATCH_SIZE) {
+    const batch = messageIds.slice(i, i + BATCH_SIZE)
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1
+    const totalBatches = Math.ceil(messageIds.length / BATCH_SIZE)
 
-    const msgResponse = await gmail.users.messages.get({
-      userId: 'me',
-      id: message.id,
-      format: 'full',
-    })
-
-    const msg = msgResponse.data
-    const headers = msg.payload?.headers || []
-
-    const from = headers.find((h) => h.name === 'From')?.value || ''
-    const subject = headers.find((h) => h.name === 'Subject')?.value || ''
-    const dateStr = headers.find((h) => h.name === 'Date')?.value || ''
-
-    // Get body
-    let body = ''
-    if (msg.payload?.body?.data) {
-      body = Buffer.from(msg.payload.body.data, 'base64').toString('utf-8')
-    } else if (msg.payload?.parts) {
-      const textPart = msg.payload.parts.find((part) => part.mimeType === 'text/plain')
-      if (textPart?.body?.data) {
-        body = Buffer.from(textPart.body.data, 'base64').toString('utf-8')
-      }
+    if (messageIds.length > 20) {
+      console.log(`  Batch ${batchNum}/${totalBatches} (${messages.length}/${messageIds.length} fetched)`)
     }
 
-    messages.push({
-      id: msg.id || '',
-      threadId: msg.threadId || '',
-      from,
-      subject,
-      body,
-      date: dateStr ? new Date(dateStr) : new Date(),
-      snippet: msg.snippet || '',
-    })
+    const batchResults = await Promise.all(
+      batch.map(async (messageId) => {
+        try {
+          const msgResponse = await gmail.users.messages.get({
+            userId: 'me',
+            id: messageId,
+            format: 'full',
+          })
+
+          const msg = msgResponse.data
+          const headers = msg.payload?.headers || []
+
+          const from = headers.find((h) => h.name === 'From')?.value || ''
+          const subject = headers.find((h) => h.name === 'Subject')?.value || ''
+          const dateStr = headers.find((h) => h.name === 'Date')?.value || ''
+
+          // Get body
+          let body = ''
+          if (msg.payload?.body?.data) {
+            body = Buffer.from(msg.payload.body.data, 'base64').toString('utf-8')
+          } else if (msg.payload?.parts) {
+            const textPart = msg.payload.parts.find((part) => part.mimeType === 'text/plain')
+            if (textPart?.body?.data) {
+              body = Buffer.from(textPart.body.data, 'base64').toString('utf-8')
+            }
+          }
+
+          return {
+            id: msg.id || '',
+            threadId: msg.threadId || '',
+            from,
+            subject,
+            body,
+            date: dateStr ? new Date(dateStr) : new Date(),
+            snippet: msg.snippet || '',
+          }
+        } catch (error) {
+          console.error(`  Failed to fetch message ${messageId}:`, error)
+          return null
+        }
+      })
+    )
+
+    messages.push(...batchResults.filter((m): m is GmailMessage => m !== null))
   }
 
+  console.log(`  ✓ Fetched ${messages.length} message details`)
   return messages
 }
 
