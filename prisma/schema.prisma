@@ -125,6 +125,7 @@ model Subscription {
   categoryId    String?          @map("category_id")
   rawEmailData  Json?   @map("raw_email_data")
   bankTransactionData Json? @map("bank_transaction_data")
+  reminderSettings    Json? @map("reminder_settings")
   externalId    String? @map("external_id")
 
   createdAt DateTime @default(now()) @map("created_at")
