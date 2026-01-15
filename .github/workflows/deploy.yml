@@ -56,6 +56,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          # Increase memory for Next.js build
+          NODE_OPTIONS: "--max-old-space-size=4096"
           # Dummy values for build (actual values on VPS)
           DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
           NEXTAUTH_SECRET: "build-secret-placeholder"
