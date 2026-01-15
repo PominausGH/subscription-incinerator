@@ -34,6 +34,7 @@ export const mockSubscription: Subscription = {
   categoryId: null,
   rawEmailData: null,
   bankTransactionData: null,
+  reminderSettings: null,
   externalId: null,
   createdAt: new Date(),
   updatedAt: new Date(),

@@ -17,7 +17,6 @@ export default async function SettingsPage() {
       email: true,
       emailProvider: true,
       oauthTokens: true,
-      homeCurrency: true,
       notificationPreferences: true,
     },
   })

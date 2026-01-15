@@ -39,7 +39,7 @@ export async function processReminderJob(job: Job<SendReminderJob>) {
       },
     })
 
-    const prefs = reminder.subscription.user.notificationPreferences as NotificationPreferences
+    const prefs = reminder.subscription.user.notificationPreferences as unknown as NotificationPreferences
     const channelsUsed: string[] = []
 
     // Send email if enabled
