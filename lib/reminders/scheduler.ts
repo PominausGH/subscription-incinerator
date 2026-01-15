@@ -1,13 +1,16 @@
 import { db } from '@/lib/db/client'
 import { queues } from '@/lib/queue/client'
-import { Subscription, User } from '@prisma/client'
+import { Subscription, User, Prisma } from '@prisma/client'
 import {
   NotificationPreferences,
   ReminderSettings,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from '@/lib/notifications/types'
 
-type SubscriptionWithUser = Subscription & { user: User }
+type SubscriptionWithUser = Subscription & {
+  user: User
+  reminderSettings?: Prisma.JsonValue | null
+}
 
 /**
  * Parse timing string to milliseconds
