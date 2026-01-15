@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client'
 import { redirect } from 'next/navigation'
 import { GmailConnectionCard } from '@/components/settings/gmail-connection-card'
 import { CurrencySettings } from '@/components/settings/currency-settings'
+import { NotificationSettings } from '@/components/settings/notification-settings'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -47,6 +48,14 @@ export default async function SettingsPage() {
             Set your home currency. All subscription costs will be converted for spending reports.
           </p>
           <CurrencySettings currentCurrency={user?.homeCurrency || 'USD'} />
+        </section>
+
+        <section className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Notification Reminders</h2>
+          <p className="text-gray-600 mb-6">
+            Configure how and when you receive reminders for upcoming renewals and trial endings.
+          </p>
+          <NotificationSettings />
         </section>
       </div>
     </div>
