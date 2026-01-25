@@ -4,6 +4,7 @@ import { db } from '@/lib/db/client'
 import { createGmailClient, fetchGmailMessages } from '@/lib/email/gmail-client'
 import { detectSubscription, deduplicateDetections, detectRecurringEmails } from '@/lib/email/scanner'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/notifications/schedule-reminders'
+import { decryptOAuthTokens } from '@/lib/crypto'
 
 export async function processScanJob(job: Job<ScanInboxJob>) {
   const { userId, fullScan } = job.data
@@ -22,7 +23,8 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
     }
     console.log('✓ User found')
 
-    const tokens = user.oauthTokens as any
+    // Decrypt OAuth tokens
+    const tokens = decryptOAuthTokens(user.oauthTokens as string)
 
     // Create Gmail client
     console.log('Step 2: Creating Gmail client...')

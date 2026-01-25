@@ -3,10 +3,18 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { createSubscriptionSchema } from '@/lib/validations/subscription'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/reminders/scheduler'
+import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 import { z } from 'zod'
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit check
+    const clientId = getClientIdentifier(req)
+    const rateLimit = await checkRateLimit(`post:subscriptions:${clientId}`, RATE_LIMITS.api)
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit.reset)
+    }
+
     const session = await auth()
 
     if (!session?.user?.id) {

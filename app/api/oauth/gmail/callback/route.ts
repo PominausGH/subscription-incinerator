@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import { db } from '@/lib/db/client'
 import { addScanJob, scheduleRecurringScan } from '@/lib/queue/scan-queue'
+import { encryptOAuthTokens } from '@/lib/crypto'
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,16 +39,18 @@ export async function GET(req: NextRequest) {
     const profile = await gmail.users.getProfile({ userId: 'me' })
     const gmailEmail = profile.data.emailAddress || ''
 
-    // Store tokens (encrypted in production)
+    // Store tokens (encrypted)
+    const encryptedTokens = encryptOAuthTokens({
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token,
+      expiryDate: tokens.expiry_date,
+      email: gmailEmail,
+    })
+    
     await db.user.update({
       where: { id: userId },
       data: {
-        oauthTokens: {
-          accessToken: tokens.access_token,
-          refreshToken: tokens.refresh_token,
-          expiryDate: tokens.expiry_date,
-          email: gmailEmail, // Store the connected Gmail address
-        },
+        oauthTokens: encryptedTokens,
         emailProvider: 'gmail',
       },
     })

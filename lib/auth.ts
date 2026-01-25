@@ -55,21 +55,8 @@ const nextAuth = NextAuth({
 
 export const { handlers, signIn, signOut } = nextAuth;
 
-// Wrap auth with dev bypass
-export const auth = async () => {
-  // DEV BYPASS: Return mock session for testing
-  if (process.env.NODE_ENV === 'development' && process.env.DEV_BYPASS_AUTH === 'true') {
-    return {
-      user: {
-        id: 'b0cb34a4-add7-48d6-b2bf-5792d4c90583',
-        email: 'genmailing@gmail.com',
-        tier: 'premium',
-      },
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    };
-  }
-  return nextAuth.auth();
-};
+// Export auth directly - no bypass in production
+export const auth = nextAuth.auth;
 
 export function isPremium(user: { tier?: string | null } | null): boolean {
   return user?.tier === 'premium'

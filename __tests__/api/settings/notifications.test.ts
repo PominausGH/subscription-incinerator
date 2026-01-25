@@ -41,8 +41,10 @@ import { GET, PUT } from '@/app/api/settings/notifications/route'
 import { db } from '@/lib/db/client'
 import { auth } from '@/lib/auth'
 
-const mockAuth = auth as jest.MockedFunction<typeof auth>
-const mockDb = db as jest.Mocked<typeof db>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockAuth = auth as jest.MockedFunction<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockDb = db as any
 
 describe('GET /api/settings/notifications', () => {
   beforeEach(() => {
