@@ -1,0 +1,73 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Testing
+coverage
+test-results
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+jest.config.js
+jest.setup.js
+jest.env.setup.js
+
+# Development
+.env
+.env.local
+.env.development
+.env.test
+*.log
+npm-debug.log*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Misc
+.DS_Store
+Thumbs.db
+*.pem
+
+# Worktrees
+.worktrees
+
+# CI/CD
+.github
+
+# Editor configs
+.editorconfig
+.prettierrc
+.eslintrc*
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Debug
+.npm
+.eslintcache
