@@ -55,7 +55,8 @@ ARG REDIS_URL="redis://localhost:6379"
 ARG GOOGLE_CLIENT_ID="placeholder"
 ARG GOOGLE_CLIENT_SECRET="placeholder"
 
-# Build the application
+# Build the application (increase memory for Next.js build)
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # ================================
