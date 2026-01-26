@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db/client'
-import { connection as redis } from '@/lib/queue/client'
+
+// Force dynamic rendering to avoid build-time connection attempts
+export const dynamic = 'force-dynamic'
 
 interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy'
@@ -21,6 +22,8 @@ interface ServiceStatus {
 async function checkDatabase(): Promise<ServiceStatus> {
   const start = Date.now()
   try {
+    // Dynamic import to avoid build-time connection
+    const { db } = await import('@/lib/db/client')
     await db.$queryRaw`SELECT 1`
     return {
       status: 'up',
@@ -37,6 +40,8 @@ async function checkDatabase(): Promise<ServiceStatus> {
 async function checkRedis(): Promise<ServiceStatus> {
   const start = Date.now()
   try {
+    // Dynamic import to avoid build-time connection
+    const { connection: redis } = await import('@/lib/queue/client')
     await redis.ping()
     return {
       status: 'up',
