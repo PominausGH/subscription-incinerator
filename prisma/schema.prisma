@@ -6,12 +6,12 @@ datasource db {
   provider = "postgresql"
 }
 
-model accounts {
-  id                  String  @id
-  user_id             String
+model Account {
+  id                  String  @id @default(cuid())
+  userId              String  @map("user_id")
   type                String
   provider            String
-  provider_account_id String
+  providerAccountId   String  @map("provider_account_id")
   refresh_token       String?
   access_token        String?
   expires_at          Int?
@@ -19,198 +19,215 @@ model accounts {
   scope               String?
   id_token            String?
   session_state       String?
-  users               users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, provider_account_id])
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
-model bank_imports {
-  id                    String   @id
-  user_id               String
-  file_name             String
-  total_transactions    Int
-  recurring_detected    Int
-  subscriptions_created Int
-  created_at            DateTime @default(now())
-  users                 users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model BankImport {
+  id                   String   @id @default(cuid())
+  userId               String   @map("user_id")
+  fileName             String   @map("file_name")
+  totalTransactions    Int      @map("total_transactions")
+  recurringDetected    Int      @map("recurring_detected")
+  subscriptionsCreated Int      @map("subscriptions_created")
+  createdAt            DateTime @default(now()) @map("created_at")
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([user_id])
+  @@index([userId])
+  @@map("bank_imports")
 }
 
-model cancellation_attempts {
-  id               String        @id
-  subscription_id  String
-  method           String?
-  status           String        @default("pending")
-  error_message    String?
-  credentials_used Json?
-  attempted_at     DateTime      @default(now())
-  completed_at     DateTime?
-  subscriptions    subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
-
-  @@index([subscription_id])
-}
-
-model categories {
-  id            String          @id
-  name          String
-  user_id       String?
-  is_preset     Boolean         @default(false)
-  created_at    DateTime        @default(now())
-  updated_at    DateTime
-  users         users?          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  subscriptions subscriptions[]
-
-  @@unique([name, user_id])
-  @@index([user_id])
-}
-
-model merchant_aliases {
-  id           String @id
-  bank_pattern String @unique
-  service_name String
-}
-
-model pending_subscriptions {
-  id                String    @id
-  user_id           String
-  service_name      String
-  confidence        Decimal   @db.Decimal(3, 2)
-  amount            Decimal?  @db.Decimal(10, 2)
-  currency          String    @default("USD")
-  is_trial          Boolean   @default(false)
-  trial_ends_at     DateTime?
-  next_billing_date DateTime?
-  email_id          String
-  email_subject     String
-  email_from        String
-  email_date        DateTime
-  raw_email_data    Json?
-  status            String    @default("pending")
-  created_at        DateTime  @default(now())
-  expires_at        DateTime
-  billing_cycle     String?
-  users             users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([expires_at])
-  @@index([user_id, status])
-}
-
-model push_subscriptions {
-  id            String   @id
-  user_id       String
-  endpoint_data Json
-  active        Boolean  @default(true)
-  created_at    DateTime @default(now())
-  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id, active])
-}
-
-model reminders {
-  id              String        @id
-  subscription_id String
-  reminder_type   String
-  scheduled_for   DateTime
-  sent_at         DateTime?
-  channels_used   String[]
-  job_id          String?
+model CancellationAttempt {
+  id              String        @id @default(cuid())
+  subscriptionId  String        @map("subscription_id")
+  method          String?
   status          String        @default("pending")
-  created_at      DateTime      @default(now())
-  subscriptions   subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+  errorMessage    String?       @map("error_message")
+  credentialsUsed Json?         @map("credentials_used")
+  attemptedAt     DateTime      @default(now()) @map("attempted_at")
+  completedAt     DateTime?     @map("completed_at")
+  subscription    Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
-  @@index([scheduled_for, status])
-  @@index([subscription_id])
+  @@index([subscriptionId])
+  @@map("cancellation_attempts")
 }
 
-model service_configs {
-  id                        String   @id
-  service_name              String   @unique
-  has_api                   Boolean  @default(false)
-  api_endpoint              String?
-  api_auth_type             String?
-  login_url                 String?
-  cancellation_url          String?
-  cancel_button_selector    String?
-  confirm_selector          String?
-  success_indicator         String?
-  cancellation_instructions Json?
-  email_patterns            Json?
-  logo_url                  String?
-  support_url               String?
-  created_at                DateTime @default(now())
-  updated_at                DateTime
+model Category {
+  id            String         @id @default(cuid())
+  name          String
+  userId        String?        @map("user_id")
+  isPreset      Boolean        @default(false) @map("is_preset")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  user          User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@map("categories")
 }
 
-model sessions {
-  id            String   @id
-  session_token String   @unique
-  user_id       String
-  expires       DateTime
-  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model MerchantAlias {
+  id          String @id @default(cuid())
+  bankPattern String @unique @map("bank_pattern")
+  serviceName String @map("service_name")
+
+  @@map("merchant_aliases")
 }
 
-model subscriptions {
-  id                    String                  @id
-  user_id               String
-  service_name          String
-  status                String                  @default("active")
-  billing_cycle         String?
-  amount                Decimal?                @db.Decimal(10, 2)
-  currency              String                  @default("USD")
-  trial_ends_at         DateTime?
-  next_billing_date     DateTime?
-  cancellation_url      String?
-  auto_cancel_enabled   Boolean                 @default(false)
-  detected_from         String?
-  type                  SubscriptionType        @default(PERSONAL)
-  category_id           String?
-  raw_email_data        Json?
-  bank_transaction_data Json?
-  external_id           String?
-  created_at            DateTime                @default(now())
-  updated_at            DateTime
-  reminder_settings     Json?
-  cancellation_attempts cancellation_attempts[]
-  reminders             reminders[]
-  categories            categories?             @relation(fields: [category_id], references: [id])
-  users                 users                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model PendingSubscription {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  serviceName     String    @map("service_name")
+  confidence      Decimal   @db.Decimal(3, 2)
+  amount          Decimal?  @db.Decimal(10, 2)
+  currency        String    @default("USD")
+  isTrial         Boolean   @default(false) @map("is_trial")
+  trialEndsAt     DateTime? @map("trial_ends_at")
+  nextBillingDate DateTime? @map("next_billing_date")
+  emailId         String    @map("email_id")
+  emailSubject    String    @map("email_subject")
+  emailFrom       String    @map("email_from")
+  emailDate       DateTime  @map("email_date")
+  rawEmailData    Json?     @map("raw_email_data")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  expiresAt       DateTime  @map("expires_at")
+  billingCycle    String?   @map("billing_cycle")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([next_billing_date])
-  @@index([user_id])
-  @@index([user_id, status])
+  @@index([expiresAt])
+  @@index([userId, status])
+  @@map("pending_subscriptions")
 }
 
-model users {
-  id                       String                  @id
-  email                    String                  @unique
-  email_verified           DateTime?
-  name                     String?
-  created_at               DateTime                @default(now())
-  updated_at               DateTime
-  oauth_tokens             Json?
-  email_provider           String?
-  tier                     String                  @default("free")
-  notification_preferences Json                    @default("{\"sms\": false, \"push\": true, \"email\": true}")
-  phone_number             String?
-  phone_verified           Boolean                 @default(false)
-  stripe_customer_id       String?                 @unique
-  home_currency            String                  @default("USD")
-  accounts                 accounts[]
-  bank_imports             bank_imports[]
-  categories               categories[]
-  pending_subscriptions    pending_subscriptions[]
-  push_subscriptions       push_subscriptions[]
-  sessions                 sessions[]
-  subscriptions            subscriptions[]
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  endpointData Json     @map("endpoint_data")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, active])
+  @@map("push_subscriptions")
 }
 
-model verification_tokens {
+model Reminder {
+  id             String       @id @default(cuid())
+  subscriptionId String       @map("subscription_id")
+  reminderType   String       @map("reminder_type")
+  scheduledFor   DateTime     @map("scheduled_for")
+  sentAt         DateTime?    @map("sent_at")
+  channelsUsed   String[]     @map("channels_used")
+  jobId          String?      @map("job_id")
+  status         String       @default("pending")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledFor, status])
+  @@index([subscriptionId])
+  @@map("reminders")
+}
+
+model ServiceConfig {
+  id                       String   @id @default(cuid())
+  serviceName              String   @unique @map("service_name")
+  hasApi                   Boolean  @default(false) @map("has_api")
+  apiEndpoint              String?  @map("api_endpoint")
+  apiAuthType              String?  @map("api_auth_type")
+  loginUrl                 String?  @map("login_url")
+  cancellationUrl          String?  @map("cancellation_url")
+  cancelButtonSelector     String?  @map("cancel_button_selector")
+  confirmSelector          String?  @map("confirm_selector")
+  successIndicator         String?  @map("success_indicator")
+  cancellationInstructions Json?    @map("cancellation_instructions")
+  emailPatterns            Json?    @map("email_patterns")
+  logoUrl                  String?  @map("logo_url")
+  supportUrl               String?  @map("support_url")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  @@map("service_configs")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Subscription {
+  id                   String                @id @default(cuid())
+  userId               String                @map("user_id")
+  serviceName          String                @map("service_name")
+  status               String                @default("active")
+  billingCycle         String?               @map("billing_cycle")
+  amount               Decimal?              @db.Decimal(10, 2)
+  currency             String                @default("USD")
+  trialEndsAt          DateTime?             @map("trial_ends_at")
+  nextBillingDate      DateTime?             @map("next_billing_date")
+  cancellationUrl      String?               @map("cancellation_url")
+  autoCancelEnabled    Boolean               @default(false) @map("auto_cancel_enabled")
+  detectedFrom         String?               @map("detected_from")
+  type                 SubscriptionType      @default(PERSONAL)
+  categoryId           String?               @map("category_id")
+  rawEmailData         Json?                 @map("raw_email_data")
+  bankTransactionData  Json?                 @map("bank_transaction_data")
+  externalId           String?               @map("external_id")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  reminderSettings     Json?                 @map("reminder_settings")
+  cancellationAttempts CancellationAttempt[]
+  reminders            Reminder[]
+  category             Category?             @relation(fields: [categoryId], references: [id])
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([nextBillingDate])
+  @@index([userId])
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+model User {
+  id                      String                @id @default(cuid())
+  email                   String                @unique
+  emailVerified           DateTime?             @map("email_verified")
+  name                    String?
+  createdAt               DateTime              @default(now()) @map("created_at")
+  updatedAt               DateTime              @updatedAt @map("updated_at")
+  oauthTokens             String?               @map("oauth_tokens")
+  emailProvider           String?               @map("email_provider")
+  tier                    String                @default("free")
+  notificationPreferences Json                  @default("{\"sms\": false, \"push\": true, \"email\": true}") @map("notification_preferences")
+  phoneNumber             String?               @map("phone_number")
+  phoneVerified           Boolean               @default(false) @map("phone_verified")
+  stripeCustomerId        String?               @unique @map("stripe_customer_id")
+  homeCurrency            String                @default("USD") @map("home_currency")
+  accounts                Account[]
+  bankImports             BankImport[]
+  categories              Category[]
+  pendingSubscriptions    PendingSubscription[]
+  pushSubscriptions       PushSubscription[]
+  sessions                Session[]
+  subscriptions           Subscription[]
+
+  @@map("users")
+}
+
+model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
 
   @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 enum SubscriptionType {
