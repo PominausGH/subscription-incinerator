@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/session'
 import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription-form'
 import { SubscriptionCard } from '@/components/subscriptions/subscription-card'
 import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
+import { ExportCalendarButton } from '@/components/dashboard/export-calendar-button'
 import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
 import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
 import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
@@ -97,6 +98,7 @@ export default async function DashboardPage({
             <ScanEmailsButton
               isGmailConnected={userWithEmail?.emailProvider === 'gmail' && userWithEmail?.oauthTokens !== null}
             />
+            <ExportCalendarButton />
           </div>
         </div>
       </div>
