@@ -24,6 +24,7 @@
     "@prisma/client": "^7.3.0",
     "@prisma/extension-accelerate": "^3.0.1",
     "@radix-ui/react-popover": "^1.1.15",
+    "bcryptjs": "^3.0.3",
     "bullmq": "^5.66.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.26.2",
@@ -46,6 +47,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@types/pg": "^8.16.0",
