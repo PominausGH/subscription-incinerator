@@ -19,7 +19,7 @@ jest.mock('@auth/prisma-adapter', () => ({
   PrismaAdapter: jest.fn(),
 }))
 
-jest.mock('next-auth/providers/resend', () => ({
+jest.mock('next-auth/providers/credentials', () => ({
   __esModule: true,
   default: jest.fn(),
 }))

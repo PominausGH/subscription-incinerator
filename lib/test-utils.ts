@@ -5,6 +5,7 @@ export const mockUser: User = {
   id: '1',
   email: 'test@example.com',
   emailVerified: null,
+  passwordHash: null,
   name: 'Test User',
   createdAt: new Date(),
   updatedAt: new Date(),
