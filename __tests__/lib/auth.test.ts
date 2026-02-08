@@ -2,7 +2,6 @@
  * @jest-environment node
  */
 
-// Mock next-auth to avoid ESM import issues
 jest.mock('next-auth', () => ({
   __esModule: true,
   default: jest.fn(() => ({
@@ -17,13 +16,23 @@ jest.mock('@auth/prisma-adapter', () => ({
   PrismaAdapter: jest.fn(),
 }))
 
-jest.mock('next-auth/providers/resend', () => ({
+jest.mock('next-auth/providers/credentials', () => ({
   __esModule: true,
   default: jest.fn(),
 }))
 
 jest.mock('@/lib/db/client', () => ({
   db: {},
+}))
+
+jest.mock('@/lib/password', () => ({
+  verifyPassword: jest.fn(),
+}))
+
+jest.mock('@/lib/validations/auth', () => ({
+  loginSchema: {
+    safeParse: jest.fn(),
+  },
 }))
 
 import { isPremium } from '@/lib/auth'
