@@ -9,10 +9,13 @@ import {
   FinalCTA,
   Footer,
 } from '@/components/landing'
+import { JsonLd } from '@/components/seo/json-ld'
 
 export default function Home() {
   return (
-    <main className="bg-dark-900">
+    <>
+      <JsonLd />
+      <main className="bg-dark-900">
       <Navigation />
       <Hero />
       <PainPoints />
@@ -22,6 +25,7 @@ export default function Home() {
       <FAQ />
       <FinalCTA />
       <Footer />
-    </main>
+      </main>
+    </>
   )
 }

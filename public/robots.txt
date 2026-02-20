@@ -1,0 +1,16 @@
+# Sitemap for Subscription Incinerator
+# https://www.subscriptionincinerator.com
+
+User-agent: *
+Allow: /
+
+# Auth pages - no indexing needed
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /subscriptions
+Disallow: /settings
+Disallow: /login
+Disallow: /verify-request
+
+# Sitemap location
+Sitemap: https://subscriptionincinerator.com/sitemap.xml
