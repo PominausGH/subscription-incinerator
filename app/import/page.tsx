@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { UploadDropzone } from '@/components/bank-import/upload-dropzone'
+import { BackButton } from '@/components/ui/back-button'
 
 export default function ImportPage() {
   const router = useRouter()
@@ -46,6 +47,7 @@ export default function ImportPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
+        <BackButton />
         <h1 className="text-2xl font-bold mb-2">Import Bank Statement</h1>
         <p className="text-gray-600 mb-8">
           Upload your bank statement CSV to automatically detect subscriptions.

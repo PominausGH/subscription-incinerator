@@ -10,6 +10,7 @@ import { PendingSubscriptionsSection } from '@/components/pending/pending-subscr
 import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
 import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
 import { SubscriptionTypeFilter } from '@/components/subscriptions/subscription-type-filter'
+import { EmptySubscriptionsState } from '@/components/subscriptions/empty-state'
 
 export default async function DashboardPage({
   searchParams,
@@ -123,9 +124,7 @@ export default async function DashboardPage({
         </div>
 
         {subscriptions.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            No subscriptions yet. Add your first one above!
-          </div>
+          <EmptySubscriptionsState />
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {subscriptions.map((sub) => (

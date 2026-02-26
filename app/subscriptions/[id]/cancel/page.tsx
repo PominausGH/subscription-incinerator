@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/session'
 import { db } from '@/lib/db/client'
 import { CancellationWizard } from '@/components/subscriptions/cancellation-wizard'
 import { OpenSourceAlternatives } from '@/components/subscriptions/open-source-alternatives'
+import { BackButton } from '@/components/ui/back-button'
 
 interface CancelPageProps {
   params: {
@@ -42,6 +43,7 @@ export default async function CancelPage({ params }: CancelPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <BackButton href="/dashboard" label="Back to dashboard" />
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Cancel Subscription</h1>
         <p className="text-gray-600">
