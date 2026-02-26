@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import { db } from '@/lib/db/client'
 import { addScanJob, scheduleRecurringScan } from '@/lib/queue/scan-queue'
-import { encryptOAuthTokens } from '@/lib/crypto'
+import { encryptOAuthTokens, decrypt } from '@/lib/crypto'
+import { auth } from '@/lib/auth'
+
+const STATE_MAX_AGE_MS = 10 * 60 * 1000 // 10 minutes
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
     const code = searchParams.get('code')
-    const userId = searchParams.get('state')
+    const state = searchParams.get('state')
     const error = searchParams.get('error')
 
     if (error) {
@@ -17,9 +20,33 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    if (!code || !userId) {
+    if (!code || !state) {
       return NextResponse.json({ error: 'Invalid callback parameters' }, { status: 400 })
     }
+
+    // Verify the signed state token
+    let statePayload: { userId: string; timestamp: number }
+    try {
+      const decrypted = decrypt(state)
+      statePayload = JSON.parse(decrypted)
+    } catch {
+      return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 })
+    }
+
+    // Check state token hasn't expired
+    if (Date.now() - statePayload.timestamp > STATE_MAX_AGE_MS) {
+      return NextResponse.redirect(
+        new URL('/settings?error=oauth_expired', req.url)
+      )
+    }
+
+    // Verify the current session matches the state token
+    const session = await auth()
+    if (!session?.user?.id || session.user.id !== statePayload.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userId = statePayload.userId
 
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
@@ -46,7 +73,7 @@ export async function GET(req: NextRequest) {
       expiryDate: tokens.expiry_date,
       email: gmailEmail,
     })
-    
+
     await db.user.update({
       where: { id: userId },
       data: {

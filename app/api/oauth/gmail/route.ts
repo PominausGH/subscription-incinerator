@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { google } from 'googleapis'
+import { encrypt } from '@/lib/crypto'
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,10 +17,17 @@ export async function GET(req: NextRequest) {
       process.env.GOOGLE_REDIRECT_URI
     )
 
+    // Create a signed state token containing the userId and a timestamp
+    const statePayload = JSON.stringify({
+      userId: session.user.id,
+      timestamp: Date.now(),
+    })
+    const signedState = encrypt(statePayload)
+
     const authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: ['https://www.googleapis.com/auth/gmail.readonly'],
-      state: session.user.id,
+      state: signedState,
       prompt: 'consent', // Force consent to get refresh token
     })
 

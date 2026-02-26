@@ -58,7 +58,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@example.com" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <a href="mailto:support@subscriptionincinerator.app" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   Contact
                 </a>
               </li>

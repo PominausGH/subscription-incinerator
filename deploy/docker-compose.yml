@@ -1,6 +1,9 @@
 # ===========================================
 # Production Docker Compose for VPS
 # Place this file at: /opt/docker/subscription/docker-compose.yml
+#
+# IMPORTANT: Copy .env.example to .env and fill in ALL required values
+# before running. Never use default/weak passwords in production.
 # ===========================================
 
 services:
@@ -22,38 +25,50 @@ services:
       retries: 5
     networks:
       - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   # Redis for BullMQ
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: sub-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$REDIS_PASSWORD redis-cli ping"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   # Next.js Web Application
   web:
     image: ghcr.io/pominausgh/subscription-incinerator-web:latest
     container_name: sub-web
     restart: unless-stopped
+    user: "1001:1001"
     ports:
-      - "${WEB_PORT:-3000}:3000"
+      - "127.0.0.1:${WEB_PORT:-3007}:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER:-subscription}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-subscription_incinerator}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@subscriptionincinerator.app}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
@@ -70,27 +85,35 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     networks:
       - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   # Background Worker
   worker:
     image: ghcr.io/pominausgh/subscription-incinerator-worker:latest
     container_name: sub-worker
     restart: unless-stopped
+    user: "1001:1001"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${POSTGRES_USER:-subscription}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-subscription_incinerator}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - ENCRYPTION_SECRET=${ENCRYPTION_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@subscriptionincinerator.app}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
       - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY}
       - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
     depends_on:
@@ -100,11 +123,17 @@ services:
         condition: service_healthy
     networks:
       - internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   # Database migrations (run once)
   migrate:
     image: ghcr.io/pominausgh/subscription-incinerator-worker:latest
     container_name: sub-migrate
+    user: "1001:1001"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-subscription}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-subscription_incinerator}
     command: ["npx", "prisma", "migrate", "deploy"]
@@ -115,6 +144,11 @@ services:
       - internal
     profiles:
       - migrate
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
 volumes:
   postgres_data:

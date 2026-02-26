@@ -38,7 +38,7 @@ export function PainPoints() {
         <div className="grid md:grid-cols-3 gap-8">
           {painPoints.map((point, index) => (
             <motion.div
-              key={index}
+              key={point.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

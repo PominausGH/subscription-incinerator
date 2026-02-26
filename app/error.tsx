@@ -11,7 +11,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Application error:', error)
+    console.error('Application error:', error.message, error.digest ? `(${error.digest})` : '')
   }, [error])
 
   return (

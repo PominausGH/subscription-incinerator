@@ -5,6 +5,7 @@
 import { POST } from '@/app/api/auth/register/route'
 import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
+import { NextRequest } from 'next/server'
 
 jest.mock('@/lib/db/client', () => ({
   db: {
@@ -19,10 +20,17 @@ jest.mock('@/lib/password', () => ({
   hashPassword: jest.fn().mockResolvedValue('$2a$12$hashedpassword'),
 }))
 
+jest.mock('@/lib/rate-limit', () => ({
+  checkRateLimit: jest.fn().mockResolvedValue({ success: true, remaining: 4, reset: 0 }),
+  getClientIdentifier: jest.fn().mockReturnValue('127.0.0.1'),
+  rateLimitResponse: jest.fn(),
+  RATE_LIMITS: { auth: { limit: 5, windowSeconds: 60 } },
+}))
+
 const mockDb = db as jest.Mocked<typeof db>
 
 function createRequest(body: any) {
-  return new Request('http://localhost:3000/api/auth/register', {
+  return new NextRequest('http://localhost:3000/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

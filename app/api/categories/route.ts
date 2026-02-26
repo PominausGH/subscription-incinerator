@@ -62,6 +62,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Category name is required' }, { status: 400 })
     }
 
+    if (name.trim().length > 50) {
+      return NextResponse.json({ error: 'Category name must be 50 characters or less' }, { status: 400 })
+    }
+
     const category = await db.category.create({
       data: {
         name: name.trim(),

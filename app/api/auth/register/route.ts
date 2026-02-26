@@ -1,10 +1,18 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
 import { registerSchema } from '@/lib/validations/auth'
+import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Rate limit registration attempts
+    const clientId = getClientIdentifier(request)
+    const rateLimit = await checkRateLimit(`register:${clientId}`, RATE_LIMITS.auth)
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit.reset)
+    }
+
     const body = await request.json()
     const parsed = registerSchema.safeParse(body)
 

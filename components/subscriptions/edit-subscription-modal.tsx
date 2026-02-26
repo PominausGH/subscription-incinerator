@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getCategoryIcon } from '@/lib/categories/presets'
+import { SUPPORTED_CURRENCIES } from '@/lib/currency/exchange-rates'
 
 type Category = {
   id: string
@@ -106,7 +107,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
       router.refresh()
       onClose()
     } catch (error) {
-      console.error('Update error:', error)
+      console.error('Update subscription error')
       setError('Failed to update subscription. Please try again.')
     } finally {
       setIsLoading(false)
@@ -196,11 +197,9 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
               >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-                <option value="AUD">AUD</option>
-                <option value="CAD">CAD</option>
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
+                ))}
               </select>
             </div>
           </div>

@@ -23,7 +23,7 @@ function escapeHtml(text: string): string {
 /**
  * Get APP_URL with fallback to localhost for development
  */
-const APP_URL = process.env.APP_URL || 'http://localhost:3000'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000'
 
 /**
  * Email template for trial ending reminders

@@ -1,30 +1,52 @@
 import { auth } from "@/lib/auth-edge";
 import { NextResponse } from "next/server";
 
+// Public API routes that don't require authentication
+const publicApiRoutes = [
+  "/api/health",
+  "/api/auth",
+  "/api/stripe/webhook",
+];
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
-
-  // Protected routes that require authentication
-  const protectedRoutes = [
-    "/dashboard",
-    "/subscriptions",
-    "/settings",
-    "/api/subscriptions",
-    "/api/reminders",
-  ];
-
-  // Check if the current path matches any protected route
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
 
   // Redirect authenticated users away from login page to dashboard
   if (pathname === "/login" && req.auth) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (isProtectedRoute && !req.auth) {
-    // Redirect to sign in page if not authenticated
+  // Check if this is an API route
+  if (pathname.startsWith("/api/")) {
+    // Allow public API routes
+    const isPublicApi = publicApiRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
+    if (isPublicApi) {
+      return NextResponse.next();
+    }
+
+    // All other API routes require authentication
+    if (!req.auth) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    return NextResponse.next();
+  }
+
+  // Protected page routes that require authentication
+  const protectedPages = [
+    "/dashboard",
+    "/subscriptions",
+    "/settings",
+    "/import",
+  ];
+
+  const isProtectedPage = protectedPages.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (isProtectedPage && !req.auth) {
     const signInUrl = new URL("/login", req.url);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);

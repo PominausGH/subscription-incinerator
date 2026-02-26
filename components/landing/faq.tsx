@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const faqs = [
   {
     question: 'Is it really free?',
-    answer: "Yes, completely free. No hidden charges, no premium tier required. We're building our user base and will add optional paid features later - but the core app will always be free.",
+    answer: "The core features are completely free — track subscriptions, get reminders, and manage your spending at no cost. We also offer an optional premium tier with advanced features like Gmail scanning and bank statement import.",
   },
   {
     question: 'Is my data safe?',

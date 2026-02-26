@@ -3,6 +3,8 @@
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 // 5MB
+
 interface UploadDropzoneProps {
   onFileSelect: (file: File) => void
   isLoading: boolean
@@ -22,7 +24,7 @@ export function UploadDropzone({ onFileSelect, isLoading, error }: UploadDropzon
       'text/csv': ['.csv']
     },
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024, // 5MB
+    maxSize: MAX_FILE_SIZE_BYTES,
     disabled: isLoading
   })
 

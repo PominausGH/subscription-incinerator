@@ -46,11 +46,11 @@ export function UpgradeButton({
       if (data.url) {
         window.location.href = data.url
       } else {
-        console.error('No checkout URL returned:', data.error)
+        console.error('No checkout URL returned')
         setLoading(false)
       }
-    } catch (error) {
-      console.error('Checkout error:', error)
+    } catch {
+      console.error('Checkout error')
       setLoading(false)
     }
   }

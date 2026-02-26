@@ -87,7 +87,7 @@ export function AddSubscriptionForm() {
         categoryId: '',
       })
     } catch (error) {
-      console.error('Submit error:', error)
+      console.error('Add subscription error')
       setError('Failed to add subscription. Please try again.')
     } finally {
       setIsLoading(false)
@@ -159,7 +159,7 @@ export function AddSubscriptionForm() {
 
         <div>
           <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-            Amount ($)
+            Amount
           </label>
           <Input
             id="amount"

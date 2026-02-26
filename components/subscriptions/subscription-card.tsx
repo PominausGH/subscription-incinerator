@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditSubscriptionModal } from './edit-subscription-modal'
+import { OpenSourceAlternatives } from './open-source-alternatives'
 import { getCategoryIcon } from '@/lib/categories/presets'
+import { getCurrencySymbol } from '@/lib/currency/exchange-rates'
 
 type Subscription = {
   id: string
@@ -40,7 +42,7 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
       router.refresh()
     } catch (error) {
-      console.error('Delete error:', error)
+      console.error('Delete error')
       alert('Failed to delete subscription. Please try again.')
     } finally {
       setIsDeleting(false)
@@ -49,11 +51,8 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
   }
 
   const formatCurrency = (amount: number | null, currency: string) => {
-    if (!amount) return null
-    const symbols: Record<string, string> = {
-      USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$'
-    }
-    return `${symbols[currency] || currency + ' '}${amount.toFixed(2)}`
+    if (amount === null || amount === undefined) return null
+    return `${getCurrencySymbol(currency)}${amount.toFixed(2)}`
   }
 
   const hasNoData = !subscription.amount && !subscription.nextBillingDate && !subscription.billingCycle
@@ -125,13 +124,15 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
                 className="text-blue-600 hover:underline inline-flex items-center gap-1"
               >
                 Cancel subscription
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
             </p>
           )}
         </div>
+
+        <OpenSourceAlternatives subscriptionId={subscription.id} />
 
         {/* Warning if no data */}
         {hasNoData && (
@@ -169,7 +170,7 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
                 disabled={isDeleting}
                 className="flex-1"
               >
-                {isDeleting ? '...' : 'Yes'}
+                {isDeleting ? 'Deleting...' : 'Yes'}
               </Button>
               <Button
                 variant="outline"

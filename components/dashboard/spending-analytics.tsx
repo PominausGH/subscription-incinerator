@@ -38,7 +38,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
           setExchangeRates(data.rates || {})
         }
       } catch (error) {
-        console.error('Failed to fetch exchange rates:', error)
+        console.error('Failed to fetch exchange rates')
       } finally {
         setRatesLoading(false)
       }
@@ -127,9 +127,9 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
     if (sub.billingCycle === 'yearly') {
       monthlyAmount = monthlyAmount / 12
     } else if (sub.billingCycle === 'fortnightly') {
-      monthlyAmount = monthlyAmount * 2.17 // ~2.17 fortnights per month
+      monthlyAmount = monthlyAmount * 2.17 // 365.25 / 14 / 12 ≈ 2.17 fortnights per month
     } else if (sub.billingCycle === 'weekly') {
-      monthlyAmount = monthlyAmount * 4.33 // ~4.33 weeks per month
+      monthlyAmount = monthlyAmount * 4.33 // 365.25 / 7 / 12 ≈ 4.33 weeks per month
     }
 
     return {

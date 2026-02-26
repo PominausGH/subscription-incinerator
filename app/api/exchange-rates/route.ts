@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { fetchExchangeRates } from '@/lib/currency/exchange-rates'
+import { fetchExchangeRates, SUPPORTED_CURRENCIES } from '@/lib/currency/exchange-rates'
+
+const VALID_CURRENCY_CODES = new Set(SUPPORTED_CURRENCIES.map(c => c.code))
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,6 +13,10 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const baseCurrency = searchParams.get('base') || 'USD'
+
+    if (!VALID_CURRENCY_CODES.has(baseCurrency)) {
+      return NextResponse.json({ error: 'Unsupported currency code' }, { status: 400 })
+    }
 
     const rates = await fetchExchangeRates(baseCurrency)
 

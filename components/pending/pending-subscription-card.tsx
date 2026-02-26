@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { getCurrencySymbol } from '@/lib/currency/exchange-rates'
 
 interface PendingSubscriptionCardProps {
   item: {
@@ -21,15 +22,11 @@ interface PendingSubscriptionCardProps {
   gmailEmail?: string
 }
 
-const currencySymbols: Record<string, string> = {
-  USD: '$', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$', NZD: 'NZ$', JPY: '¥', CHF: 'CHF '
-}
-
 export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptionCardProps) {
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const currencySymbol = currencySymbols[item.currency] || item.currency + ' '
+  const currencySymbol = getCurrencySymbol(item.currency)
 
   async function handleApprove() {
     setError(null)
@@ -50,7 +47,7 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
         setIsProcessing(false)
       }
     } catch (error) {
-      console.error('Approve error:', error)
+      console.error('Approve error')
       setError('Failed to approve subscription')
       setIsProcessing(false)
     }
@@ -75,7 +72,7 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
         setIsProcessing(false)
       }
     } catch (error) {
-      console.error('Dismiss error:', error)
+      console.error('Dismiss error')
       setError('Failed to dismiss subscription')
       setIsProcessing(false)
     }
@@ -130,7 +127,7 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
           className="mt-1 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
           title={item.emailSubject}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
           View original email

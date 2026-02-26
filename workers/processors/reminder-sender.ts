@@ -25,8 +25,8 @@ export async function processReminderJob(job: Job<SendReminderJob>) {
     throw new Error(`Reminder ${reminderId} not found`)
   }
 
-  if (reminder.status !== 'pending') {
-    console.log(`Reminder ${reminderId} already processed, skipping`)
+  if (reminder.status === 'sent') {
+    console.log(`Reminder ${reminderId} already sent, skipping`)
     return
   }
 

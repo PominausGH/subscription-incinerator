@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/session'
 import { db } from '@/lib/db/client'
 import { CancellationWizard } from '@/components/subscriptions/cancellation-wizard'
+import { OpenSourceAlternatives } from '@/components/subscriptions/open-source-alternatives'
 
 interface CancelPageProps {
   params: {
@@ -49,6 +50,11 @@ export default async function CancelPage({ params }: CancelPageProps) {
       </div>
 
       <CancellationWizard subscriptionId={subscription.id} />
+
+      <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+        <p className="text-emerald-800 font-semibold mb-2">Consider these free alternatives before you cancel</p>
+        <OpenSourceAlternatives subscriptionId={subscription.id} />
+      </div>
 
       <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <p className="text-yellow-800 font-semibold mb-2">Important Notes:</p>

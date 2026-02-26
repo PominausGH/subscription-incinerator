@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth, isPremium } from '@/lib/auth'
 import { processBankStatement } from '@/lib/bank-import/processor'
 import { BankImportError } from '@/lib/bank-import/errors'
+import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,12 @@ export async function POST(req: NextRequest) {
         { error: 'UNAUTHORIZED', message: 'Please sign in to continue' },
         { status: 401 }
       )
+    }
+
+    // Rate limit expensive bank import processing
+    const rateLimit = await checkRateLimit(`bank-import:${session.user.id}`, RATE_LIMITS.expensive)
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit.reset)
     }
 
     // Check premium tier

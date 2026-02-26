@@ -77,6 +77,24 @@ model MerchantAlias {
   @@map("merchant_aliases")
 }
 
+model OpenSourceAlternative {
+  id              String   @id @default(cuid())
+  serviceName     String   @map("service_name")
+  alternativeName String   @map("alternative_name")
+  description     String
+  websiteUrl      String?  @map("website_url")
+  sourceCodeUrl   String?  @map("source_code_url")
+  stars           Int      @default(0)
+  license         String?
+  category        String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([serviceName, alternativeName])
+  @@index([serviceName])
+  @@map("open_source_alternatives")
+}
+
 model PendingSubscription {
   id              String    @id @default(cuid())
   userId          String    @map("user_id")

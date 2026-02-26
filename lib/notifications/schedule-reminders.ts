@@ -1,5 +1,6 @@
 import { Subscription } from '@prisma/client'
 import { reminderQueue } from '@/lib/queue/client'
+import { db } from '@/lib/db/client'
 
 export async function scheduleTrialReminders(subscription: Subscription) {
   if (!subscription.trialEndsAt) return
@@ -18,15 +19,33 @@ export async function scheduleTrialReminders(subscription: Subscription) {
 
     // Only schedule future reminders
     if (scheduledFor > now) {
+      const jobId = `reminder-trial-${subscription.id}-${type}`
+
+      // Skip if a reminder with this jobId already exists and is pending
+      const existing = await db.reminder.findFirst({
+        where: { jobId, status: 'pending' },
+      })
+      if (existing) continue
+
+      // Create the Reminder record in the database first
+      const reminder = await db.reminder.create({
+        data: {
+          subscriptionId: subscription.id,
+          reminderType: 'trial_ending',
+          scheduledFor,
+          jobId,
+          status: 'pending',
+        },
+      })
+
       await reminderQueue.add(
         'send_reminder',
         {
-          subscriptionId: subscription.id,
-          reminderType: 'trial_ending',
+          reminderId: reminder.id,
         },
         {
           delay: scheduledFor.getTime() - now.getTime(),
-          jobId: `reminder-trial-${subscription.id}-${type}`,
+          jobId,
         }
       )
     }
@@ -49,15 +68,33 @@ export async function scheduleBillingReminders(subscription: Subscription) {
 
     // Only schedule future reminders
     if (scheduledFor > now) {
+      const jobId = `reminder-billing-${subscription.id}-${type}`
+
+      // Skip if a reminder with this jobId already exists and is pending
+      const existing = await db.reminder.findFirst({
+        where: { jobId, status: 'pending' },
+      })
+      if (existing) continue
+
+      // Create the Reminder record in the database first
+      const reminder = await db.reminder.create({
+        data: {
+          subscriptionId: subscription.id,
+          reminderType: 'billing_upcoming',
+          scheduledFor,
+          jobId,
+          status: 'pending',
+        },
+      })
+
       await reminderQueue.add(
         'send_reminder',
         {
-          subscriptionId: subscription.id,
-          reminderType: 'billing_upcoming',
+          reminderId: reminder.id,
         },
         {
           delay: scheduledFor.getTime() - now.getTime(),
-          jobId: `reminder-billing-${subscription.id}-${type}`,
+          jobId,
         }
       )
     }

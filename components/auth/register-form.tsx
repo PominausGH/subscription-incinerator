@@ -55,7 +55,7 @@ export function RegisterForm() {
         router.refresh()
       }
     } catch (error) {
-      console.error('Registration error:', error)
+      console.error('Registration error')
       setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)

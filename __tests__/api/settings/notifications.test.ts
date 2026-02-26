@@ -140,9 +140,8 @@ describe('PUT /api/settings/notifications', () => {
     })
   })
 
-  it('uses default values for missing fields', async () => {
+  it('rejects invalid/incomplete preferences', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } } as any)
-    mockDb.user.update.mockResolvedValue({} as any)
 
     const request = new NextRequest('http://localhost/api/settings/notifications', {
       method: 'PUT',
@@ -154,15 +153,23 @@ describe('PUT /api/settings/notifications', () => {
 
     const response = await PUT(request)
 
-    expect(response.status).toBe(200)
-    expect(mockDb.user.update).toHaveBeenCalledWith({
-      where: { id: 'user-1' },
-      data: {
-        notificationPreferences: {
-          channels: { email: false, push: false },
-          defaults: { trial: ['24h', '1h'], billing: ['7d', '1d'] },
-        },
-      },
+    expect(response.status).toBe(400)
+    expect(mockDb.user.update).not.toHaveBeenCalled()
+  })
+
+  it('rejects invalid timing values', async () => {
+    mockAuth.mockResolvedValue({ user: { id: 'user-1' } } as any)
+
+    const request = new NextRequest('http://localhost/api/settings/notifications', {
+      method: 'PUT',
+      body: JSON.stringify({
+        channels: { email: true, push: false },
+        defaults: { trial: ['invalid'], billing: ['7d'] },
+      }),
     })
+
+    const response = await PUT(request)
+
+    expect(response.status).toBe(400)
   })
 })

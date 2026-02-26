@@ -27,7 +27,7 @@ export function PendingSubscriptionsSection({ pending, gmailEmail }: PendingSubs
   return (
     <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" aria-hidden="true" />
         <h2 className="text-lg font-semibold text-blue-900">
           Review Detected Subscriptions ({pending.length})
         </h2>

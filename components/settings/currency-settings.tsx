@@ -34,7 +34,7 @@ export function CurrencySettings({ currentCurrency }: CurrencySettingsProps) {
       setMessage({ type: 'success', text: 'Currency updated successfully' })
       router.refresh()
     } catch (error) {
-      console.error('Save error:', error)
+      console.error('Currency save error')
       setMessage({ type: 'error', text: 'Failed to update currency' })
     } finally {
       setIsSaving(false)

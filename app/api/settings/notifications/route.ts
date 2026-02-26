@@ -6,6 +6,21 @@ import {
   NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from '@/lib/notifications/types'
+import { z } from 'zod'
+
+const VALID_TRIAL_TIMINGS = ['24h', '12h', '1h'] as const
+const VALID_BILLING_TIMINGS = ['14d', '7d', '3d', '1d'] as const
+
+const notificationPreferencesSchema = z.object({
+  channels: z.object({
+    email: z.boolean(),
+    push: z.boolean(),
+  }),
+  defaults: z.object({
+    trial: z.array(z.enum(VALID_TRIAL_TIMINGS)),
+    billing: z.array(z.enum(VALID_BILLING_TIMINGS)),
+  }),
+})
 
 export async function GET() {
   try {
@@ -40,16 +55,15 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json()
 
-    const preferences: NotificationPreferences = {
-      channels: {
-        email: Boolean(body.channels?.email),
-        push: Boolean(body.channels?.push),
-      },
-      defaults: {
-        trial: body.defaults?.trial || ['24h', '1h'],
-        billing: body.defaults?.billing || ['7d', '1d'],
-      },
+    const parsed = notificationPreferencesSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid preferences', details: parsed.error.flatten() },
+        { status: 400 }
+      )
     }
+
+    const preferences: NotificationPreferences = parsed.data
 
     await db.user.update({
       where: { id: session.user.id },
