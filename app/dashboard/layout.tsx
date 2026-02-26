@@ -1,18 +1,27 @@
-import { getCurrentUser } from '@/lib/session'
-import { Navbar } from '@/components/dashboard/navbar'
+import { Navigation } from '@/components/navigation'
+import { auth } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const user = await getCurrentUser()
+  const session = await auth()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar userEmail={user.email!} userTier={user.tier} />
+      <Navigation user={session.user} />
+      
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {children}
+        <div className="px-4 sm:px-0">
+          {children}
+        </div>
       </main>
     </div>
   )
