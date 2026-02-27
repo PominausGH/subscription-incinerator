@@ -9,7 +9,7 @@ export const createSubscriptionSchema = z.object({
   trialEndsAt: z.string().datetime().optional(),
   nextBillingDate: z.string().datetime().optional(),
   cancellationUrl: z.string().url().optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryId: z.string().cuid().optional(),
 })
 
 export type CreateSubscriptionInput = z.infer<typeof createSubscriptionSchema>
@@ -23,7 +23,7 @@ export const updateSubscriptionSchema = z.object({
   trialEndsAt: z.string().datetime().optional().nullable(),
   nextBillingDate: z.string().datetime().optional().nullable(),
   cancellationUrl: z.string().url().optional().nullable().or(z.literal('')),
-  categoryId: z.string().uuid().optional().nullable(),
+  categoryId: z.string().cuid().optional().nullable(),
   type: z.enum(['PERSONAL', 'BUSINESS']).optional(),
 })
 
