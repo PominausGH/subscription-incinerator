@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { getCurrencySymbol } from '@/lib/currency/exchange-rates'
+import { toMonthlyAmount } from '@/lib/analytics/queries'
 
 type Subscription = {
   id: string
@@ -14,16 +15,27 @@ type Subscription = {
   type: 'PERSONAL' | 'BUSINESS'
 }
 
+interface AnalyticsSummaryData {
+  byCategory?: { name: string; monthly: number; yearly: number }[]
+}
+
 interface SpendingAnalyticsProps {
   subscriptions: Subscription[]
   homeCurrency: string
+  data?: AnalyticsSummaryData
 }
 
 type FilterType = 'all' | 'personal' | 'business'
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
 
-export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnalyticsProps) {
+const CATEGORY_COLORS = [
+  '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e',
+  '#f97316', '#eab308', '#22c55e', '#14b8a6',
+  '#0ea5e9', '#64748b',
+]
+
+export function SpendingAnalytics({ subscriptions, homeCurrency, data }: SpendingAnalyticsProps) {
   const [filter, setFilter] = useState<FilterType>('all')
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({})
   const [ratesLoading, setRatesLoading] = useState(true)
@@ -80,7 +92,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 filter === 'all'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-800 hover:text-gray-900'
               }`}
             >
               All
@@ -90,7 +102,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 filter === 'personal'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-800 hover:text-gray-900'
               }`}
             >
               Personal
@@ -100,14 +112,14 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 filter === 'business'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-800 hover:text-gray-900'
               }`}
             >
               Business
             </button>
           </div>
         </div>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-800 text-sm">
           {filter === 'all'
             ? 'Add prices to your subscriptions to see spending analytics.'
             : `No ${filter} subscriptions with prices found.`}
@@ -118,19 +130,8 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
 
   // Calculate monthly cost for each subscription (converted to home currency)
   const monthlyData = activeWithAmount.map(sub => {
-    let monthlyAmount = sub.amount || 0
-
-    // Convert to home currency first
-    monthlyAmount = convertToHomeCurrency(monthlyAmount, sub.currency)
-
-    // Then convert to monthly based on billing cycle
-    if (sub.billingCycle === 'yearly') {
-      monthlyAmount = monthlyAmount / 12
-    } else if (sub.billingCycle === 'fortnightly') {
-      monthlyAmount = monthlyAmount * 2.17 // 365.25 / 14 / 12 ≈ 2.17 fortnights per month
-    } else if (sub.billingCycle === 'weekly') {
-      monthlyAmount = monthlyAmount * 4.33 // 365.25 / 7 / 12 ≈ 4.33 weeks per month
-    }
+    const converted = convertToHomeCurrency(sub.amount || 0, sub.currency)
+    const monthlyAmount = toMonthlyAmount(converted, sub.billingCycle)
 
     return {
       name: sub.serviceName,
@@ -158,7 +159,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
               filter === 'all'
                 ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-800 hover:text-gray-900'
             }`}
           >
             All
@@ -168,7 +169,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
               filter === 'personal'
                 ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-800 hover:text-gray-900'
             }`}
           >
             Personal
@@ -178,7 +179,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
               filter === 'business'
                 ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-800 hover:text-gray-900'
             }`}
           >
             Business
@@ -212,22 +213,22 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
       <div className="grid md:grid-cols-2 gap-8">
         {/* Bar Chart - Monthly Cost by Service */}
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Monthly Cost by Service</h3>
-          <div className="h-64">
+          <h3 className="text-sm font-medium text-gray-900 mb-4">Monthly Cost by Service</h3>
+          <div style={{ height: Math.max(260, monthlyData.length * 38) }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData} layout="vertical" margin={{ left: 80, right: 20 }}>
-                <XAxis type="number" tickFormatter={(value) => `${symbol}${value}`} />
+              <BarChart data={monthlyData} layout="vertical" margin={{ left: 90, right: 30, top: 4, bottom: 4 }}>
+                <XAxis type="number" tickFormatter={(value) => `${symbol}${value}`} tick={{ fill: '#374151', fontSize: 10 }} />
                 <YAxis
                   type="category"
                   dataKey="name"
-                  tick={{ fontSize: 12 }}
-                  width={75}
+                  tick={{ fontSize: 10, fill: '#374151' }}
+                  width={85}
                 />
                 <Tooltip
                   formatter={(value) => [`${symbol}${Number(value).toFixed(2)}/mo`, 'Cost']}
-                  contentStyle={{ fontSize: 12 }}
+                  contentStyle={{ fontSize: 11, color: '#111827' }}
                 />
-                <Bar dataKey="amount" fill="#3B82F6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="amount" fill="#3B82F6" radius={[0, 4, 4, 0]} barSize={18} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -235,8 +236,8 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
 
         {/* Pie Chart - Distribution */}
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Spending Distribution</h3>
-          <div className="h-64">
+          <h3 className="text-sm font-medium text-gray-900 mb-4">Spending Distribution</h3>
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -244,16 +245,21 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
                   dataKey="amount"
                   nameKey="name"
                   cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                  labelLine={false}
+                  cy="45%"
+                  outerRadius={95}
+                  stroke="none"
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `${symbol}${Number(value).toFixed(2)}/mo`} />
+                <Tooltip formatter={(value) => `${symbol}${Number(value).toFixed(2)}/mo`} contentStyle={{ fontSize: 11 }} />
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
+                  formatter={(value) => <span style={{ color: '#374151' }}>{value}</span>}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -262,15 +268,15 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
 
       {/* Detailed Breakdown Table */}
       <div className="mt-8">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Detailed Breakdown</h3>
+        <h3 className="text-sm font-medium text-gray-900 mb-4">Detailed Breakdown</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm text-gray-900">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-2 font-medium text-gray-600">Service</th>
-                <th className="text-right py-2 font-medium text-gray-600">Amount</th>
-                <th className="text-right py-2 font-medium text-gray-600">Cycle</th>
-                <th className="text-right py-2 font-medium text-gray-600">Monthly</th>
+                <th className="text-left py-2 font-medium text-gray-900">Service</th>
+                <th className="text-right py-2 font-medium text-gray-900">Amount</th>
+                <th className="text-right py-2 font-medium text-gray-900">Cycle</th>
+                <th className="text-right py-2 font-medium text-gray-900">Monthly</th>
               </tr>
             </thead>
             <tbody>
@@ -283,13 +289,13 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
                     />
                     {item.name}
                   </td>
-                  <td className="text-right py-2 text-gray-600">
+                  <td className="text-right py-2 text-gray-900">
                     {getCurrencySymbol(item.originalCurrency)}{item.originalAmount?.toFixed(2)}
                     {item.originalCurrency !== homeCurrency && (
-                      <span className="text-xs text-gray-400 ml-1">({item.originalCurrency})</span>
+                      <span className="text-xs text-gray-700 ml-1">({item.originalCurrency})</span>
                     )}
                   </td>
-                  <td className="text-right py-2 text-gray-500 capitalize">
+                  <td className="text-right py-2 text-gray-900 capitalize">
                     {item.billingCycle}
                   </td>
                   <td className="text-right py-2 font-medium">
@@ -307,6 +313,35 @@ export function SpendingAnalytics({ subscriptions, homeCurrency }: SpendingAnaly
           </table>
         </div>
       </div>
+
+      {data?.byCategory && data.byCategory.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-medium text-gray-400 mb-3">Spending by Category</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart>
+              <Pie
+                data={data.byCategory}
+                dataKey="monthly"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ name, percent }: { name: string; percent: number }) =>
+                  `${name} ${(percent * 100).toFixed(0)}%`
+                }
+              >
+                {data.byCategory.map((_: unknown, index: number) => (
+                  <Cell
+                    key={index}
+                    fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}/mo`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   )
 }

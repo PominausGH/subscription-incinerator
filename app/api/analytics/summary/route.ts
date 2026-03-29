@@ -6,6 +6,7 @@ import {
   calculateYearlyTotal,
   getTopSpender,
   countByType,
+  calculateByCategory,
 } from '@/lib/analytics/queries'
 
 export async function GET(req: NextRequest) {
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
         billingCycle: true,
         status: true,
         type: true,
+        category: { select: { name: true } },
       },
     })
 
@@ -35,6 +37,18 @@ export async function GET(req: NextRequest) {
       ...sub,
       amount: sub.amount ? Number(sub.amount) : null,
     }))
+
+    const subscriptionsWithCategory = subscriptionsRaw.map((sub) => ({
+      id: sub.id,
+      serviceName: sub.serviceName,
+      amount: sub.amount ? Number(sub.amount) : null,
+      billingCycle: sub.billingCycle,
+      status: sub.status,
+      type: sub.type,
+      categoryName: (sub as any).category?.name ?? null,
+    }))
+
+    const byCategory = calculateByCategory(subscriptionsWithCategory)
 
     const filterType = typeFilter === 'all' || !typeFilter ? undefined : typeFilter
 
@@ -67,6 +81,7 @@ export async function GET(req: NextRequest) {
       yearlyTotal: Math.round(yearlyTotal * 100) / 100,
       subscriptionCount: counts,
       topSpender,
+      byCategory,
     })
   } catch (error) {
     console.error('Analytics summary error:', error)

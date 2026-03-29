@@ -1,4 +1,4 @@
-import { calculateMonthlyTotal, calculateYearlyTotal } from '@/lib/analytics/queries'
+import { calculateMonthlyTotal, calculateYearlyTotal, calculateByCategory } from '@/lib/analytics/queries'
 
 describe('Analytics Queries', () => {
   describe('calculateMonthlyTotal', () => {
@@ -36,5 +36,29 @@ describe('Analytics Queries', () => {
       const result = calculateYearlyTotal(subscriptions)
       expect(result).toBeCloseTo(9.99 * 12 + 120.00, 2) // 239.88
     })
+  })
+})
+
+describe('calculateByCategory', () => {
+  it('groups active subscriptions by category name', () => {
+    const subs = [
+      { amount: 10, billingCycle: 'monthly', status: 'active', categoryName: 'Entertainment' },
+      { amount: 5,  billingCycle: 'monthly', status: 'active', categoryName: 'Entertainment' },
+      { amount: 20, billingCycle: 'monthly', status: 'active', categoryName: 'Software' },
+      { amount: 8,  billingCycle: 'monthly', status: 'cancelled', categoryName: 'Software' },
+    ]
+    const result = calculateByCategory(subs)
+    expect(result).toEqual([
+      { name: 'Software',      monthly: 20, yearly: 240 },
+      { name: 'Entertainment', monthly: 15, yearly: 180 },
+    ])
+  })
+
+  it('labels subscriptions with no category as Uncategorised', () => {
+    const subs = [
+      { amount: 10, billingCycle: 'monthly', status: 'active', categoryName: null },
+    ]
+    const result = calculateByCategory(subs)
+    expect(result[0].name).toBe('Uncategorised')
   })
 })
