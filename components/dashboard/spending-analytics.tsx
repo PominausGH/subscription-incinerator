@@ -330,11 +330,8 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
               >
-                {data.byCategory.map((_: unknown, index: number) => (
-                  <Cell
-                    key={index}
-                    fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                  />
+                {data.byCategory.map((entry: { name: string }, index: number) => (
+                  <Cell key={entry.name} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip formatter={(value: number) => `${symbol}${value.toFixed(2)}/mo`} />

@@ -34,33 +34,22 @@ export async function GET(req: NextRequest) {
     })
 
     const subscriptions = subscriptionsRaw.map((sub) => ({
-      ...sub,
-      amount: sub.amount ? Number(sub.amount) : null,
-    }))
-
-    const subscriptionsWithCategory = subscriptionsRaw.map((sub) => ({
       id: sub.id,
       serviceName: sub.serviceName,
       amount: sub.amount ? Number(sub.amount) : null,
       billingCycle: sub.billingCycle,
       status: sub.status,
       type: sub.type,
-      categoryName: (sub as any).category?.name ?? null,
+      categoryName: sub.category?.name ?? null,
     }))
 
-    const byCategory = calculateByCategory(subscriptionsWithCategory)
+    const byCategory = calculateByCategory(subscriptions)
 
     const filterType = typeFilter === 'all' || !typeFilter ? undefined : typeFilter
 
     const monthlyTotal = calculateMonthlyTotal(subscriptions, filterType)
     const yearlyTotal = calculateYearlyTotal(subscriptions, filterType)
     const counts = countByType(subscriptions)
-
-    // Calculate previous month total for comparison (simplified - would need historical data)
-    const previousMonthTotal = monthlyTotal
-    const monthlyChange = previousMonthTotal > 0
-      ? ((monthlyTotal - previousMonthTotal) / previousMonthTotal) * 100
-      : 0
 
     const topSpenderRaw = getTopSpender(
       filterType ? subscriptions.filter((s) => s.type === filterType) : subscriptions
@@ -77,7 +66,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       monthlyTotal: Math.round(monthlyTotal * 100) / 100,
-      monthlyChange: Math.round(monthlyChange * 10) / 10,
       yearlyTotal: Math.round(yearlyTotal * 100) / 100,
       subscriptionCount: counts,
       topSpender,
