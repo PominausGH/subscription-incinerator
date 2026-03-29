@@ -2,6 +2,7 @@ export enum JobType {
   SEND_REMINDER = 'send_reminder',
   SCAN_INBOX = 'scan_inbox',
   CLEANUP_PENDING = 'cleanup_pending',
+  SYNC_PLAID = 'SYNC_PLAID',
 }
 
 export interface SendReminderJob {

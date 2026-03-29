@@ -1,10 +1,11 @@
-import { auth } from '@/lib/auth'
+import { auth, isPremium } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { GmailConnectionCard } from '@/components/settings/gmail-connection-card'
 import { CurrencySettings } from '@/components/settings/currency-settings'
 import { NotificationSettings } from '@/components/settings/notification-settings'
+import { PlaidConnectionCard } from '@/components/settings/plaid-connection-card'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -24,6 +25,13 @@ export default async function SettingsPage() {
   })
 
   const isGmailConnected = user?.emailProvider === 'gmail' && user?.oauthTokens !== null
+
+  const plaidItems = session.user.tier === 'premium'
+    ? await db.plaidItem.findMany({
+        where: { userId: session.user.id },
+        select: { id: true, institutionName: true },
+      })
+    : []
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -66,6 +74,16 @@ export default async function SettingsPage() {
           </p>
           <NotificationSettings />
         </section>
+
+        {isPremium(session.user) && (
+          <section className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-4">Bank Account Linking</h2>
+            <p className="text-gray-800 mb-6">
+              Connect your bank account to automatically detect subscriptions from transactions.
+            </p>
+            <PlaidConnectionCard connectedInstitutions={plaidItems} />
+          </section>
+        )}
       </div>
     </div>
   )

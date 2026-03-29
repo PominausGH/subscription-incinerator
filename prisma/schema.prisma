@@ -121,6 +121,36 @@ model PendingSubscription {
   @@map("pending_subscriptions")
 }
 
+model PlaidItem {
+  id              String         @id @default(cuid())
+  userId          String         @map("user_id")
+  itemId          String         @unique @map("item_id")
+  accessToken     String         @map("access_token")
+  institutionName String?        @map("institution_name")
+  cursor          String?
+  lastSyncedAt    DateTime?      @map("last_synced_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts        PlaidAccount[]
+
+  @@index([userId])
+  @@map("plaid_items")
+}
+
+model PlaidAccount {
+  id          String    @id @default(cuid())
+  plaidItemId String    @map("plaid_item_id")
+  accountId   String    @unique @map("account_id")
+  name        String
+  mask        String?
+  type        String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  plaidItem   PlaidItem @relation(fields: [plaidItemId], references: [id], onDelete: Cascade)
+
+  @@map("plaid_accounts")
+}
+
 model PushSubscription {
   id           String   @id @default(cuid())
   userId       String   @map("user_id")
@@ -250,6 +280,7 @@ model User {
   accounts                Account[]
   bankImports             BankImport[]
   savingsGoals            SavingsGoal[]
+  plaidItems              PlaidItem[]
   categories              Category[]
   pendingSubscriptions    PendingSubscription[]
   pushSubscriptions       PushSubscription[]

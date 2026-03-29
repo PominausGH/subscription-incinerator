@@ -2,7 +2,8 @@ import { Worker, Job } from 'bullmq'
 import { processReminderJob } from './processors/reminder-sender'
 import { processScanJob } from './processors/email-scanner'
 import { cleanupExpiredPending } from './processors/cleanup-pending'
-import { SendReminderJob, ScanInboxJob } from '@/lib/queue/jobs'
+import { processSyncPlaid } from './processors/plaid-sync'
+import { SendReminderJob, ScanInboxJob, JobType } from '@/lib/queue/jobs'
 import { connection } from '@/lib/queue/client'
 
 const reminderWorker = new Worker<SendReminderJob>(
@@ -18,6 +19,8 @@ const scanWorker = new Worker<ScanInboxJob | {}>(
   async (job) => {
     if (job.name === 'cleanup-pending') {
       await cleanupExpiredPending()
+    } else if (job.name === JobType.SYNC_PLAID) {
+      await processSyncPlaid(job as Job<{ plaidItemId: string }>)
     } else {
       await processScanJob(job as Job<ScanInboxJob>)
     }

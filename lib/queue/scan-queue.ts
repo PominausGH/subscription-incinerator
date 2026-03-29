@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq'
 import { connection } from './client'
-import { ScanInboxJob, CleanupPendingJob, JobData } from './jobs'
+import { ScanInboxJob, CleanupPendingJob, JobData, JobType } from './jobs'
 
 export const scanQueue = new Queue<JobData>('email-scanning', {
   connection: connection as any, // Type cast needed due to ioredis version mismatch between app and bullmq
@@ -55,5 +55,13 @@ export async function scheduleCleanupJob() {
       },
       removeOnComplete: true,
     }
+  )
+}
+
+export async function addPlaidSyncJob(plaidItemId: string) {
+  await scanQueue.add(
+    JobType.SYNC_PLAID,
+    { plaidItemId },
+    { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
   )
 }
