@@ -41,6 +41,21 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    // Record cancellation data when status is being set to 'cancelled'
+    const cancelData: Record<string, unknown> = {}
+    if (body.status === 'cancelled') {
+      const existing = await db.subscription.findFirst({
+        where: { id: subscriptionId, userId: session.user.id },
+        select: { amount: true, billingCycle: true, status: true },
+      })
+      if (existing && existing.status !== 'cancelled' && existing.amount) {
+        const { toMonthlyAmount } = await import('@/lib/analytics/queries')
+        const monthly = toMonthlyAmount(Number(existing.amount), existing.billingCycle ?? null)
+        cancelData.cancelledAt = new Date()
+        cancelData.savedAmount = Math.round(monthly * 12 * 100) / 100
+      }
+    }
+
     // Update the subscription with validated data
     const updated = await db.subscription.update({
       where: { id: subscriptionId },
@@ -61,6 +76,8 @@ export async function PATCH(
         }),
         ...(validated.type !== undefined && { type: validated.type }),
         ...(validated.categoryId !== undefined && { categoryId: validated.categoryId }),
+        ...(validated.description !== undefined && { description: validated.description }),
+        ...cancelData,
       },
     })
 

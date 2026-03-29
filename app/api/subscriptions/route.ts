@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         nextBillingDate: validated.nextBillingDate ? new Date(validated.nextBillingDate) : null,
         cancellationUrl: validated.cancellationUrl,
         categoryId: validated.categoryId,
+        description: validated.description,
         detectedFrom: 'manual',
       },
     })

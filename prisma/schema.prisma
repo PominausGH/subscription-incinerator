@@ -171,6 +171,21 @@ model ServiceConfig {
   @@map("service_configs")
 }
 
+model SavingsGoal {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  name         String
+  targetAmount Decimal   @db.Decimal(10, 2) @map("target_amount")
+  currency     String    @default("USD")
+  deadline     DateTime?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("savings_goals")
+}
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique @map("session_token")
@@ -191,6 +206,7 @@ model Subscription {
   currency             String                @default("USD")
   trialEndsAt          DateTime?             @map("trial_ends_at")
   nextBillingDate      DateTime?             @map("next_billing_date")
+  description          String?               @map("description")
   cancellationUrl      String?               @map("cancellation_url")
   autoCancelEnabled    Boolean               @default(false) @map("auto_cancel_enabled")
   detectedFrom         String?               @map("detected_from")
@@ -202,6 +218,8 @@ model Subscription {
   createdAt            DateTime              @default(now()) @map("created_at")
   updatedAt            DateTime              @updatedAt @map("updated_at")
   reminderSettings     Json?                 @map("reminder_settings")
+  cancelledAt          DateTime?             @map("cancelled_at")
+  savedAmount          Decimal?              @db.Decimal(10, 2) @map("saved_amount")
   cancellationAttempts CancellationAttempt[]
   reminders            Reminder[]
   category             Category?             @relation(fields: [categoryId], references: [id])
@@ -231,6 +249,7 @@ model User {
   homeCurrency            String                @default("USD") @map("home_currency")
   accounts                Account[]
   bankImports             BankImport[]
+  savingsGoals            SavingsGoal[]
   categories              Category[]
   pendingSubscriptions    PendingSubscription[]
   pushSubscriptions       PushSubscription[]

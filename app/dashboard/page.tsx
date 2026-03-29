@@ -3,14 +3,14 @@ import Link from 'next/link'
 import { db } from '@/lib/db/client'
 import { getCurrentUser } from '@/lib/session'
 import { AddSubscriptionForm } from '@/components/subscriptions/add-subscription-form'
-import { SubscriptionCard } from '@/components/subscriptions/subscription-card'
 import { ScanEmailsButton } from '@/components/dashboard/scan-emails-button'
 import { ExportCalendarButton } from '@/components/dashboard/export-calendar-button'
 import { PendingSubscriptionsSection } from '@/components/pending/pending-subscriptions-section'
 import { SpendingAnalytics } from '@/components/dashboard/spending-analytics'
 import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
 import { SubscriptionTypeFilter } from '@/components/subscriptions/subscription-type-filter'
-import { EmptySubscriptionsState } from '@/components/subscriptions/empty-state'
+import { SubscriptionListView } from '@/components/subscriptions/subscription-list-view'
+import { SavingsGoals } from '@/components/dashboard/savings-goals'
 
 export default async function DashboardPage({
   searchParams,
@@ -70,6 +70,15 @@ export default async function DashboardPage({
     orderBy: { createdAt: 'desc' },
   })
 
+  const cancelledSubs = await db.subscription.findMany({
+    where: { userId: user.id, status: 'cancelled' },
+    select: { savedAmount: true },
+  })
+  const totalSaved = cancelledSubs.reduce(
+    (sum, s) => sum + (s.savedAmount ? Number(s.savedAmount) : 0),
+    0
+  )
+
   // Convert Decimal types to numbers for client components
   const subscriptions = subscriptionsRaw.map(sub => ({
     ...sub,
@@ -85,7 +94,7 @@ export default async function DashboardPage({
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-800">
               Track and manage your subscriptions
             </p>
           </div>
@@ -113,26 +122,19 @@ export default async function DashboardPage({
         <SpendingAnalytics subscriptions={subscriptions} homeCurrency={userWithEmail?.homeCurrency || 'USD'} />
       </div>
 
+      {/* Savings Goals */}
+      <div className="mb-8">
+        <SavingsGoals totalSaved={totalSaved} currency={userWithEmail?.homeCurrency ?? 'USD'} />
+      </div>
+
       <div className="mb-8">
         <AddSubscriptionForm />
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Your Subscriptions ({subscriptions.length})</h2>
-          <SubscriptionTypeFilter currentFilter={typeFilter} />
-        </div>
-
-        {subscriptions.length === 0 ? (
-          <EmptySubscriptionsState />
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {subscriptions.map((sub) => (
-              <SubscriptionCard key={sub.id} subscription={sub} />
-            ))}
-          </div>
-        )}
-      </div>
+      <SubscriptionListView
+        subscriptions={subscriptions}
+        subscriptionTypeFilter={<SubscriptionTypeFilter currentFilter={typeFilter} />}
+      />
     </div>
   )
 }
