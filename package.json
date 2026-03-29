@@ -16,7 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "seed:merchants": "tsx prisma/seed-merchant-aliases.ts",
-    "seed:alternatives": "tsx prisma/seed-open-source-alternatives.ts"
+    "seed:alternatives": "tsx prisma/seed-open-source-alternatives.ts",
+    "seed:service-configs": "tsx prisma/seed-service-configs.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

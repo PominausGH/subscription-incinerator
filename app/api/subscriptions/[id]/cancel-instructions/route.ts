@@ -1,94 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
+import { getCancellationSteps, getCancellationUrl } from '@/lib/services/cancellation'
 
 export async function GET(
-  request: NextRequest,
+  _: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    // Check authentication using NextAuth v5
-    const session = await auth()
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+  const sub = await db.subscription.findFirst({
+    where: { id: params.id, userId: session.user.id },
+    select: { serviceName: true, cancellationUrl: true },
+  })
+  if (!sub) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    const { id } = params
+  const config = await db.serviceConfig.findFirst({
+    where: { serviceName: { equals: sub.serviceName, mode: 'insensitive' } },
+    select: { cancellationUrl: true, cancellationInstructions: true },
+  })
 
-    if (!id || typeof id !== 'string' || id.trim() === '') {
-      return NextResponse.json({ error: 'Invalid subscription ID' }, { status: 400 })
-    }
+  await db.cancellationAttempt.create({
+    data: {
+      subscriptionId: params.id,
+      method: 'guided',
+      status: 'in_progress',
+    },
+  })
 
-    // Fetch subscription and check ownership
-    const subscription = await db.subscription.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        userId: true,
-        serviceName: true,
-      },
-    })
-
-    if (!subscription) {
-      return NextResponse.json(
-        { error: 'Subscription not found' },
-        { status: 404 }
-      )
-    }
-
-    if (subscription.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
-    }
-
-    // Look up service config
-    const serviceConfig = await db.serviceConfig.findUnique({
-      where: { serviceName: subscription.serviceName },
-      select: {
-        serviceName: true,
-        cancellationUrl: true,
-        supportUrl: true,
-        logoUrl: true,
-        cancellationInstructions: true,
-      },
-    })
-
-    if (serviceConfig && serviceConfig.cancellationInstructions) {
-      return NextResponse.json({
-        serviceName: serviceConfig.serviceName,
-        cancellationUrl: serviceConfig.cancellationUrl,
-        supportUrl: serviceConfig.supportUrl,
-        logoUrl: serviceConfig.logoUrl,
-        instructions: serviceConfig.cancellationInstructions,
-      })
-    }
-
-    // Return generic fallback if no config found
-    return NextResponse.json({
-      serviceName: subscription.serviceName,
-      cancellationUrl: null,
-      supportUrl: null,
-      logoUrl: null,
-      instructions: [
-        'Log in to your account on the service website',
-        'Navigate to Account Settings or Subscription Management',
-        'Look for "Cancel Subscription" or "Manage Plan" option',
-        'Follow the cancellation flow and confirm',
-        'Save or screenshot any confirmation number',
-        'Check your email for cancellation confirmation',
-      ],
-    })
-  } catch (error) {
-    console.error('Error fetching cancel instructions:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+  return NextResponse.json({
+    steps: getCancellationSteps(config),
+    cancellationUrl: getCancellationUrl(config, sub.cancellationUrl),
+    hasServiceConfig: !!config,
+  })
 }
