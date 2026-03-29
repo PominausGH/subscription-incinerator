@@ -4,6 +4,7 @@ import { db } from '@/lib/db/client'
 import { updateSubscriptionSchema } from '@/lib/validations/subscription'
 import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 import { z } from 'zod'
+import { toMonthlyAmount } from '@/lib/analytics/queries'
 
 export async function PATCH(
   req: NextRequest,
@@ -49,7 +50,6 @@ export async function PATCH(
         select: { amount: true, billingCycle: true, status: true },
       })
       if (existing && existing.status !== 'cancelled' && existing.amount) {
-        const { toMonthlyAmount } = await import('@/lib/analytics/queries')
         const monthly = toMonthlyAmount(Number(existing.amount), existing.billingCycle ?? null)
         cancelData.cancelledAt = new Date()
         cancelData.savedAmount = Math.round(monthly * 12 * 100) / 100

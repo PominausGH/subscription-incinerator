@@ -24,8 +24,9 @@ export function SavingsGoals({ totalSaved, currency }: Props) {
 
   useEffect(() => {
     fetch('/api/savings-goals')
-      .then((r) => r.json())
+      .then((r) => r.ok ? r.json() : [])
       .then(setGoals)
+      .catch(() => setGoals([]))
   }, [])
 
   async function addGoal(e: React.FormEvent) {
@@ -45,8 +46,10 @@ export function SavingsGoals({ totalSaved, currency }: Props) {
   }
 
   async function deleteGoal(id: string) {
-    await fetch(`/api/savings-goals/${id}`, { method: 'DELETE' })
-    setGoals((prev) => prev.filter((g) => g.id !== id))
+    const res = await fetch(`/api/savings-goals/${id}`, { method: 'DELETE' })
+    if (res.ok) {
+      setGoals((prev) => prev.filter((g) => g.id !== id))
+    }
   }
 
   return (
