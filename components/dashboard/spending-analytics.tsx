@@ -337,7 +337,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
                   />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `$${value.toFixed(2)}/mo`} />
+              <Tooltip formatter={(value: number) => `${symbol}${value.toFixed(2)}/mo`} />
             </PieChart>
           </ResponsiveContainer>
         </div>
