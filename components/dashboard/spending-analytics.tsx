@@ -334,7 +334,8 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
                   <Cell key={entry.name} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number | string) => `${symbol}${Number(value).toFixed(2)}/mo`} />
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <Tooltip formatter={((value: number | string) => `${symbol}${Number(value).toFixed(2)}/mo`) as any} />
             </PieChart>
           </ResponsiveContainer>
         </div>
