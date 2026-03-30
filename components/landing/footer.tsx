@@ -21,19 +21,19 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Product</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <a href="/#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   Features
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <a href="/#how-it-works" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   How It Works
                 </a>
               </li>
               <li>
-                <a href="#faq" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
-                  FAQ
-                </a>
+                <Link href="/pricing" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Pricing
+                </Link>
               </li>
               <li>
                 <Link href="/login" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -45,8 +45,13 @@ export function Footer() {
 
           {/* Legal column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <h4 className="text-white font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
+              <li>
+                <Link href="/contact" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Contact Us
+                </Link>
+              </li>
               <li>
                 <Link href="/privacy" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   Privacy Policy
@@ -56,11 +61,6 @@ export function Footer() {
                 <Link href="/terms" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   Terms of Service
                 </Link>
-              </li>
-              <li>
-                <a href="mailto:support@subscriptionincinerator.app" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
-                  Contact
-                </a>
               </li>
             </ul>
           </div>

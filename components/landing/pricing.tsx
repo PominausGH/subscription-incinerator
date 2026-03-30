@@ -66,6 +66,10 @@ function UpgradeCTA() {
     setLoading(true)
     try {
       const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      if (res.status === 401) {
+        window.location.href = '/login?callbackUrl=/pricing'
+        return
+      }
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
