@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { usePlaidLink } from 'react-plaid-link'
+import { usePlaidLink, PlaidLinkOnSuccess } from 'react-plaid-link'
 import { Building2, CheckCircle, RefreshCw } from 'lucide-react'
 
 type ConnectedInstitution = { id: string; institutionName: string | null }
@@ -28,14 +28,14 @@ export function PlaidConnectionCard({ connectedInstitutions }: Props) {
     setLoading(false)
   }
 
-  const onSuccess = useCallback(
-    async (publicToken: string, metadata: { institution: { name: string } }) => {
+  const onSuccess = useCallback<PlaidLinkOnSuccess>(
+    async (publicToken, metadata) => {
       await fetch('/api/plaid/exchange-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           publicToken,
-          institutionName: metadata.institution.name,
+          institutionName: metadata.institution?.name ?? null,
         }),
       })
       setInstitutions((prev) => [
