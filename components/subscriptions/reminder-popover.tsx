@@ -135,7 +135,7 @@ export function ReminderPopover({
                 />
                 <div>
                   <span className="text-sm text-gray-700">Use default settings</span>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-700">
                     ({defaultTimings.join(', ')} before)
                   </p>
                 </div>

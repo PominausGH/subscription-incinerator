@@ -21,6 +21,7 @@ type Subscription = {
   type: 'PERSONAL' | 'BUSINESS'
   categoryId: string | null
   category?: { id: string; name: string } | null
+  description: string | null
 }
 
 export function SubscriptionCard({ subscription }: { subscription: Subscription }) {
@@ -97,6 +98,11 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
           </p>
         ) : (
           <p className="text-sm text-gray-700 italic mb-2">No price set</p>
+        )}
+
+        {/* Description */}
+        {subscription.description && (
+          <p className="text-sm text-gray-700 mb-2 leading-snug">{subscription.description}</p>
         )}
 
         {/* Details */}

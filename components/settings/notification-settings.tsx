@@ -174,7 +174,7 @@ export function NotificationSettings({ initialPreferences }: NotificationSetting
               </button>
             )}
             {!pushSupported && (
-              <span className="text-xs text-gray-400">(not supported)</span>
+              <span className="text-xs text-gray-600">(not supported)</span>
             )}
           </label>
         </div>

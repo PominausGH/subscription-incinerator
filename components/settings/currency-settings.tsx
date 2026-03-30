@@ -62,7 +62,7 @@ export function CurrencySettings({ currentCurrency }: CurrencySettingsProps) {
               </option>
             ))}
           </select>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-700">
             All subscription costs will be converted to this currency in reports.
           </p>
         </div>

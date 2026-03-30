@@ -38,6 +38,7 @@ export const mockSubscription: Subscription = {
   bankTransactionData: null,
   reminderSettings: null,
   externalId: null,
+  description: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 }

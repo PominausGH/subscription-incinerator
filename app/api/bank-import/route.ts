@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, isPremium } from '@/lib/auth'
+import { auth } from '@/lib/auth'
 import { processBankStatement } from '@/lib/bank-import/processor'
 import { BankImportError } from '@/lib/bank-import/errors'
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
@@ -21,13 +21,6 @@ export async function POST(req: NextRequest) {
       return rateLimitResponse(rateLimit.reset)
     }
 
-    // Check premium tier
-    if (!isPremium({ tier: session.user.tier })) {
-      return NextResponse.json(
-        { error: 'Premium subscription required for bank import' },
-        { status: 403 }
-      )
-    }
 
     const formData = await req.formData()
     const file = formData.get('file') as File | null

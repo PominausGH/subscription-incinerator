@@ -73,7 +73,7 @@ export function OpenSourceAlternatives({ subscriptionId }: { subscriptionId: str
       {isOpen && alternatives !== null && (
         <div className="mt-2 space-y-2">
           {alternatives.length === 0 ? (
-            <p className="text-sm text-gray-500 italic">
+            <p className="text-sm text-gray-700 italic">
               No open-source alternatives found for {serviceName}
             </p>
           ) : (

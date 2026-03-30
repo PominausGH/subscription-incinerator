@@ -137,7 +137,7 @@ export function GmailConnectionCard({ isConnected, userEmail, userTier }: GmailC
         Connect Gmail
       </Button>
 
-      <div className="mt-4 space-y-2 text-sm text-gray-500">
+      <div className="mt-4 space-y-2 text-sm text-gray-700">
         <p>✓ Read-only access</p>
         <p>✓ Scans every 3 days automatically</p>
         <p>✓ Detects trials and billing dates</p>

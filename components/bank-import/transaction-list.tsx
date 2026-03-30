@@ -86,7 +86,7 @@ export function TransactionList({
                   </span>
                 )}
               </div>
-              <div className="text-sm text-gray-500 truncate">
+              <div className="text-sm text-gray-700 truncate">
                 {txn.date} • {txn.description}
               </div>
             </div>
@@ -98,7 +98,7 @@ export function TransactionList({
         ))}
 
         {filtered.length === 0 && (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-gray-700">
             No transactions found
           </div>
         )}
