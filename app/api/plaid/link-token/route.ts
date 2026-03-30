@@ -14,7 +14,7 @@ export async function POST() {
     user: { client_user_id: session.user.id },
     client_name: 'Subscription Incinerator',
     products: [Products.Transactions],
-    country_codes: [CountryCode.Us, CountryCode.Gb, CountryCode.Au],
+    country_codes: [CountryCode.Us, CountryCode.Gb],
     language: 'en',
   })
 
