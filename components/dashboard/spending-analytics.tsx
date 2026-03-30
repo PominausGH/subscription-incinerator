@@ -334,7 +334,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
                   <Cell key={entry.name} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => `${symbol}${value.toFixed(2)}/mo`} />
+              <Tooltip formatter={(value: number | string) => `${symbol}${Number(value).toFixed(2)}/mo`} />
             </PieChart>
           </ResponsiveContainer>
         </div>
