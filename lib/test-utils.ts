@@ -39,6 +39,8 @@ export const mockSubscription: Subscription = {
   reminderSettings: null,
   externalId: null,
   description: null,
+  cancelledAt: null,
+  savedAmount: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 }
