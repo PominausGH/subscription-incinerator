@@ -5,6 +5,7 @@ import {
   Solution,
   Features,
   HowItWorks,
+  Pricing,
   FAQ,
   FinalCTA,
   Footer,
@@ -19,6 +20,7 @@ export default function Home() {
       <Solution />
       <Features />
       <HowItWorks />
+      <Pricing />
       <FAQ />
       <FinalCTA />
       <Footer />
