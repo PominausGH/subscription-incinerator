@@ -40,7 +40,7 @@ export function PlaidConnectionCard({ connectedInstitutions }: Props) {
       })
       setInstitutions((prev) => [
         ...prev,
-        { id: Date.now().toString(), institutionName: metadata.institution.name },
+        { id: Date.now().toString(), institutionName: metadata.institution?.name ?? null },
       ])
       setLinkToken(null)
     },
