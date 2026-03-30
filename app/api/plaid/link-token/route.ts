@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
-import { isPremium } from '@/lib/auth'
+import { auth, isPremium } from '@/lib/auth'
 import { plaidClient } from '@/lib/plaid/client'
 import { CountryCode, Products } from 'plaid'
 
