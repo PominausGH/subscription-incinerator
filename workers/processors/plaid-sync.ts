@@ -36,7 +36,8 @@ export async function processSyncPlaid(job: Job<{ plaidItemId: string }>) {
   const debits = added
     .filter((t) => t.amount > 0)
     .map((t) => ({
-      merchantName: t.merchant_name ?? t.name,
+      merchant_name: t.merchant_name ?? null,
+      name: t.name,
       amount: t.amount,
       date: t.date,
     }))
@@ -44,22 +45,23 @@ export async function processSyncPlaid(job: Job<{ plaidItemId: string }>) {
   const recurring = filterRecurringTransactions(debits)
 
   for (const t of recurring) {
-    if (!t.merchantName) continue
+    const merchantName = t.merchant_name ?? t.name
+    if (!merchantName) continue
 
     const exists = await db.pendingSubscription.findFirst({
-      where: { userId: item.userId, serviceName: t.merchantName, status: 'pending' },
+      where: { userId: item.userId, serviceName: merchantName, status: 'pending' },
     })
     if (exists) continue
 
     await db.pendingSubscription.create({
       data: {
         userId: item.userId,
-        serviceName: t.merchantName,
+        serviceName: merchantName,
         confidence: 0.75,
         amount: t.amount,
         currency: 'USD',
-        emailId: `plaid-${t.date}-${t.merchantName.replace(/\s+/g, '-')}`,
-        emailSubject: `Recurring charge from ${t.merchantName}`,
+        emailId: `plaid-${t.date}-${merchantName.replace(/\s+/g, '-')}`,
+        emailSubject: `Recurring charge from ${merchantName}`,
         emailFrom: 'plaid-sync',
         emailDate: new Date(t.date),
         status: 'pending',
