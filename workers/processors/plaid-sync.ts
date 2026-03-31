@@ -14,7 +14,8 @@ export async function processSyncPlaid(job: Job<{ plaidItemId: string }>) {
 
   const accessToken = decryptAccessToken(item.accessToken)
   let cursor = item.cursor ?? undefined
-  const added: Array<{ merchant_name: string | null; name: string; amount: number; date: string }> = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const added: any[] = []
 
   let hasMore = true
   while (hasMore) {
