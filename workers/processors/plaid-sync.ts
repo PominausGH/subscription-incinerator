@@ -37,16 +37,15 @@ export async function processSyncPlaid(job: Job<{ plaidItemId: string }>) {
   const debits = added
     .filter((t) => t.amount > 0)
     .map((t) => ({
-      merchant_name: t.merchant_name ?? null,
-      name: t.name,
-      amount: t.amount,
-      date: t.date,
+      merchantName: (t.merchant_name ?? t.name) as string | null,
+      amount: t.amount as number,
+      date: t.date as string,
     }))
 
   const recurring = filterRecurringTransactions(debits)
 
   for (const t of recurring) {
-    const merchantName = t.merchant_name ?? t.name
+    const merchantName = t.merchantName
     if (!merchantName) continue
 
     const exists = await db.pendingSubscription.findFirst({
