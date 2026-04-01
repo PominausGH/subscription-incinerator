@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Subscription Incinerator - Track & Cancel Forgotten Subscriptions Free",
@@ -28,8 +29,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevent flash of wrong theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('si-theme')||'dark';document.documentElement.classList.toggle('dark',t==='dark')})()`,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

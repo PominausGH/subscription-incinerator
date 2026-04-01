@@ -2,15 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light mode (default) */
 :root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-bg-2: #f1f5f9;
+  --card-border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+}
+
+/* Dark mode */
+.dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --card-bg: #121212;
+  --card-bg-2: #1a1a1a;
+  --card-border: #242424;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 html {
@@ -32,5 +52,15 @@ html {
 
   .glow-fire {
     box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+  }
+
+  /* Theme-aware card utilities */
+  .theme-card {
+    background: var(--card-bg);
+    border-color: var(--card-border);
+  }
+
+  .theme-card-2 {
+    background: var(--card-bg-2);
   }
 }

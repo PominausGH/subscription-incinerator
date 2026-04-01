@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { useState } from 'react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 interface NavigationProps {
   user?: {
@@ -54,11 +55,11 @@ export function Navigation({ user }: NavigationProps) {
   // App navigation (logged in)
   if (isLoggedIn) {
     return (
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center space-x-2 text-gray-900 font-bold text-xl">
+            <Link href="/dashboard" className="flex items-center space-x-2 text-gray-900 dark:text-white font-bold text-xl">
               <span className="text-2xl">🔥</span>
               <span className="hidden sm:inline">Subscription Incinerator</span>
               <span className="sm:hidden">SI</span>
@@ -66,18 +67,18 @@ export function Navigation({ user }: NavigationProps) {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center space-x-6">
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className={`text-sm font-medium transition-colors ${
-                  pathname === '/dashboard' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'
+                  pathname === '/dashboard' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 Dashboard
               </Link>
-              <Link 
-                href="/import" 
+              <Link
+                href="/import"
                 className={`text-sm font-medium transition-colors ${
-                  pathname === '/import' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'
+                  pathname === '/import' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 Import
@@ -85,7 +86,8 @@ export function Navigation({ user }: NavigationProps) {
             </div>
 
             {/* User Menu */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
               {user.tier === 'premium' && (
                 <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-amber-400 to-orange-500 text-white">
                   Premium
@@ -95,7 +97,7 @@ export function Navigation({ user }: NavigationProps) {
               <div className="relative">
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 text-sm text-gray-700 hover:text-gray-900 focus:outline-none"
+                  className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
                     {user.name?.[0] || user.email?.[0] || '?'}
@@ -106,10 +108,10 @@ export function Navigation({ user }: NavigationProps) {
                 </button>
 
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
-                      <p className="text-xs text-gray-700 truncate">{user.email}</p>
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-800">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name || 'User'}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
                     </div>
                     <button
                       onClick={() => {

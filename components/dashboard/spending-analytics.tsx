@@ -83,10 +83,10 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
 
   if (activeWithAmount.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Spending Overview</h2>
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
             <button
               onClick={() => setFilter('all')}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -150,10 +150,10 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
   const pieData = monthlyData.slice(0, 8) // Top 8 for readability
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Spending Overview</h2>
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
           <button
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -316,7 +316,7 @@ export function SpendingAnalytics({ subscriptions, homeCurrency, data }: Spendin
 
       {data?.byCategory && data.byCategory.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Spending by Category</h3>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Spending by Category</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie

@@ -47,11 +47,11 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
   }
 
   return (
-    <div className="bg-gray-900 rounded-xl p-5 border border-gray-800">
+    <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-4 h-4 text-green-400" />
-          <h3 className="text-sm font-medium text-gray-300">Savings Goals</h3>
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Savings Goals</h3>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
@@ -61,8 +61,8 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
         </button>
       </div>
 
-      <div className="mb-4 p-3 bg-green-900/20 rounded-lg border border-green-800/30">
-        <p className="text-xs text-gray-400">Total saved by cancelling</p>
+      <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/30">
+        <p className="text-xs text-gray-500 dark:text-gray-400">Total saved by cancelling</p>
         <p className="text-2xl font-bold text-green-400">
           {currency} {totalSaved.toFixed(2)}
           <span className="text-xs text-gray-500 font-normal ml-1">/yr</span>
@@ -75,7 +75,7 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Goal name (e.g. Holiday Fund)"
-            className="w-full bg-gray-800 text-sm rounded-lg px-3 py-2 text-white border border-gray-700"
+            className="w-full bg-gray-100 dark:bg-gray-800 text-sm rounded-lg px-3 py-2 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700"
             required
           />
           <input
@@ -83,7 +83,7 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
             value={target}
             onChange={(e) => setTarget(e.target.value)}
             placeholder="Target amount"
-            className="w-full bg-gray-800 text-sm rounded-lg px-3 py-2 text-white border border-gray-700"
+            className="w-full bg-gray-100 dark:bg-gray-800 text-sm rounded-lg px-3 py-2 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700"
             min="1"
             required
           />
@@ -102,7 +102,7 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
           const progress = Math.min((totalSaved / targetAmt) * 100, 100)
           return (
             <div key={goal.id}>
-              <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
                 <span>{goal.name}</span>
                 <div className="flex items-center gap-2">
                   <span>{currency} {totalSaved.toFixed(0)} / {targetAmt.toFixed(0)}</span>
@@ -111,7 +111,7 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
                   </button>
                 </div>
               </div>
-              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-green-500 rounded-full transition-all"
                   style={{ width: `${progress}%` }}
@@ -121,7 +121,7 @@ export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props)
           )
         })}
         {goals.length === 0 && !showForm && (
-          <p className="text-xs text-gray-600 text-center py-2">
+          <p className="text-xs text-gray-400 dark:text-gray-600 text-center py-2">
             No goals yet — add one to track progress
           </p>
         )}
