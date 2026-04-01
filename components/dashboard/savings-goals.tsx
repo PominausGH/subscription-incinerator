@@ -14,20 +14,14 @@ type SavingsGoal = {
 type Props = {
   totalSaved: number
   currency: string
+  initialGoals?: SavingsGoal[]
 }
 
-export function SavingsGoals({ totalSaved, currency }: Props) {
-  const [goals, setGoals] = useState<SavingsGoal[]>([])
+export function SavingsGoals({ totalSaved, currency, initialGoals = [] }: Props) {
+  const [goals, setGoals] = useState<SavingsGoal[]>(initialGoals)
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [target, setTarget] = useState('')
-
-  useEffect(() => {
-    fetch('/api/savings-goals')
-      .then((r) => r.ok ? r.json() : [])
-      .then(setGoals)
-      .catch(() => setGoals([]))
-  }, [])
 
   async function addGoal(e: React.FormEvent) {
     e.preventDefault()

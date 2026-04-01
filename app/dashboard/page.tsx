@@ -79,6 +79,18 @@ export default async function DashboardPage({
     0
   )
 
+  const savingsGoalsRaw = await db.savingsGoal.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+  })
+  const savingsGoals = savingsGoalsRaw.map(g => ({
+    id: g.id,
+    name: g.name,
+    targetAmount: g.targetAmount.toString(),
+    currency: g.currency,
+    deadline: g.deadline ? g.deadline.toISOString() : null,
+  }))
+
   // Convert Decimal types to numbers for client components
   const subscriptions = subscriptionsRaw.map(sub => ({
     ...sub,
@@ -124,7 +136,7 @@ export default async function DashboardPage({
 
       {/* Savings Goals */}
       <div className="mb-8">
-        <SavingsGoals totalSaved={totalSaved} currency={userWithEmail?.homeCurrency ?? 'USD'} />
+        <SavingsGoals totalSaved={totalSaved} currency={userWithEmail?.homeCurrency ?? 'USD'} initialGoals={savingsGoals} />
       </div>
 
       <div className="mb-8">

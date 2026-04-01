@@ -18,7 +18,9 @@ export async function GET() {
     where: { userId: session.user.id },
     orderBy: { createdAt: 'desc' },
   })
-  return NextResponse.json(goals)
+  return NextResponse.json(goals, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }
 
 export async function POST(req: NextRequest) {
