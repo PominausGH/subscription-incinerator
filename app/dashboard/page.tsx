@@ -97,6 +97,20 @@ export default async function DashboardPage({
     amount: sub.amount ? Number(sub.amount) : null
   }))
 
+  // Count user's subscriptions that have open source alternatives
+  const activeSubNames = subscriptions
+    .filter(s => s.status === 'active' || s.status === 'trial')
+    .map(s => s.serviceName)
+
+  const matchedSubs = activeSubNames.length > 0
+    ? await db.openSourceAlternative.findMany({
+        where: { serviceName: { in: activeSubNames } },
+        select: { serviceName: true },
+        distinct: ['serviceName'],
+      })
+    : []
+  const matchedSubCount = matchedSubs.length
+
   return (
     <div className="px-4 sm:px-0">
       <Suspense fallback={null}>
@@ -105,8 +119,8 @@ export default async function DashboardPage({
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="mt-2 text-sm text-gray-800">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="mt-2 text-sm text-gray-800 dark:text-gray-300">
               Track and manage your subscriptions
             </p>
           </div>
@@ -138,6 +152,33 @@ export default async function DashboardPage({
       <div className="mb-8">
         <SavingsGoals totalSaved={totalSaved} currency={userWithEmail?.homeCurrency ?? 'USD'} initialGoals={savingsGoals} />
       </div>
+
+      {/* Open Source Teaser */}
+      {matchedSubCount > 0 && (
+        <div className="mb-8">
+          <Link
+            href="/dashboard/open-source"
+            className="block bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl p-5 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🌿</span>
+                <div>
+                  <p className="font-semibold text-emerald-900 dark:text-emerald-300 text-sm">
+                    {matchedSubCount} of your subscription{matchedSubCount !== 1 ? 's have' : ' has'} a free open source alternative
+                  </p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-500 mt-0.5">
+                    Click to explore free replacements and save money
+                  </p>
+                </div>
+              </div>
+              <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium group-hover:underline">
+                View all →
+              </span>
+            </div>
+          </Link>
+        </div>
+      )}
 
       <div className="mb-8">
         <AddSubscriptionForm />
