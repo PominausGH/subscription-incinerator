@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     where: {
       serviceName: {
         mode: 'insensitive',
-        contains: serviceName.trim(),
+        contains: cleanName,
       },
     },
     orderBy: { stars: 'desc' },
