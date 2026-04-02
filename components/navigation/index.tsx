@@ -83,6 +83,14 @@ export function Navigation({ user }: NavigationProps) {
               >
                 Import
               </Link>
+              <Link
+                href="/dashboard/open-source"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/dashboard/open-source' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Open Source
+              </Link>
             </div>
 
             {/* User Menu */}
@@ -140,13 +148,21 @@ export function Navigation({ user }: NavigationProps) {
             >
               Dashboard
             </Link>
-            <Link 
-              href="/import" 
+            <Link
+              href="/import"
               className={`flex-1 py-3 text-center text-sm font-medium ${
                 pathname === '/import' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
               }`}
             >
               Import
+            </Link>
+            <Link
+              href="/dashboard/open-source"
+              className={`flex-1 py-3 text-center text-sm font-medium ${
+                pathname === '/dashboard/open-source' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
+              }`}
+            >
+              Open Source
             </Link>
           </div>
         </div>
