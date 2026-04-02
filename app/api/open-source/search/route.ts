@@ -15,8 +15,16 @@ export async function POST(req: NextRequest) {
   if (!serviceName || typeof serviceName !== 'string') {
     return NextResponse.json({ error: 'serviceName required' }, { status: 400 })
   }
+  if (serviceName.trim().length === 0 || serviceName.length > 100) {
+    return NextResponse.json({ error: 'serviceName must be 1-100 characters' }, { status: 400 })
+  }
 
-  const yearlySaving = monthlyPrice ? Math.round(Number(monthlyPrice) * 12) : null
+  const cleanName = serviceName.trim().slice(0, 100).replace(/["\n\r]/g, ' ')
+
+  const price = Number(monthlyPrice)
+  const yearlySaving = monthlyPrice != null && isFinite(price) && price >= 0
+    ? Math.round(price * 12)
+    : null
 
   // Step 1: DB lookup (case-insensitive)
   const dbResults = await db.openSourceAlternative.findMany({
@@ -41,12 +49,15 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: 'user',
-          content: `Suggest up to 3 open source alternatives to "${serviceName}". For each, reply with a JSON array (no markdown, just raw JSON) with objects containing these exact keys: alternativeName, description (1 sentence), websiteUrl, sourceCodeUrl (GitHub URL), stars (estimated GitHub stars as integer), license (e.g. MIT, GPL-2.0), category (e.g. Productivity, Design, Communication). Only include actively maintained projects.`,
+          content: `Suggest up to 3 open source alternatives to "${cleanName}". For each, reply with a JSON array (no markdown, just raw JSON) with objects containing these exact keys: alternativeName, description (1 sentence), websiteUrl, sourceCodeUrl (GitHub URL), stars (estimated GitHub stars as integer), license (e.g. MIT, GPL-2.0), category (e.g. Productivity, Design, Communication). Only include actively maintained projects.`,
         },
       ],
     })
 
-    const text = (message.content[0] as { type: string; text: string }).text.trim()
+    const block = message.content[0]
+    if (!block || block.type !== 'text') throw new Error('Unexpected AI response format')
+    const raw = block.text.trim()
+    const text = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
     const parsed = JSON.parse(text)
     const alternatives = (Array.isArray(parsed) ? parsed : []).map((a: Record<string, unknown>, i: number) => ({
       id: `ai-${i}`,
@@ -61,7 +72,8 @@ export async function POST(req: NextRequest) {
     }))
 
     return NextResponse.json({ alternatives, source: 'ai', yearlySaving })
-  } catch {
+  } catch (error) {
+    console.error('AI alternatives error:', error)
     return NextResponse.json({ alternatives: [], source: 'ai', yearlySaving })
   }
 }
