@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { db } from '@/lib/db/client'
 import { getCurrentUser } from '@/lib/session'
 import { OpenSourcePageClient } from '@/components/open-source/open-source-page-client'
@@ -9,17 +10,17 @@ export const metadata = {
 
 export default async function OpenSourcePage() {
   const user = await getCurrentUser()
+  if (!user) redirect('/login')
 
-  // Fetch all alternatives grouped by category
-  const allAlternatives = await db.openSourceAlternative.findMany({
-    orderBy: [{ category: 'asc' }, { stars: 'desc' }],
-  })
-
-  // Get user's active subscription service names for matching
-  const activeSubs = await db.subscription.findMany({
-    where: { userId: user.id, status: { in: ['active', 'trial'] } },
-    select: { serviceName: true },
-  })
+  const [allAlternatives, activeSubs] = await Promise.all([
+    db.openSourceAlternative.findMany({
+      orderBy: [{ category: 'asc' }, { stars: 'desc' }],
+    }),
+    db.subscription.findMany({
+      where: { userId: user.id, status: { in: ['active', 'trial'] } },
+      select: { serviceName: true },
+    }),
+  ])
   const userServiceNames = new Set(
     activeSubs.map(s => s.serviceName.toLowerCase())
   )
@@ -33,12 +34,11 @@ export default async function OpenSourcePage() {
   }
 
   // Find which service names from the alternatives DB match the user's subscriptions
-  const matchedServiceNames = new Set<string>()
-  for (const alt of allAlternatives) {
-    if (userServiceNames.has(alt.serviceName.toLowerCase())) {
-      matchedServiceNames.add(alt.serviceName)
-    }
-  }
+  const matchedServiceNames = new Set(
+    allAlternatives
+      .filter(alt => userServiceNames.has(alt.serviceName.toLowerCase()))
+      .map(alt => alt.serviceName)
+  )
 
   return (
     <OpenSourcePageClient
