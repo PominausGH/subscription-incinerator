@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://subscriptionincinerator.app/",
   },
+  other: {
+    'application-name': 'Subscription Incinerator',
+  },
 };
 
 export default function RootLayout({
