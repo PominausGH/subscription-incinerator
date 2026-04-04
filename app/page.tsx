@@ -8,6 +8,7 @@ import {
   HowItWorks,
   Pricing,
   FAQ,
+  Testimonials,
   FinalCTA,
   Footer,
 } from '@/components/landing'
@@ -95,6 +96,7 @@ export default function Home() {
       <HowItWorks />
       <Pricing />
       <FAQ />
+      <Testimonials />
       <FinalCTA />
       <Footer />
     </main>
