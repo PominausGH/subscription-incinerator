@@ -21,14 +21,14 @@ const freeFeatures = [
 
 const premiumFeatures = [
   { label: 'Everything in Free', included: true },
-  { label: 'Unlimited subscriptions', included: true },
-  { label: 'Gmail auto-scan', included: true },
-  { label: 'Bank statement import (CSV)', included: true },
-  { label: 'Bank account linking (Plaid)', included: true },
-  { label: 'Full category breakdown', included: true },
-  { label: 'Savings goals', included: true },
-  { label: 'Cancellation assistant', included: true },
-  { label: 'Priority support', included: true },
+  { label: 'Track every subscription — no limits', included: true },
+  { label: 'Find subscriptions you didn\'t know you had', included: true },
+  { label: 'Spot hidden charges in your bank statements', included: true },
+  { label: 'Live bank account sync (coming soon)', included: true },
+  { label: 'See exactly where your money goes', included: true },
+  { label: 'Set goals and watch your savings grow', included: true },
+  { label: 'Cancel anything — step-by-step guides for 40+ services', included: true },
+  { label: 'Get help fast when you need it', included: true },
 ]
 
 function CheckIcon() {
@@ -59,13 +59,17 @@ function CrossIcon() {
   )
 }
 
-function UpgradeCTA() {
+function UpgradeCTA({ annual }: { annual: boolean }) {
   const [loading, setLoading] = useState(false)
 
   async function handleUpgrade() {
     setLoading(true)
     try {
-      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ annual }),
+      })
       if (res.status === 401) {
         window.location.href = '/login?callbackUrl=/pricing'
         return
@@ -143,6 +147,15 @@ export function Pricing() {
             </button>
           </div>
         </motion.div>
+
+        {/* Urgency stat */}
+        <div className="text-center mb-10">
+          <p className="text-gray-400 text-sm">
+            💸 The average person wastes{' '}
+            <span className="text-fire-400 font-semibold">$273/year</span>{' '}
+            on forgotten subscriptions. Premium pays for itself the day you find your first forgotten charge.
+          </p>
+        </div>
 
         {/* Cards */}
         <div className="grid md:grid-cols-2 gap-6 items-start">
@@ -229,7 +242,7 @@ export function Pricing() {
               )}
             </div>
 
-            <UpgradeCTA />
+            <UpgradeCTA annual={annual} />
 
             <p className="text-center text-xs text-gray-500 mt-3">
               7-day free trial · Cancel anytime
@@ -244,6 +257,18 @@ export function Pricing() {
               ))}
             </ul>
           </motion.div>
+        </div>
+
+        {/* Objection handling */}
+        <div className="mt-12 max-w-xl mx-auto grid sm:grid-cols-2 gap-4">
+          <div className="bg-dark-700 rounded-lg p-4 border border-dark-600">
+            <p className="text-white font-semibold text-sm mb-1">Why not just use a spreadsheet?</p>
+            <p className="text-gray-400 text-xs leading-relaxed">You could. Most people don&apos;t. We automate the finding, tracking, and reminding so you actually do it.</p>
+          </div>
+          <div className="bg-dark-700 rounded-lg p-4 border border-dark-600">
+            <p className="text-white font-semibold text-sm mb-1">Is the free plan actually free?</p>
+            <p className="text-gray-400 text-xs leading-relaxed">Yes — forever. No credit card, no trial. Track up to 10 subscriptions and get reminders at zero cost.</p>
+          </div>
         </div>
       </div>
     </section>
