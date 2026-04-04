@@ -4,6 +4,7 @@ import {
   PainPoints,
   Solution,
   Features,
+  TrustBar,
   HowItWorks,
   Pricing,
   FAQ,
@@ -90,6 +91,7 @@ export default function Home() {
       <PainPoints />
       <Solution />
       <Features />
+      <TrustBar />
       <HowItWorks />
       <Pricing />
       <FAQ />
