@@ -64,6 +64,9 @@ export function Hero() {
                 Learn More
               </a>
             </div>
+            <p className="mt-4 text-sm text-gray-500">
+              🌍 Works worldwide — GBP, USD, EUR & more
+            </p>
           </motion.div>
 
           {/* App mockup placeholder */}
@@ -81,7 +84,7 @@ export function Hero() {
                     <div className="text-white font-medium">Netflix</div>
                     <div className="text-sm text-gray-400">Trial ends in 2 days</div>
                   </div>
-                  <div className="ml-auto text-fire-500 font-semibold">£9.99/mo</div>
+                  <div className="ml-auto text-fire-500 font-semibold">$9.99/mo</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold">S</div>
@@ -89,7 +92,7 @@ export function Hero() {
                     <div className="text-white font-medium">Spotify</div>
                     <div className="text-sm text-gray-400">Renews in 5 days</div>
                   </div>
-                  <div className="ml-auto text-gray-400 font-semibold">£10.99/mo</div>
+                  <div className="ml-auto text-gray-400 font-semibold">$10.99/mo</div>
                 </div>
                 <div className="flex items-center gap-3 opacity-50">
                   <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold">A</div>
@@ -97,7 +100,7 @@ export function Hero() {
                     <div className="text-white font-medium line-through">Adobe CC</div>
                     <div className="text-sm text-fire-500">Cancelled</div>
                   </div>
-                  <div className="ml-auto text-gray-500 font-semibold line-through">£54.99/mo</div>
+                  <div className="ml-auto text-gray-500 font-semibold line-through">$54.99/mo</div>
                 </div>
               </div>
             </div>
