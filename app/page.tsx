@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import {
   Navigation,
   Hero,
@@ -12,6 +13,11 @@ import {
   FinalCTA,
   Footer,
 } from '@/components/landing'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+  openGraph: { url: '/' },
+}
 
 const softwareSchema = {
   "@context": "https://schema.org",

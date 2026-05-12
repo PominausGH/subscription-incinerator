@@ -1,5 +1,13 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Mail, RefreshCw, LifeBuoy, ChevronLeft } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Check your email',
+  description: 'We sent you a magic link to sign in to Subscription Incinerator.',
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/verify-request' },
+}
 
 export default function VerifyRequestPage() {
   return (

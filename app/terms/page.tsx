@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Subscription Incinerator',
+  title: 'Terms of Service',
   description: 'Terms of Service for Subscription Incinerator',
+  alternates: { canonical: '/terms' },
 }
 
 export default function TermsPage() {

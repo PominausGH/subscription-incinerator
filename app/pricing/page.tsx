@@ -2,9 +2,17 @@ import { Navigation } from '@/components/landing/navigation'
 import { Pricing } from '@/components/landing/pricing'
 import { Footer } from '@/components/landing/footer'
 
-export const metadata = {
-  title: 'Pricing — Subscription Incinerator',
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Pricing',
   description: 'Start free and upgrade when you\'re ready. $9/mo or $79/year.',
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: 'Pricing — Subscription Incinerator',
+    description: 'Start free and upgrade when you\'re ready. $9/mo or $79/year.',
+    url: '/pricing',
+  },
 }
 
 export default function PricingPage() {
