@@ -6,11 +6,11 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'Start free and upgrade when you\'re ready. $9/mo or $79/year.',
+  description: 'Start free and upgrade when you\'re ready. $9/mo or $50/year.',
   alternates: { canonical: '/pricing' },
   openGraph: {
     title: 'Pricing — Subscription Incinerator',
-    description: 'Start free and upgrade when you\'re ready. $9/mo or $79/year.',
+    description: 'Start free and upgrade when you\'re ready. $9/mo or $50/year.',
     url: '/pricing',
   },
 }
