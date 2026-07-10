@@ -20,7 +20,7 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -78,6 +78,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/data ./data
 
 # Copy Next.js build output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

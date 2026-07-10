@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Navigation } from '@/components/landing/navigation'
 import { Footer } from '@/components/landing/footer'
-import { blogPosts } from '@/lib/blog/posts'
+import { getPosts, CATEGORY_LABELS } from '@/lib/blog'
 import { cancellationServices } from '@/lib/cancel/services'
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function ResourcesPage() {
               </Link>
             </div>
             <div className="grid gap-4">
-              {blogPosts.map((post) => (
+              {getPosts().map((post) => (
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
@@ -84,14 +84,14 @@ export default function ResourcesPage() {
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-fire-500 text-xs font-semibold">{post.category}</span>
+                      <span className="text-fire-500 text-xs font-semibold">{CATEGORY_LABELS[post.category] ?? post.category}</span>
                       <span className="text-gray-600 text-xs">·</span>
-                      <span className="text-gray-500 text-xs">{post.readTime}</span>
+                      <span className="text-gray-500 text-xs">{post.date}</span>
                     </div>
                     <p className="text-white font-semibold group-hover:text-fire-400 transition-colors">
                       {post.title}
                     </p>
-                    <p className="text-gray-400 text-sm mt-1">{post.description}</p>
+                    <p className="text-gray-400 text-sm mt-1">{post.excerpt}</p>
                   </div>
                   <span className="text-fire-500 text-lg flex-shrink-0 self-center">→</span>
                 </Link>
