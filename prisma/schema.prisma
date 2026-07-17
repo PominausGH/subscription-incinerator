@@ -277,6 +277,7 @@ model User {
   phoneVerified           Boolean               @default(false) @map("phone_verified")
   stripeCustomerId        String?               @unique @map("stripe_customer_id")
   homeCurrency            String                @default("USD") @map("home_currency")
+  lastQuarterlyAuditEmailAt DateTime?           @map("last_quarterly_audit_email_at")
   accounts                Account[]
   bankImports             BankImport[]
   savingsGoals            SavingsGoal[]
@@ -297,6 +298,14 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model EmailUnsubscribe {
+  email          String   @id
+  reason         String?
+  unsubscribedAt DateTime @default(now()) @map("unsubscribed_at")
+
+  @@map("email_unsubscribes")
 }
 
 enum SubscriptionType {

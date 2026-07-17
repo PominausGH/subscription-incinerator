@@ -58,6 +58,20 @@ export async function scheduleCleanupJob() {
   )
 }
 
+export async function scheduleQuarterlyAuditJob() {
+  return await scanQueue.add(
+    'quarterly-audit-check',
+    {},
+    {
+      jobId: 'quarterly-audit-check-daily',
+      repeat: {
+        every: 24 * 60 * 60 * 1000 // Daily; the processor decides who is actually due
+      },
+      removeOnComplete: true,
+    }
+  )
+}
+
 export async function addPlaidSyncJob(plaidItemId: string) {
   await scanQueue.add(
     JobType.SYNC_PLAID,

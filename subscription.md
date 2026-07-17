@@ -6,7 +6,7 @@
 - Domain name pointed to VPS IP
 - Google OAuth credentials (for Gmail integration)
 - Stripe account (for payments)
-- Resend account (for emails)
+- Brevo account (for emails)
 
 ## 1. System Setup
 
@@ -107,8 +107,9 @@ STRIPE_WEBHOOK_SECRET="whsec_xxx"
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_live_xxx"
 STRIPE_PRICE_ID_PREMIUM="price_xxx"
 
-# Resend (email service)
-RESEND_API_KEY="re_xxx"
+# Brevo (email service, via SMTP)
+BREVO_SMTP_USER="your_brevo_smtp_login"
+BREVO_SMTP_KEY="your_brevo_smtp_key"
 EMAIL_FROM="noreply@yourdomain.com"
 
 # Web Push (from generated VAPID keys)

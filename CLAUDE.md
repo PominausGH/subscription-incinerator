@@ -76,7 +76,7 @@ Separate Docker container running BullMQ processors:
 Key models: User, Subscription, PendingSubscription, Category, Reminder, PushSubscription, BankImport, MerchantAlias, OpenSourceAlternative, ServiceConfig, CancellationAttempt.
 
 ### External Services
-- **Resend** — Transactional email (reminders, notifications)
+- **Brevo** — Transactional email via SMTP relay (reminders, notifications)
 - **Stripe** — Premium tier payments + webhooks
 - **Google APIs** — Gmail OAuth for email scanning
 - **Anthropic Claude** — AI-powered CSV/email parsing and confidence scoring
@@ -92,4 +92,4 @@ Docker Compose on VPS. Services: PostgreSQL 16.4, Redis 7.4, Next.js web (port 3
 
 ## Environment
 
-Copy `.env.example` to `.env`. Required: `POSTGRES_*`, `REDIS_PASSWORD`, `NEXTAUTH_SECRET`, `ENCRYPTION_SECRET`. Optional per feature: `RESEND_API_KEY`, `GOOGLE_CLIENT_*`, `STRIPE_*`, `ANTHROPIC_API_KEY`, `VAPID_*` keys. Changes to `.env` require `docker compose up -d` to take effect.
+Copy `.env.example` to `.env`. Required: `POSTGRES_*`, `REDIS_PASSWORD`, `NEXTAUTH_SECRET`, `ENCRYPTION_SECRET`. Optional per feature: `BREVO_SMTP_USER`/`BREVO_SMTP_KEY`, `GOOGLE_CLIENT_*`, `STRIPE_*`, `ANTHROPIC_API_KEY`, `VAPID_*` keys. Changes to `.env` require `docker compose up -d` to take effect.

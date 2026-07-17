@@ -27,7 +27,7 @@ A modern subscription tracking application built with Next.js 14, helping users 
 - **Database**: PostgreSQL (via Prisma ORM)
 - **Authentication**: NextAuth v5
 - **Queue System**: BullMQ + Redis
-- **Email Service**: Resend
+- **Email Service**: Brevo (SMTP)
 - **Styling**: Tailwind CSS
 - **Development**: Docker Compose for local services
 
@@ -58,7 +58,7 @@ A modern subscription tracking application built with Next.js 14, helping users 
 
    Edit `.env` and fill in:
    - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
-   - `RESEND_API_KEY`: Get from [Resend](https://resend.com)
+   - `BREVO_SMTP_USER` / `BREVO_SMTP_KEY`: Get from [Brevo](https://www.brevo.com) (SMTP & API settings)
    - Other variables are pre-configured for local development
 
 4. **Run database migrations**

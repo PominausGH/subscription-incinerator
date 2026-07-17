@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { toMonthlyAmount } from '@/lib/analytics/queries'
+import { emailService } from '@/lib/services/email'
+import { NotificationPreferences } from '@/lib/notifications/types'
 
 export async function POST(
   _: NextRequest,
@@ -12,7 +14,7 @@ export async function POST(
 
   const sub = await db.subscription.findFirst({
     where: { id: params.id, userId: session.user.id },
-    select: { amount: true, billingCycle: true, status: true },
+    select: { amount: true, billingCycle: true, status: true, currency: true },
   })
   if (!sub) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (sub.status === 'cancelled') {
@@ -45,5 +47,29 @@ export async function POST(
     })
   }
 
+  if (savedAmount > 0) {
+    celebrateSavingsIfOptedIn(session.user.id, savedAmount, sub.currency).catch((err) =>
+      console.error('[confirm-cancelled] savings milestone email failed:', err)
+    )
+  }
+
   return NextResponse.json({ success: true, savedAmount, subscription: updated })
+}
+
+async function celebrateSavingsIfOptedIn(userId: string, savedAmount: number, currency: string) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { email: true, name: true, notificationPreferences: true },
+  })
+  if (!user) return
+
+  const prefs = user.notificationPreferences as unknown as NotificationPreferences
+  if (prefs?.channels?.email === false) return
+
+  const formatted = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  }).format(savedAmount)
+
+  await emailService.celebrateSavings(user.email, user.name ?? 'there', formatted)
 }

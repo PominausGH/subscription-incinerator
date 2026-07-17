@@ -2,6 +2,7 @@ import { Worker, Job } from 'bullmq'
 import { processReminderJob } from './processors/reminder-sender'
 import { processScanJob } from './processors/email-scanner'
 import { cleanupExpiredPending } from './processors/cleanup-pending'
+import { processQuarterlyAudit } from './processors/quarterly-audit'
 import { processSyncPlaid } from './processors/plaid-sync'
 import { SendReminderJob, ScanInboxJob, JobType } from '@/lib/queue/jobs'
 import { connection } from '@/lib/queue/client'
@@ -19,6 +20,8 @@ const scanWorker = new Worker<ScanInboxJob | {}>(
   async (job) => {
     if (job.name === 'cleanup-pending') {
       await cleanupExpiredPending()
+    } else if (job.name === 'quarterly-audit-check') {
+      await processQuarterlyAudit()
     } else if (job.name === JobType.SYNC_PLAID) {
       await processSyncPlaid(job as Job<{ plaidItemId: string }>)
     } else {
@@ -39,6 +42,8 @@ reminderWorker.on('failed', (job, err) => {
 scanWorker.on('completed', async (job) => {
   if (job.name === 'cleanup-pending') {
     console.log('Cleanup job completed')
+  } else if (job.name === 'quarterly-audit-check') {
+    console.log('Quarterly audit check completed')
   } else {
     console.log(`Scan job ${job.id} completed`)
   }
@@ -50,10 +55,14 @@ scanWorker.on('failed', (job, err) => {
 
 console.log('Workers started successfully')
 
-// Schedule cleanup job on startup
-import { scheduleCleanupJob } from '@/lib/queue/scan-queue'
+// Schedule recurring jobs on startup
+import { scheduleCleanupJob, scheduleQuarterlyAuditJob } from '@/lib/queue/scan-queue'
 scheduleCleanupJob().then(() => {
   console.log('Cleanup job scheduled')
+}).catch(console.error)
+
+scheduleQuarterlyAuditJob().then(() => {
+  console.log('Quarterly audit check job scheduled')
 }).catch(console.error)
 
 // Graceful shutdown
