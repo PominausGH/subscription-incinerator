@@ -278,6 +278,7 @@ model User {
   stripeCustomerId        String?               @unique @map("stripe_customer_id")
   homeCurrency            String                @default("USD") @map("home_currency")
   lastQuarterlyAuditEmailAt DateTime?           @map("last_quarterly_audit_email_at")
+  householdOwnerId        String?               @map("household_owner_id")
   accounts                Account[]
   bankImports             BankImport[]
   savingsGoals            SavingsGoal[]
@@ -287,8 +288,27 @@ model User {
   pushSubscriptions       PushSubscription[]
   sessions                Session[]
   subscriptions           Subscription[]
+  householdOwner          User?                 @relation("HouseholdMembership", fields: [householdOwnerId], references: [id], onDelete: SetNull)
+  householdMembers        User[]                @relation("HouseholdMembership")
+  sentHouseholdInvites    HouseholdInvite[]
 
   @@map("users")
+}
+
+model HouseholdInvite {
+  id         String    @id @default(cuid())
+  ownerId    String    @map("owner_id")
+  email      String
+  token      String    @unique
+  status     String    @default("pending")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  expiresAt  DateTime  @map("expires_at")
+  acceptedAt DateTime? @map("accepted_at")
+  owner      User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([email])
+  @@map("household_invites")
 }
 
 model VerificationToken {

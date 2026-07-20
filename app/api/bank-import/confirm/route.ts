@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { isHouseholdPremium } from '@/lib/household'
 import { db } from '@/lib/db/client'
 import { scheduleBillingReminders } from '@/lib/reminders/scheduler'
 import { z } from 'zod'
@@ -45,6 +46,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'UNAUTHORIZED', message: 'Please sign in to continue' },
         { status: 401 }
+      )
+    }
+
+    if (!(await isHouseholdPremium(session.user.id))) {
+      return NextResponse.json(
+        { error: 'PREMIUM_REQUIRED', message: 'Bank statement import is a Premium feature' },
+        { status: 403 }
       )
     }
 

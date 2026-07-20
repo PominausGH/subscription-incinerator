@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { isHouseholdPremium } from '@/lib/household'
 import { processBankStatement } from '@/lib/bank-import/processor'
 import { BankImportError } from '@/lib/bank-import/errors'
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
@@ -12,6 +13,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'UNAUTHORIZED', message: 'Please sign in to continue' },
         { status: 401 }
+      )
+    }
+
+    if (!(await isHouseholdPremium(session.user.id))) {
+      return NextResponse.json(
+        { error: 'PREMIUM_REQUIRED', message: 'Bank statement import is a Premium feature' },
+        { status: 403 }
       )
     }
 

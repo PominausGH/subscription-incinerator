@@ -5,6 +5,7 @@ import { updateSubscriptionSchema } from '@/lib/validations/subscription'
 import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 import { z } from 'zod'
 import { toMonthlyAmount } from '@/lib/analytics/queries'
+import { getHouseholdMemberIds } from '@/lib/household'
 
 export async function PATCH(
   req: NextRequest,
@@ -38,7 +39,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Subscription not found' }, { status: 404 })
     }
 
-    if (subscription.userId !== session.user.id) {
+    // Any member of the same household can edit a subscription, not just
+    // whoever originally added it - matches the shared/combined view.
+    const memberIds = await getHouseholdMemberIds(session.user.id)
+    if (!memberIds.includes(subscription.userId)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -46,7 +50,7 @@ export async function PATCH(
     const cancelData: Record<string, unknown> = {}
     if (body.status === 'cancelled') {
       const existing = await db.subscription.findFirst({
-        where: { id: subscriptionId, userId: session.user.id },
+        where: { id: subscriptionId },
         select: { amount: true, billingCycle: true, status: true },
       })
       if (existing && existing.status !== 'cancelled' && existing.amount) {
@@ -114,7 +118,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Subscription not found' }, { status: 404 })
     }
 
-    if (subscription.userId !== session.user.id) {
+    const memberIds = await getHouseholdMemberIds(session.user.id)
+    if (!memberIds.includes(subscription.userId)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

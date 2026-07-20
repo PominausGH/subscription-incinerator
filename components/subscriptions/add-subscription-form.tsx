@@ -89,7 +89,8 @@ export function AddSubscriptionForm() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create subscription')
+        const data = await response.json().catch(() => null)
+        throw new Error(typeof data?.error === 'string' ? data.error : 'Failed to create subscription')
       }
 
       router.refresh()
@@ -109,7 +110,7 @@ export function AddSubscriptionForm() {
       })
     } catch (error) {
       console.error('Add subscription error')
-      setError('Failed to add subscription. Please try again.')
+      setError(error instanceof Error ? error.message : 'Failed to add subscription. Please try again.')
     } finally {
       setIsLoading(false)
     }

@@ -219,3 +219,84 @@ export function getBillingUpcomingEmailTemplate(reminder: ReminderWithRelations)
 
   return { subject, html }
 }
+
+/**
+ * Email template for household invites
+ */
+export function getHouseholdInviteEmailTemplate(params: { ownerEmail: string; token: string }) {
+  const { ownerEmail, token } = params
+  const acceptUrl = `${APP_URL}/household/accept/${token}`
+
+  const subject = `${ownerEmail} invited you to their household on Subscription Incinerator`
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Household Invite</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                🏠 Household Invite
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
+                <strong>${escapeHtml(ownerEmail)}</strong> invited you to join their household on Subscription Incinerator.
+              </p>
+
+              <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #374151;">
+                Once you accept, your subscriptions will show up alongside theirs in one combined view, and you'll get access to any Premium features on their plan.
+              </p>
+
+              <!-- Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td>
+                    <a href="${acceptUrl}" style="display: block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-align: center; box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);">
+                      Accept Invite
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 24px 0 0; font-size: 13px; line-height: 20px; color: #9ca3af;">
+                This invite expires in 7 days. If you weren't expecting this, you can safely ignore it.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 8px; font-size: 14px; color: #6b7280;">
+                Sent by Subscription Incinerator
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                Managing your subscriptions so you don't have to.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `
+
+  return { subject, html }
+}

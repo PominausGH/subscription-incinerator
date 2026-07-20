@@ -1,11 +1,13 @@
-import { auth, isPremium } from '@/lib/auth'
+import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
+import { isHouseholdPremium } from '@/lib/household'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { GmailConnectionCard } from '@/components/settings/gmail-connection-card'
 import { CurrencySettings } from '@/components/settings/currency-settings'
 import { NotificationSettings } from '@/components/settings/notification-settings'
 import { PlaidConnectionCard } from '@/components/settings/plaid-connection-card'
+import { HouseholdSettings } from '@/components/settings/household-settings'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -25,8 +27,9 @@ export default async function SettingsPage() {
   })
 
   const isGmailConnected = user?.emailProvider === 'gmail' && user?.oauthTokens !== null
+  const householdPremium = await isHouseholdPremium(session.user.id)
 
-  const plaidItems = session.user.tier === 'premium'
+  const plaidItems = householdPremium
     ? await db.plaidItem.findMany({
         where: { userId: session.user.id },
         select: { id: true, institutionName: true },
@@ -55,7 +58,7 @@ export default async function SettingsPage() {
           <GmailConnectionCard
             isConnected={isGmailConnected}
             userEmail={user?.email || ''}
-            userTier={session.user.tier}
+            userTier={householdPremium ? 'premium' : 'free'}
           />
         </section>
 
@@ -75,7 +78,7 @@ export default async function SettingsPage() {
           <NotificationSettings />
         </section>
 
-        {isPremium(session.user) && (
+        {householdPremium && (
           <section className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Bank Account Linking</h2>
             <p className="text-gray-800 mb-6">
@@ -84,6 +87,15 @@ export default async function SettingsPage() {
             <PlaidConnectionCard connectedInstitutions={plaidItems} />
           </section>
         )}
+
+        <section className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Household</h2>
+          <p className="text-gray-800 mb-6">
+            Invite family members to see one combined view of everyone&apos;s subscriptions. If
+            you&apos;re Premium, invited members get Premium features too.
+          </p>
+          <HouseholdSettings />
+        </section>
       </div>
     </div>
   )

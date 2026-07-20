@@ -18,6 +18,7 @@ export const mockUser: User = {
   stripeCustomerId: null,
   homeCurrency: 'USD',
   lastQuarterlyAuditEmailAt: null,
+  householdOwnerId: null,
 }
 
 export const mockSubscription: Subscription = {

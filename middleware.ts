@@ -6,6 +6,9 @@ const publicApiRoutes = [
   "/api/health",
   "/api/auth",
   "/api/stripe/webhook",
+  "/api/email/checklist-signup",
+  "/api/unsubscribe",
+  "/api/household/invite/accept",
 ];
 
 export default auth((req) => {

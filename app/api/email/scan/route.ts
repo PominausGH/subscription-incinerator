@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, isPremium } from '@/lib/auth'
+import { auth } from '@/lib/auth'
+import { isHouseholdPremium } from '@/lib/household'
 import { db } from '@/lib/db/client'
 import { addScanJob } from '@/lib/queue/scan-queue'
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
@@ -18,8 +19,8 @@ export async function POST(req: NextRequest) {
       return rateLimitResponse(rateLimit.reset)
     }
 
-    // Check premium tier
-    if (!isPremium({ tier: session.user.tier })) {
+    // Check premium tier (shared across the household)
+    if (!(await isHouseholdPremium(session.user.id))) {
       return NextResponse.json(
         { error: 'Premium subscription required for email scanning' },
         { status: 403 }

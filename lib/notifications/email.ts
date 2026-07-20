@@ -1,11 +1,20 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 import { Reminder, Subscription, User } from '@prisma/client'
 import {
   getTrialEndingEmailTemplate,
   getBillingUpcomingEmailTemplate,
+  getHouseholdInviteEmailTemplate,
 } from './templates'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const transporter = nodemailer.createTransport({
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_SMTP_USER,
+    pass: process.env.BREVO_SMTP_KEY,
+  },
+})
 
 export type ReminderWithRelations = Reminder & {
   subscription: Subscription & {
@@ -14,13 +23,12 @@ export type ReminderWithRelations = Reminder & {
 }
 
 /**
- * Send reminder email via Resend
+ * Send reminder email via Brevo SMTP
  */
 export async function sendReminderEmail(reminder: ReminderWithRelations) {
   const { subscription } = reminder
   const { user } = subscription
 
-  // Get template based on reminder type
   let template: { subject: string; html: string }
 
   switch (reminder.reminderType) {
@@ -34,17 +42,24 @@ export async function sendReminderEmail(reminder: ReminderWithRelations) {
       throw new Error(`Unknown reminder type: ${reminder.reminderType}`)
   }
 
-  // Send email
-  const { data, error } = await resend.emails.send({
+  await transporter.sendMail({
     from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
     to: user.email,
     subject: template.subject,
     html: template.html,
   })
+}
 
-  if (error) {
-    throw new Error(`Failed to send email: ${error.message}`)
-  }
+/**
+ * Send a household invite email via Brevo SMTP
+ */
+export async function sendHouseholdInviteEmail(params: { toEmail: string; ownerEmail: string; token: string }) {
+  const template = getHouseholdInviteEmailTemplate({ ownerEmail: params.ownerEmail, token: params.token })
 
-  return data
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
+    to: params.toEmail,
+    subject: template.subject,
+    html: template.html,
+  })
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/notifications/schedule-reminders'
+import { isAtFreeTierLimit, FREE_TIER_SUBSCRIPTION_LIMIT } from '@/lib/subscriptions/limits'
 import { Prisma } from '@prisma/client'
 
 export async function POST(req: NextRequest) {
@@ -29,6 +30,15 @@ export async function POST(req: NextRequest) {
 
     if (pending.status !== 'pending') {
       return NextResponse.json({ error: 'Already processed' }, { status: 400 })
+    }
+
+    if (await isAtFreeTierLimit(session.user.id)) {
+      return NextResponse.json(
+        {
+          error: `Free plan is limited to ${FREE_TIER_SUBSCRIPTION_LIMIT} active subscriptions. Upgrade to Premium to track more.`,
+        },
+        { status: 403 }
+      )
     }
 
     // Create subscription and mark as approved in a transaction

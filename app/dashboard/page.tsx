@@ -12,6 +12,7 @@ import { SubscriptionTypeFilter } from '@/components/subscriptions/subscription-
 import { SubscriptionListView } from '@/components/subscriptions/subscription-list-view'
 import { SavingsGoals } from '@/components/dashboard/savings-goals'
 import { findOverlappingSubscriptions } from '@/lib/subscriptions/duplicate-detector'
+import { getHouseholdMemberIds } from '@/lib/household'
 
 export default async function DashboardPage({
   searchParams,
@@ -26,9 +27,13 @@ export default async function DashboardPage({
     select: { emailProvider: true, oauthTokens: true, homeCurrency: true },
   })
 
+  // Combined household view: subscriptions/pending items from every member
+  // are pooled together, since any member can add/edit/review any of them.
+  const memberIds = await getHouseholdMemberIds(user.id)
+
   const pendingSubscriptionsRaw = await db.pendingSubscription.findMany({
     where: {
-      userId: user.id,
+      userId: { in: memberIds },
       status: 'pending'
     },
     orderBy: { confidence: 'desc' },
@@ -59,7 +64,7 @@ export default async function DashboardPage({
 
   const subscriptionsRaw = await db.subscription.findMany({
     where: {
-      userId: user.id,
+      userId: { in: memberIds },
       ...(typeFilter === 'personal' ? { type: 'PERSONAL' } : {}),
       ...(typeFilter === 'business' ? { type: 'BUSINESS' } : {}),
     },
@@ -72,7 +77,7 @@ export default async function DashboardPage({
   })
 
   const cancelledSubs = await db.subscription.findMany({
-    where: { userId: user.id, status: 'cancelled' },
+    where: { userId: { in: memberIds }, status: 'cancelled' },
     select: { savedAmount: true },
   })
   const totalSaved = cancelledSubs.reduce(
