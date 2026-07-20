@@ -1,0 +1,421 @@
+export type OpenSourceAlternative = {
+  name: string
+  description: string
+  websiteUrl: string
+  sourceCodeUrl: string
+  stars: number
+  license: string
+  selfHosted: boolean
+}
+
+export type AlternativeCategory = {
+  slug: string
+  category: string
+  emoji: string
+  paidServices: string[]
+  alternatives: OpenSourceAlternative[]
+}
+
+export const alternativeCategories: AlternativeCategory[] = [
+  {
+    slug: 'media-streaming',
+    category: 'Media Streaming',
+    emoji: '🎬',
+    paidServices: ['Netflix', 'Disney+', 'Max', 'Hulu', 'Paramount+', 'Peacock', 'Crunchyroll', 'Amazon Prime Video', 'YouTube Premium'],
+    alternatives: [
+      {
+        name: 'Jellyfin',
+        description: 'Free media system that lets you stream your own movie, TV, and music collection from any device.',
+        websiteUrl: 'https://jellyfin.org',
+        sourceCodeUrl: 'https://github.com/jellyfin/jellyfin',
+        stars: 36000,
+        license: 'GPL-2.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Invidious',
+        description: 'Lightweight YouTube front-end with no ads, no tracking, and no Google account required.',
+        websiteUrl: 'https://invidious.io',
+        sourceCodeUrl: 'https://github.com/iv-org/invidious',
+        stars: 16000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'PeerTube',
+        description: 'Decentralised, federated video platform — like a community-run YouTube.',
+        websiteUrl: 'https://joinpeertube.org',
+        sourceCodeUrl: 'https://github.com/Chocobozzz/PeerTube',
+        stars: 13000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'music-streaming',
+    category: 'Music Streaming',
+    emoji: '🎵',
+    paidServices: ['Spotify', 'Apple Music', 'Tidal', 'YouTube Music'],
+    alternatives: [
+      {
+        name: 'Navidrome',
+        description: 'Modern, fast self-hosted music server compatible with Subsonic and Airsonic clients.',
+        websiteUrl: 'https://www.navidrome.org',
+        sourceCodeUrl: 'https://github.com/navidrome/navidrome',
+        stars: 12000,
+        license: 'GPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Funkwhale',
+        description: 'Federated music streaming and sharing platform built for communities.',
+        websiteUrl: 'https://funkwhale.audio',
+        sourceCodeUrl: 'https://dev.funkwhale.audio/funkwhale/funkwhale',
+        stars: 1600,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'cloud-storage',
+    category: 'Cloud Storage',
+    emoji: '☁️',
+    paidServices: ['Dropbox', 'Google One', 'iCloud+', 'OneDrive'],
+    alternatives: [
+      {
+        name: 'Nextcloud',
+        description: 'Full Dropbox/Google Workspace replacement — files, calendar, contacts, notes, video calls.',
+        websiteUrl: 'https://nextcloud.com',
+        sourceCodeUrl: 'https://github.com/nextcloud/server',
+        stars: 28000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Syncthing',
+        description: 'Continuous, peer-to-peer file sync between your devices. No cloud middleman.',
+        websiteUrl: 'https://syncthing.net',
+        sourceCodeUrl: 'https://github.com/syncthing/syncthing',
+        stars: 66000,
+        license: 'MPL-2.0',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'design-creative',
+    category: 'Design & Creative',
+    emoji: '🎨',
+    paidServices: ['Adobe Creative Cloud', 'Canva Pro', 'Figma', 'Sketch'],
+    alternatives: [
+      {
+        name: 'GIMP',
+        description: 'Mature raster image editor — the open-source counterpart to Photoshop.',
+        websiteUrl: 'https://www.gimp.org',
+        sourceCodeUrl: 'https://gitlab.gnome.org/GNOME/gimp',
+        stars: 1800,
+        license: 'GPL-3.0',
+        selfHosted: false,
+      },
+      {
+        name: 'Inkscape',
+        description: 'Professional vector graphics editor — an open alternative to Illustrator.',
+        websiteUrl: 'https://inkscape.org',
+        sourceCodeUrl: 'https://gitlab.com/inkscape/inkscape',
+        stars: 2200,
+        license: 'GPL-2.0',
+        selfHosted: false,
+      },
+      {
+        name: 'Kdenlive',
+        description: 'Non-linear video editor with multi-track timelines, effects, and proxy editing.',
+        websiteUrl: 'https://kdenlive.org',
+        sourceCodeUrl: 'https://invent.kde.org/multimedia/kdenlive',
+        stars: 3100,
+        license: 'GPL-3.0',
+        selfHosted: false,
+      },
+      {
+        name: 'Penpot',
+        description: 'Open-source design and prototyping platform — the Figma replacement.',
+        websiteUrl: 'https://penpot.app',
+        sourceCodeUrl: 'https://github.com/penpot/penpot',
+        stars: 34000,
+        license: 'MPL-2.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Darktable',
+        description: 'RAW photo workflow and non-destructive editor — a Lightroom alternative.',
+        websiteUrl: 'https://www.darktable.org',
+        sourceCodeUrl: 'https://github.com/darktable-org/darktable',
+        stars: 11000,
+        license: 'GPL-3.0',
+        selfHosted: false,
+      },
+    ],
+  },
+  {
+    slug: 'productivity',
+    category: 'Productivity & Notes',
+    emoji: '📝',
+    paidServices: ['Notion', 'Evernote', 'Todoist', 'Microsoft 365', 'Grammarly'],
+    alternatives: [
+      {
+        name: 'AppFlowy',
+        description: 'Notion-style workspace for wikis, projects, and docs — all open source.',
+        websiteUrl: 'https://appflowy.io',
+        sourceCodeUrl: 'https://github.com/AppFlowy-IO/AppFlowy',
+        stars: 58000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Outline',
+        description: 'Fast, collaborative team knowledge base and wiki.',
+        websiteUrl: 'https://www.getoutline.com',
+        sourceCodeUrl: 'https://github.com/outline/outline',
+        stars: 29000,
+        license: 'BSL-1.1',
+        selfHosted: true,
+      },
+      {
+        name: 'Joplin',
+        description: 'Cross-platform note-taking app with end-to-end encryption and sync.',
+        websiteUrl: 'https://joplinapp.org',
+        sourceCodeUrl: 'https://github.com/laurent22/joplin',
+        stars: 47000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Vikunja',
+        description: 'To-do app with kanban boards, CalDAV sync, and team collaboration.',
+        websiteUrl: 'https://vikunja.io',
+        sourceCodeUrl: 'https://kolaente.dev/vikunja/vikunja',
+        stars: 1000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'LibreOffice',
+        description: 'Full office suite — Writer, Calc, Impress — compatible with MS Office files.',
+        websiteUrl: 'https://www.libreoffice.org',
+        sourceCodeUrl: 'https://github.com/LibreOffice/core',
+        stars: 2300,
+        license: 'MPL-2.0',
+        selfHosted: false,
+      },
+      {
+        name: 'LanguageTool',
+        description: 'Multilingual grammar, style, and spell checker — supports 30+ languages.',
+        websiteUrl: 'https://languagetool.org',
+        sourceCodeUrl: 'https://github.com/languagetool-org/languagetool',
+        stars: 12000,
+        license: 'LGPL-2.1',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'communication',
+    category: 'Communication',
+    emoji: '💬',
+    paidServices: ['Slack', 'Zoom', 'Microsoft Teams'],
+    alternatives: [
+      {
+        name: 'Mattermost',
+        description: 'Open-source Slack alternative built for secure team collaboration.',
+        websiteUrl: 'https://mattermost.com',
+        sourceCodeUrl: 'https://github.com/mattermost/mattermost',
+        stars: 31000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Rocket.Chat',
+        description: 'Fully customisable team chat platform with high data-protection standards.',
+        websiteUrl: 'https://rocket.chat',
+        sourceCodeUrl: 'https://github.com/RocketChat/Rocket.Chat',
+        stars: 41000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+      {
+        name: 'Jitsi Meet',
+        description: 'Secure, fully-featured video conferencing — no account required.',
+        websiteUrl: 'https://jitsi.org',
+        sourceCodeUrl: 'https://github.com/jitsi/jitsi-meet',
+        stars: 23000,
+        license: 'Apache-2.0',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'vpn-security',
+    category: 'VPN & Password Management',
+    emoji: '🔐',
+    paidServices: ['NordVPN', 'ExpressVPN', 'Surfshark', '1Password', 'LastPass', 'Dashlane'],
+    alternatives: [
+      {
+        name: 'WireGuard',
+        description: 'Fast, modern VPN protocol — pair with a cheap VPS for your own private VPN.',
+        websiteUrl: 'https://www.wireguard.com',
+        sourceCodeUrl: 'https://www.wireguard.com/repositories/',
+        stars: 0,
+        license: 'GPL-2.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Vaultwarden',
+        description: 'Lightweight Bitwarden-compatible password server in Rust — self-hosted in minutes.',
+        websiteUrl: 'https://github.com/dani-garcia/vaultwarden',
+        sourceCodeUrl: 'https://github.com/dani-garcia/vaultwarden',
+        stars: 40000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'KeePassXC',
+        description: 'Local-first password manager with browser integration. No subscription, ever.',
+        websiteUrl: 'https://keepassxc.org',
+        sourceCodeUrl: 'https://github.com/keepassxreboot/keepassxc',
+        stars: 22000,
+        license: 'GPL-3.0',
+        selfHosted: false,
+      },
+    ],
+  },
+  {
+    slug: 'ai-tools',
+    category: 'AI & Machine Learning',
+    emoji: '🤖',
+    paidServices: ['ChatGPT Plus', 'Claude Pro', 'GitHub Copilot'],
+    alternatives: [
+      {
+        name: 'Ollama',
+        description: 'Run Llama, Mistral, and other LLMs locally with a single command.',
+        websiteUrl: 'https://ollama.com',
+        sourceCodeUrl: 'https://github.com/ollama/ollama',
+        stars: 105000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+      {
+        name: 'Open WebUI',
+        description: 'ChatGPT-style web interface for Ollama and other local models.',
+        websiteUrl: 'https://openwebui.com',
+        sourceCodeUrl: 'https://github.com/open-webui/open-webui',
+        stars: 55000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+      {
+        name: 'Continue',
+        description: 'Open-source AI code assistant for VS Code and JetBrains, works with local models.',
+        websiteUrl: 'https://continue.dev',
+        sourceCodeUrl: 'https://github.com/continuedev/continue',
+        stars: 19000,
+        license: 'Apache-2.0',
+        selfHosted: false,
+      },
+    ],
+  },
+  {
+    slug: 'marketing',
+    category: 'Email & Marketing',
+    emoji: '📧',
+    paidServices: ['Mailchimp', 'ConvertKit', 'Substack'],
+    alternatives: [
+      {
+        name: 'Listmonk',
+        description: 'Self-hosted newsletter and mailing list manager — fast and free.',
+        websiteUrl: 'https://listmonk.app',
+        sourceCodeUrl: 'https://github.com/knadh/listmonk',
+        stars: 15000,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Ghost',
+        description: 'Modern publishing platform for newsletters and blogs — open source core.',
+        websiteUrl: 'https://ghost.org',
+        sourceCodeUrl: 'https://github.com/TryGhost/Ghost',
+        stars: 47000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+    ],
+  },
+  {
+    slug: 'education',
+    category: 'Learning',
+    emoji: '🎓',
+    paidServices: ['Duolingo Plus', 'Babbel', 'Rosetta Stone'],
+    alternatives: [
+      {
+        name: 'LibreLingo',
+        description: 'Community-driven language learning platform — open courses, no ads.',
+        websiteUrl: 'https://librelingo.app',
+        sourceCodeUrl: 'https://github.com/LibreLingo/LibreLingo',
+        stars: 1900,
+        license: 'AGPL-3.0',
+        selfHosted: true,
+      },
+      {
+        name: 'Anki',
+        description: 'Spaced-repetition flashcards — used by language learners and med students worldwide.',
+        websiteUrl: 'https://apps.ankiweb.net',
+        sourceCodeUrl: 'https://github.com/ankitects/anki',
+        stars: 19000,
+        license: 'AGPL-3.0',
+        selfHosted: false,
+      },
+    ],
+  },
+  {
+    slug: 'development',
+    category: 'Developer Tools',
+    emoji: '💻',
+    paidServices: ['GitHub', 'GitLab Premium', 'Bitbucket'],
+    alternatives: [
+      {
+        name: 'Gitea',
+        description: 'Lightweight, painless self-hosted Git service — the easiest GitHub replacement.',
+        websiteUrl: 'https://gitea.com',
+        sourceCodeUrl: 'https://github.com/go-gitea/gitea',
+        stars: 46000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+      {
+        name: 'Forgejo',
+        description: 'Community-led fork of Gitea — fully featured Git forge, run yours in minutes.',
+        websiteUrl: 'https://forgejo.org',
+        sourceCodeUrl: 'https://codeberg.org/forgejo/forgejo',
+        stars: 2000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+      {
+        name: 'GitLab CE',
+        description: 'Complete DevOps platform — Git hosting, CI/CD, issue tracking, container registry.',
+        websiteUrl: 'https://about.gitlab.com',
+        sourceCodeUrl: 'https://gitlab.com/gitlab-org/gitlab-foss',
+        stars: 24000,
+        license: 'MIT',
+        selfHosted: true,
+      },
+    ],
+  },
+]
+
+export function findAlternativesForService(serviceName: string): AlternativeCategory | undefined {
+  const target = serviceName.trim().toLowerCase()
+  return alternativeCategories.find(cat =>
+    cat.paidServices.some(s => s.toLowerCase() === target)
+  )
+}
