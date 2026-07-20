@@ -67,7 +67,7 @@ export default function CancelDirectoryPage() {
         </h2>
         <p className="text-gray-400 mb-6 max-w-xl mx-auto">
           Before you can cancel them, you need to find them. Subscription Incinerator scans your
-          Gmail and bank imports to surface every recurring charge automatically — free.
+          Gmail and bank imports to surface every recurring charge automatically — $9/mo.
         </p>
         <Link
           href="/login"

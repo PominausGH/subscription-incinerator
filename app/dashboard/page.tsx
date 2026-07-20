@@ -11,6 +11,7 @@ import { UpgradeSuccessToast } from '@/components/upgrade-success-toast'
 import { SubscriptionTypeFilter } from '@/components/subscriptions/subscription-type-filter'
 import { SubscriptionListView } from '@/components/subscriptions/subscription-list-view'
 import { SavingsGoals } from '@/components/dashboard/savings-goals'
+import { findOverlappingSubscriptions } from '@/lib/subscriptions/duplicate-detector'
 
 export default async function DashboardPage({
   searchParams,
@@ -111,6 +112,18 @@ export default async function DashboardPage({
     : []
   const matchedSubCount = matchedSubs.length
 
+  const overlapGroups = findOverlappingSubscriptions(
+    subscriptions.map(sub => ({
+      id: sub.id,
+      serviceName: sub.serviceName,
+      amount: sub.amount,
+      currency: sub.currency,
+      billingCycle: sub.billingCycle,
+      status: sub.status,
+      categoryName: sub.category?.name ?? null,
+    }))
+  )
+
   return (
     <div className="px-4 sm:px-0">
       <Suspense fallback={null}>
@@ -127,7 +140,7 @@ export default async function DashboardPage({
           <div className="flex items-center gap-2">
             <Link
               href="/import"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium px-3 py-1.5 border border-gray-300 bg-white hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium px-3 py-1.5 border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               Import Bank Statement
             </Link>
@@ -174,6 +187,33 @@ export default async function DashboardPage({
               </div>
               <span className="text-emerald-600 dark:text-emerald-400 text-sm font-medium group-hover:underline">
                 View all →
+              </span>
+            </div>
+          </Link>
+        </div>
+      )}
+
+      {/* Overlapping Subscriptions Teaser */}
+      {overlapGroups.length > 0 && (
+        <div className="mb-8">
+          <Link
+            href="/dashboard/duplicates"
+            className="block bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-5 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div>
+                  <p className="font-semibold text-amber-900 dark:text-amber-300 text-sm">
+                    {overlapGroups.length} categor{overlapGroups.length !== 1 ? 'ies' : 'y'} with overlapping subscriptions
+                  </p>
+                  <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5">
+                    You may be paying for more than one service doing the same job
+                  </p>
+                </div>
+              </div>
+              <span className="text-amber-600 dark:text-amber-400 text-sm font-medium group-hover:underline">
+                Review →
               </span>
             </div>
           </Link>

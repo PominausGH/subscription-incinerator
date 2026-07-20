@@ -17,16 +17,22 @@ jest.mock('@anthropic-ai/sdk', () => ({
 jest.mock('@/lib/db/client', () => ({
   db: {
     merchantAlias: {
-      findMany: jest.fn()
+      findMany: jest.fn(),
+      upsert: jest.fn()
     }
   }
 }))
 
+import Anthropic from '@anthropic-ai/sdk'
 import { findMerchantAlias, matchMerchant, matchMerchantWithAI } from '@/lib/bank-import/merchant-matcher'
 import { db } from '@/lib/db/client'
 
-// Get reference to the mock function after import
+// Get reference to the mock functions after import
 const mockFindMany = db.merchantAlias.findMany as jest.Mock
+const mockUpsert = db.merchantAlias.upsert as jest.Mock
+// merchant-matcher.ts does `new Anthropic()` once at module load - grab that
+// instance's create fn so tests can override its response per-test.
+const mockCreate = (Anthropic as unknown as jest.Mock).mock.results[0].value.messages.create as jest.Mock
 
 describe('findMerchantAlias', () => {
   beforeEach(() => {
@@ -121,5 +127,51 @@ describe('matchMerchant', () => {
 
     const result = await matchMerchant('UNKNOWN MERCHANT')
     expect(result.source).toBe('ai')
+  })
+
+  it('learns a new alias when AI match is high-confidence', async () => {
+    mockFindMany.mockResolvedValue([])
+    mockCreate.mockResolvedValueOnce({
+      content: [{
+        type: 'text',
+        text: JSON.stringify({ serviceName: 'Cool Streaming Co', confidence: 0.9 })
+      }]
+    })
+
+    await matchMerchant('COOLSTREAM.COM 800-123-4567')
+
+    expect(mockUpsert).toHaveBeenCalledWith({
+      where: { bankPattern: 'COOLSTREAM.COM*' },
+      update: { serviceName: 'Cool Streaming Co' },
+      create: { bankPattern: 'COOLSTREAM.COM*', serviceName: 'Cool Streaming Co' }
+    })
+  })
+
+  it('does not learn when AI confidence is below the threshold', async () => {
+    mockFindMany.mockResolvedValue([])
+    mockCreate.mockResolvedValueOnce({
+      content: [{
+        type: 'text',
+        text: JSON.stringify({ serviceName: 'Maybe Service', confidence: 0.5 })
+      }]
+    })
+
+    await matchMerchant('SOME MERCHANT 4421')
+
+    expect(mockUpsert).not.toHaveBeenCalled()
+  })
+
+  it('does not learn when AI returns no serviceName', async () => {
+    mockFindMany.mockResolvedValue([])
+    mockCreate.mockResolvedValueOnce({
+      content: [{
+        type: 'text',
+        text: JSON.stringify({ serviceName: null, confidence: 0 })
+      }]
+    })
+
+    await matchMerchant('RANDOM GROCERY STORE')
+
+    expect(mockUpsert).not.toHaveBeenCalled()
   })
 })
