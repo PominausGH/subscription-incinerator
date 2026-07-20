@@ -7,6 +7,11 @@ import { auth } from '@/lib/auth'
 
 const STATE_MAX_AGE_MS = 10 * 60 * 1000 // 10 minutes
 
+// Redirects must be built from the trusted public app URL, not req.url -
+// behind the reverse proxy, req.url reflects the container's internal
+// bind address (e.g. 0.0.0.0:3000) rather than the real public host.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -16,7 +21,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       return NextResponse.redirect(
-        new URL(`/settings?error=${encodeURIComponent('Gmail connection failed')}`, req.url)
+        new URL(`/settings?error=${encodeURIComponent('Gmail connection failed')}`, APP_URL)
       )
     }
 
@@ -36,7 +41,7 @@ export async function GET(req: NextRequest) {
     // Check state token hasn't expired
     if (Date.now() - statePayload.timestamp > STATE_MAX_AGE_MS) {
       return NextResponse.redirect(
-        new URL('/settings?error=oauth_expired', req.url)
+        new URL('/settings?error=oauth_expired', APP_URL)
       )
     }
 
@@ -92,12 +97,12 @@ export async function GET(req: NextRequest) {
     await scheduleRecurringScan(userId)
 
     return NextResponse.redirect(
-      new URL('/dashboard?connected=gmail', req.url)
+      new URL('/dashboard?connected=gmail', APP_URL)
     )
   } catch (error) {
     console.error('Gmail OAuth callback error:', error)
     return NextResponse.redirect(
-      new URL('/settings?error=oauth_failed', req.url)
+      new URL('/settings?error=oauth_failed', APP_URL)
     )
   }
 }

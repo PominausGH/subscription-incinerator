@@ -11,12 +11,17 @@ const publicApiRoutes = [
   "/api/household/invite/accept",
 ];
 
+// Redirects must be built from the trusted public app URL, not req.url -
+// behind the reverse proxy, req.url reflects the container's internal
+// bind address (e.g. 0.0.0.0:3000) rather than the real public host.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   // Redirect authenticated users away from login page to dashboard
   if (pathname === "/login" && req.auth) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/dashboard", APP_URL));
   }
 
   // Check if this is an API route
@@ -50,7 +55,7 @@ export default auth((req) => {
   );
 
   if (isProtectedPage && !req.auth) {
-    const signInUrl = new URL("/login", req.url);
+    const signInUrl = new URL("/login", APP_URL);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
   }
