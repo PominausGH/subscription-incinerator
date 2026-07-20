@@ -28,7 +28,7 @@ export function HouseholdSettings() {
       if (res.ok) {
         setData(await res.json())
       }
-    } catch (error) {
+    } catch {
       console.error('Failed to load household')
     } finally {
       setIsLoading(false)
@@ -72,7 +72,7 @@ export function HouseholdSettings() {
       const res = await fetch(`/api/household/members/${memberId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to remove member')
       await load()
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to remove member' })
     }
   }
@@ -83,7 +83,7 @@ export function HouseholdSettings() {
       if (!res.ok) throw new Error('Failed to leave household')
       await load()
       router.refresh()
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to leave household' })
     }
   }
