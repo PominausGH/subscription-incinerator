@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { GmailConnectionCard } from '@/components/settings/gmail-connection-card'
 import { CurrencySettings } from '@/components/settings/currency-settings'
 import { NotificationSettings } from '@/components/settings/notification-settings'
-import { PlaidConnectionCard } from '@/components/settings/plaid-connection-card'
 import { HouseholdSettings } from '@/components/settings/household-settings'
+import { ChangePasswordForm } from '@/components/settings/change-password-form'
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -29,13 +29,6 @@ export default async function SettingsPage() {
   const isGmailConnected = user?.emailProvider === 'gmail' && user?.oauthTokens !== null
   const householdPremium = await isHouseholdPremium(session.user.id)
 
-  const plaidItems = householdPremium
-    ? await db.plaidItem.findMany({
-        where: { userId: session.user.id },
-        select: { id: true, institutionName: true },
-      })
-    : []
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
@@ -50,7 +43,7 @@ export default async function SettingsPage() {
 
       <div className="space-y-6">
         <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Email Scanning</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">Email Scanning</h2>
           <p className="text-gray-800 mb-6">
             Connect your Gmail to automatically detect subscriptions from your emails.
           </p>
@@ -63,7 +56,7 @@ export default async function SettingsPage() {
         </section>
 
         <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Currency</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">Currency</h2>
           <p className="text-gray-800 mb-6">
             Set your home currency. All subscription costs will be converted for spending reports.
           </p>
@@ -71,25 +64,23 @@ export default async function SettingsPage() {
         </section>
 
         <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Notification Reminders</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">Notification Reminders</h2>
           <p className="text-gray-800 mb-6">
             Configure how and when you receive reminders for upcoming renewals and trial endings.
           </p>
           <NotificationSettings />
         </section>
 
-        {householdPremium && (
-          <section className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Bank Account Linking</h2>
-            <p className="text-gray-800 mb-6">
-              Connect your bank account to automatically detect subscriptions from transactions.
-            </p>
-            <PlaidConnectionCard connectedInstitutions={plaidItems} />
-          </section>
-        )}
+        <section className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">Password</h2>
+          <p className="text-gray-800 mb-6">
+            Change your account password.
+          </p>
+          <ChangePasswordForm />
+        </section>
 
         <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Household</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">Household</h2>
           <p className="text-gray-800 mb-6">
             Invite family members to see one combined view of everyone&apos;s subscriptions. If
             you&apos;re Premium, invited members get Premium features too.

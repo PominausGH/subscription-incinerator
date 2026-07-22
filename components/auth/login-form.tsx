@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +15,7 @@ export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const resetSuccess = searchParams.get('reset') === 'success'
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -43,6 +45,11 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {resetSuccess && !error && (
+        <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm" role="status">
+          Password reset! Sign in with your new password.
+        </div>
+      )}
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm" role="alert">
           <div className="flex items-center gap-2">
@@ -72,9 +79,14 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-          Password
-        </label>
+        <div className="flex items-center justify-between mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
         <Input
           id="password"
           type="password"

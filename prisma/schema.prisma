@@ -114,6 +114,8 @@ model PendingSubscription {
   createdAt       DateTime  @default(now()) @map("created_at")
   expiresAt       DateTime  @map("expires_at")
   billingCycle    String?   @map("billing_cycle")
+  sourceType      String    @default("receipt") @map("source_type")
+  noticeType      String?   @map("notice_type")
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([expiresAt])
@@ -291,8 +293,22 @@ model User {
   householdOwner          User?                 @relation("HouseholdMembership", fields: [householdOwnerId], references: [id], onDelete: SetNull)
   householdMembers        User[]                @relation("HouseholdMembership")
   sentHouseholdInvites    HouseholdInvite[]
+  passwordResetTokens     PasswordResetToken[]
 
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model HouseholdInvite {
