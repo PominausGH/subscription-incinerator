@@ -80,17 +80,30 @@ function derivePatternFromDescription(description: string): string | null {
   return `${base}*`
 }
 
-async function learnMerchantAlias(description: string, serviceName: string): Promise<void> {
+// Queues a confident AI match for admin review rather than writing straight
+// into the shared alias table - that table has no userId scoping, so one bad
+// classification would silently mismatch this merchant for every user.
+async function queueMerchantAliasForReview(
+  description: string,
+  serviceName: string,
+  confidence: number
+): Promise<void> {
   const pattern = derivePatternFromDescription(description)
   if (!pattern) {
     return
   }
 
   try {
-    await db.merchantAlias.upsert({
+    const existing = await db.pendingMerchantAlias.findUnique({ where: { bankPattern: pattern } })
+    if (existing && existing.status !== 'pending') {
+      // Already reviewed (approved/rejected) - don't resurface it or clobber the decision
+      return
+    }
+
+    await db.pendingMerchantAlias.upsert({
       where: { bankPattern: pattern },
-      update: { serviceName },
-      create: { bankPattern: pattern, serviceName }
+      update: { serviceName, sampleDescription: description, confidence },
+      create: { bankPattern: pattern, serviceName, sampleDescription: description, confidence }
     })
   } catch {
     // Best-effort — a failed write shouldn't break the match result
@@ -111,10 +124,10 @@ export async function matchMerchant(description: string): Promise<MerchantMatch>
   // Tier 2: AI fallback
   const aiMatch = await matchMerchantWithAI(description)
 
-  // Auto-learn: promote confident AI matches into the alias table so the
-  // same merchant hits tier 1 next time instead of paying for AI again.
+  // Queue confident AI matches for admin review - once approved, they get
+  // promoted into the alias table so the same merchant hits tier 1 next time.
   if (aiMatch.serviceName && aiMatch.confidence >= LEARN_CONFIDENCE_THRESHOLD) {
-    await learnMerchantAlias(description, aiMatch.serviceName)
+    await queueMerchantAliasForReview(description, aiMatch.serviceName, aiMatch.confidence)
   }
 
   return aiMatch

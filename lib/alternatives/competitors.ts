@@ -88,7 +88,7 @@ export const competitorAlternatives: CompetitorAlternative[] = [
   {
     slug: 'truebill',
     competitorName: 'Truebill',
-    metaTitle: 'Truebill Alternative (Now Rocket Money) — Subscription Incinerator',
+    metaTitle: 'Truebill Alternative (Now Rocket Money)',
     metaDescription:
       'Truebill was rebranded to Rocket Money in 2022. If you’re looking for a lighter, bank-linking-free alternative to either, here’s how Subscription Incinerator compares.',
     intro:

@@ -48,6 +48,7 @@ export default auth((req) => {
     "/subscriptions",
     "/settings",
     "/import",
+    "/admin",
   ];
 
   const isProtectedPage = protectedPages.some((route) =>

@@ -19,6 +19,10 @@ jest.mock('@/lib/db/client', () => ({
     merchantAlias: {
       findMany: jest.fn(),
       upsert: jest.fn()
+    },
+    pendingMerchantAlias: {
+      findUnique: jest.fn(),
+      upsert: jest.fn()
     }
   }
 }))
@@ -30,6 +34,8 @@ import { db } from '@/lib/db/client'
 // Get reference to the mock functions after import
 const mockFindMany = db.merchantAlias.findMany as jest.Mock
 const mockUpsert = db.merchantAlias.upsert as jest.Mock
+const mockPendingFindUnique = db.pendingMerchantAlias.findUnique as jest.Mock
+const mockPendingUpsert = db.pendingMerchantAlias.upsert as jest.Mock
 // merchant-matcher.ts does `new Anthropic()` once at module load - grab that
 // instance's create fn so tests can override its response per-test.
 const mockCreate = (Anthropic as unknown as jest.Mock).mock.results[0].value.messages.create as jest.Mock
@@ -129,8 +135,9 @@ describe('matchMerchant', () => {
     expect(result.source).toBe('ai')
   })
 
-  it('learns a new alias when AI match is high-confidence', async () => {
+  it('queues a pending alias for review when AI match is high-confidence', async () => {
     mockFindMany.mockResolvedValue([])
+    mockPendingFindUnique.mockResolvedValue(null)
     mockCreate.mockResolvedValueOnce({
       content: [{
         type: 'text',
@@ -140,11 +147,31 @@ describe('matchMerchant', () => {
 
     await matchMerchant('COOLSTREAM.COM 800-123-4567')
 
-    expect(mockUpsert).toHaveBeenCalledWith({
+    expect(mockPendingUpsert).toHaveBeenCalledWith({
       where: { bankPattern: 'COOLSTREAM.COM*' },
-      update: { serviceName: 'Cool Streaming Co' },
-      create: { bankPattern: 'COOLSTREAM.COM*', serviceName: 'Cool Streaming Co' }
+      update: { serviceName: 'Cool Streaming Co', sampleDescription: 'COOLSTREAM.COM 800-123-4567', confidence: 0.9 },
+      create: { bankPattern: 'COOLSTREAM.COM*', serviceName: 'Cool Streaming Co', sampleDescription: 'COOLSTREAM.COM 800-123-4567', confidence: 0.9 }
     })
+    // Never writes straight into the shared live alias table
+    expect(mockUpsert).not.toHaveBeenCalled()
+  })
+
+  it('does not resurface or overwrite an already-reviewed pattern', async () => {
+    mockFindMany.mockResolvedValue([])
+    mockPendingFindUnique.mockResolvedValue({
+      bankPattern: 'COOLSTREAM.COM*',
+      status: 'rejected'
+    })
+    mockCreate.mockResolvedValueOnce({
+      content: [{
+        type: 'text',
+        text: JSON.stringify({ serviceName: 'Cool Streaming Co', confidence: 0.9 })
+      }]
+    })
+
+    await matchMerchant('COOLSTREAM.COM 800-123-4567')
+
+    expect(mockPendingUpsert).not.toHaveBeenCalled()
   })
 
   it('does not learn when AI confidence is below the threshold', async () => {
@@ -158,7 +185,7 @@ describe('matchMerchant', () => {
 
     await matchMerchant('SOME MERCHANT 4421')
 
-    expect(mockUpsert).not.toHaveBeenCalled()
+    expect(mockPendingUpsert).not.toHaveBeenCalled()
   })
 
   it('does not learn when AI returns no serviceName', async () => {
@@ -172,6 +199,6 @@ describe('matchMerchant', () => {
 
     await matchMerchant('RANDOM GROCERY STORE')
 
-    expect(mockUpsert).not.toHaveBeenCalled()
+    expect(mockPendingUpsert).not.toHaveBeenCalled()
   })
 })

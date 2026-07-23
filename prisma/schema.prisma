@@ -77,6 +77,20 @@ model MerchantAlias {
   @@map("merchant_aliases")
 }
 
+model PendingMerchantAlias {
+  id                String    @id @default(cuid())
+  bankPattern       String    @unique @map("bank_pattern")
+  serviceName       String    @map("service_name")
+  sampleDescription String    @map("sample_description")
+  confidence        Float
+  status            String    @default("pending")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  reviewedAt        DateTime? @map("reviewed_at")
+
+  @@index([status])
+  @@map("pending_merchant_aliases")
+}
+
 model OpenSourceAlternative {
   id              String   @id @default(cuid())
   serviceName     String   @map("service_name")
