@@ -102,6 +102,13 @@ export default function OpenSourcePage() {
 
                       <p className="text-gray-400 text-sm flex-1">{alt.description}</p>
 
+                      {alt.installInstructions && (
+                        <p className="text-gray-500 text-xs mt-3 pt-3 border-t border-dark-700 leading-relaxed">
+                          <span className="text-emerald-400 font-medium">Self-host: </span>
+                          {alt.installInstructions}
+                        </p>
+                      )}
+
                       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-dark-700">
                         <a
                           href={alt.websiteUrl}

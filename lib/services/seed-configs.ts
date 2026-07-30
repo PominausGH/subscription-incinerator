@@ -109,6 +109,48 @@ const serviceConfigs = [
       'Follow the prompts to confirm cancellation',
       'You may be offered a refund if you have not used any Prime benefits'
     ]
+  },
+  {
+    serviceName: 'LinkedIn Premium',
+    cancellationUrl: 'https://www.linkedin.com/premium/products/',
+    supportUrl: 'https://www.linkedin.com/help/linkedin',
+    logoUrl: 'https://logo.clearbit.com/linkedin.com',
+    cancellationInstructions: [
+      'Log in to linkedin.com and click your profile photo in the top right',
+      'Select "Access My Premium" (or go to linkedin.com/premium/products)',
+      'Click "Manage subscription"',
+      'Select "Cancel subscription" and choose a reason when prompted',
+      'Confirm the cancellation',
+      'You will keep Premium features until the end of the current billing period'
+    ]
+  },
+  {
+    serviceName: 'Semrush',
+    cancellationUrl: 'https://www.semrush.com/subscription-info/',
+    supportUrl: 'https://www.semrush.com/company/contacts/',
+    logoUrl: 'https://logo.clearbit.com/semrush.com',
+    cancellationInstructions: [
+      'Log in to semrush.com and go to Subscription info (semrush.com/subscription-info)',
+      'Click "Cancel subscription" next to your plan',
+      'Select a reason for cancelling when prompted',
+      'Review any retention offers, then confirm you want to proceed',
+      'You will receive an email confirming the subscription has been cancelled',
+      'If no self-serve option appears for your plan, contact Semrush support to request cancellation'
+    ]
+  },
+  {
+    serviceName: 'GoDaddy',
+    cancellationUrl: 'https://account.godaddy.com/products',
+    supportUrl: 'https://www.godaddy.com/help',
+    logoUrl: 'https://logo.clearbit.com/godaddy.com',
+    cancellationInstructions: [
+      'Log in to godaddy.com and go to Account Settings > My Products',
+      'Find the product or subscription you want to cancel',
+      'Click "Manage" (or the three-dot menu) next to it and select "Cancel"',
+      'Choose whether to cancel immediately or let it run until expiration, then confirm',
+      'Check your email for a cancellation confirmation',
+      'Domains and hosting cancelled within the refund window may qualify for a partial refund — check the specific product\'s refund policy'
+    ]
   }
 ]
 

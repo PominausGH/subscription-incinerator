@@ -6,6 +6,7 @@ export type OpenSourceAlternative = {
   stars: number
   license: string
   selfHosted: boolean
+  installInstructions?: string
 }
 
 export type AlternativeCategory = {
@@ -31,6 +32,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 36000,
         license: 'GPL-2.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name jellyfin -p 8096:8096 -v /path/to/config:/config -v /path/to/media:/media jellyfin/jellyfin:latest`. See jellyfin.org/docs/general/installation for reverse proxy and hardware transcoding setup.',
       },
       {
         name: 'Invidious',
@@ -40,6 +42,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 16000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Ships an official `docker-compose.yml` (bundles Postgres) in the repo root — clone github.com/iv-org/invidious, copy `docker-compose.yml.example`, and run `docker compose up -d`. Full instructions at github.com/iv-org/invidious/wiki/Installation.',
       },
       {
         name: 'PeerTube',
@@ -49,6 +52,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 13000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Officially deployed via Docker Compose: download the sample `docker-compose.yml` and `.env` from the `support/docker/production` directory of the PeerTube repo, fill in your domain/SMTP settings, then run `docker compose up -d`. See docs.joinpeertube.org/install/docker.',
       },
     ],
   },
@@ -66,6 +70,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 12000,
         license: 'GPL-3.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name navidrome -p 4533:4533 -v /path/data:/data -v /path/music:/music:ro deluan/navidrome:latest`. See navidrome.org/docs/installation/docker for a Compose example.',
       },
       {
         name: 'Funkwhale',
@@ -75,6 +80,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 1600,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Recommended install is Docker Compose (multiple services: api, celery worker, nginx, Postgres, Redis) — follow the step-by-step guide at docs.funkwhale.audio/administrator/installation/docker.html to generate your `.env` and `docker-compose.yml`.',
       },
     ],
   },
@@ -92,6 +98,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 28000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d -p 8080:80 -v /path/nextcloud:/var/www/html nextcloud:latest`. For production use, pair it with a separate database container (MariaDB/Postgres) as shown in the docs at hub.docker.com/_/nextcloud.',
       },
       {
         name: 'Syncthing',
@@ -101,6 +108,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 66000,
         license: 'MPL-2.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name syncthing -p 8384:8384 -p 22000:22000/tcp -p 22000:22000/udp -p 21027:21027/udp -v /path/config:/var/syncthing syncthing/syncthing`. See docs.syncthing.net/users/docker.html.',
       },
     ],
   },
@@ -145,6 +153,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 34000,
         license: 'MPL-2.0',
         selfHosted: true,
+        installInstructions: 'Deployed via Docker Compose (frontend, backend, exporter, Postgres, Redis, MinIO/S3 services). Follow the official self-hosting guide at penpot.app/docs/self-hosting to fetch the `docker-compose.yaml` and run `docker compose up -d`.',
       },
       {
         name: 'Darktable',
@@ -171,6 +180,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 58000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'The AppFlowy app itself is a desktop client; for self-hosted sync, deploy AppFlowy Cloud via its official `docker-compose.yml` (see github.com/AppFlowy-IO/AppFlowy-Cloud) and point the desktop client at your server URL.',
       },
       {
         name: 'Outline',
@@ -180,6 +190,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 29000,
         license: 'BSL-1.1',
         selfHosted: true,
+        installInstructions: 'Runs via Docker Compose (needs Postgres, Redis, and S3-compatible storage). Copy the repo\'s `docker-compose.yml` and `.env.sample`, fill in the required secrets, then run `docker compose up`. Full guide at docs.getoutline.com/s/hosting.',
       },
       {
         name: 'Joplin',
@@ -189,6 +200,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 47000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'For synced notes across devices, self-host Joplin Server via the official image: `docker run -d -p 22300:22300 joplin/server:latest` (requires a Postgres database, configured via env vars). See joplinapp.org/help/apps/sync/joplin_server.',
       },
       {
         name: 'Vikunja',
@@ -198,6 +210,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 1000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d -p 3456:3456 -v /path/data:/app/vikunja/files vikunja/vikunja`. See vikunja.io/docs/installing for database configuration (SQLite by default, Postgres/MySQL supported).',
       },
       {
         name: 'LibreOffice',
@@ -216,6 +229,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 12000,
         license: 'LGPL-2.1',
         selfHosted: true,
+        installInstructions: 'LanguageTool doesn\'t publish an official Docker image, but the standalone HTTP server can be self-hosted by running `java -cp languagetool-server.jar org.languagetool.server.HTTPServer --port 8081` from the downloadable server package, or via the widely-used community image `erikvl87/languagetool`. See dev.languagetool.org/http-server.',
       },
     ],
   },
@@ -233,6 +247,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 31000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Quick single-container trial: `docker run --name mattermost -d --publish 8065:8065 mattermost/mattermost-team-edition`. For production, use the official Docker Compose setup (with Postgres) at docs.mattermost.com/install/install-docker.html.',
       },
       {
         name: 'Rocket.Chat',
@@ -242,6 +257,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 41000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Officially deployed with Docker Compose (Rocket.Chat + MongoDB replica set). Download the official `docker-compose.yml` from docs.rocket.chat/docs/deploy-with-docker-docker-compose and run `docker compose up -d`.',
       },
       {
         name: 'Jitsi Meet',
@@ -251,6 +267,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 23000,
         license: 'Apache-2.0',
         selfHosted: true,
+        installInstructions: 'Official install method is docker-jitsi-meet: clone github.com/jitsi/docker-jitsi-meet, copy `env.example` to `.env`, run `./gen-passwords.sh` to generate secrets, then `docker compose up -d`.',
       },
     ],
   },
@@ -268,6 +285,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 0,
         license: 'GPL-2.0',
         selfHosted: true,
+        installInstructions: 'Not a typical containerized web app — install the `wireguard-tools` package on a VPS and configure `wg-quick` per the official quickstart at wireguard.com/quickstart, or use the popular community image `linuxserver/wireguard` for a Docker-based setup.',
       },
       {
         name: 'Vaultwarden',
@@ -277,6 +295,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 40000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name vaultwarden -p 80:80 -v /path/vw-data:/data vaultwarden/server:latest`. Put it behind HTTPS (reverse proxy) before connecting real Bitwarden clients — see github.com/dani-garcia/vaultwarden/wiki.',
       },
       {
         name: 'KeePassXC',
@@ -303,6 +322,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 105000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama`. Then pull a model with `docker exec -it ollama ollama run llama3`. See github.com/ollama/ollama for GPU passthrough options.',
       },
       {
         name: 'Open WebUI',
@@ -312,6 +332,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 55000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main`. Point it at an existing Ollama instance via the `OLLAMA_BASE_URL` env var. See docs.openwebui.com/getting-started.',
       },
       {
         name: 'Continue',
@@ -338,6 +359,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 15000,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'Official Docker image `listmonk/listmonk` requires a Postgres database. Easiest path is the sample `docker-compose.yml` from the repo (bundles Postgres), then run the one-time `--install` step to set up the schema. See listmonk.app/docs/installation.',
       },
       {
         name: 'Ghost',
@@ -347,6 +369,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 47000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name ghost -e url=https://yourdomain.com -p 2368:2368 ghost:5-alpine`. For production, pair with a MySQL container instead of the built-in SQLite. See ghost.org/docs/install/docker.',
       },
     ],
   },
@@ -364,6 +387,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 1900,
         license: 'AGPL-3.0',
         selfHosted: true,
+        installInstructions: 'LibreLingo builds to a static site rather than a server app — there\'s no official Docker image. Clone the repo, run the build per github.com/LibreLingo/LibreLingo\'s CONTRIBUTING docs, and deploy the generated static files to any web host or static file server.',
       },
       {
         name: 'Anki',
@@ -390,6 +414,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 46000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name gitea -p 3000:3000 -p 222:22 -v /path/data:/data gitea/gitea:latest`. See docs.gitea.com/installation/install-with-docker for a Compose file with Postgres.',
       },
       {
         name: 'Forgejo',
@@ -399,6 +424,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 2000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run -d --name forgejo -p 3000:3000 -p 222:22 -v /path/data:/data codeberg.org/forgejo/forgejo:latest`. See forgejo.org/docs/latest/admin/installation-docker for Compose setup.',
       },
       {
         name: 'GitLab CE',
@@ -408,6 +434,7 @@ export const alternativeCategories: AlternativeCategory[] = [
         stars: 24000,
         license: 'MIT',
         selfHosted: true,
+        installInstructions: 'Official Docker image: `docker run --detach --hostname gitlab.example.com --publish 443:443 --publish 80:80 --publish 22:22 --name gitlab --volume /srv/gitlab/config:/etc/gitlab --volume /srv/gitlab/logs:/var/log/gitlab --volume /srv/gitlab/data:/var/opt/gitlab gitlab/gitlab-ce:latest`. Needs at least 4GB RAM. See docs.gitlab.com/install/docker.',
       },
     ],
   },
