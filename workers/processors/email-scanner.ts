@@ -3,8 +3,9 @@ import { ScanInboxJob } from '@/lib/queue/jobs'
 import { db } from '@/lib/db/client'
 import { createGmailClient, fetchGmailMessages } from '@/lib/email/gmail-client'
 import { detectSubscription, deduplicateDetections, detectRecurringEmails } from '@/lib/email/scanner'
+import { detectTrialAndRenewalNotices, NOTICE_SEARCH_QUERY } from '@/lib/email/notice-detector'
 import { scheduleTrialReminders, scheduleBillingReminders } from '@/lib/notifications/schedule-reminders'
-import { decryptOAuthTokens } from '@/lib/crypto'
+import { decryptOAuthTokens, encryptOAuthTokens } from '@/lib/crypto'
 
 export async function processScanJob(job: Job<ScanInboxJob>) {
   const { userId, fullScan } = job.data
@@ -29,6 +30,27 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
     // Create Gmail client
     console.log('Step 2: Creating Gmail client...')
     const oauth2Client = createGmailClient(tokens.accessToken, tokens.refreshToken)
+
+    // Listen for token refresh events and persist them
+    oauth2Client.on('tokens', async (newTokens) => {
+      console.log('🔄 Gmail tokens refreshed, updating database...')
+      try {
+        const updatedEncryptedTokens = encryptOAuthTokens({
+          accessToken: newTokens.access_token || tokens.accessToken,
+          refreshToken: newTokens.refresh_token || tokens.refreshToken,
+          expiryDate: newTokens.expiry_date,
+          email: tokens.email, // Preserve the email if available
+        })
+
+        await db.user.update({
+          where: { id: userId },
+          data: { oauthTokens: updatedEncryptedTokens },
+        })
+        console.log('✓ Tokens updated successfully')
+      } catch (err) {
+        console.error('Failed to persist refreshed tokens:', err)
+      }
+    })
     console.log('✓ Gmail client created')
 
     // Determine date range
@@ -54,10 +76,19 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
     })
     console.log(`✓ Fetched ${frequencyMessages.length} messages for frequency analysis`)
 
+    // Fetch trial/renewal notice candidates — the default query above misses
+    // plain renewal notices with no trial/billing/subscription/payment keyword
+    const noticeMessages = await fetchGmailMessages(oauth2Client, {
+      maxResults: fullScan ? 200 : 100,
+      afterDate,
+      query: NOTICE_SEARCH_QUERY,
+    })
+    console.log(`✓ Fetched ${noticeMessages.length} messages for notice detection`)
+
     // Merge and deduplicate by email ID
     const seenIds = new Set<string>()
     const messages = []
-    for (const msg of [...subscriptionMessages, ...frequencyMessages]) {
+    for (const msg of [...subscriptionMessages, ...frequencyMessages, ...noticeMessages]) {
       if (!seenIds.has(msg.id)) {
         seenIds.add(msg.id)
         messages.push(msg)
@@ -69,13 +100,13 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
 
     // Detect subscriptions using pattern matching
     const patternDetections = messages
-      .map(msg => detectSubscription(msg))
+      .map(msg => detectSubscription(msg, user.homeCurrency))
       .filter(d => d !== null) as any[]
 
     console.log(`Found ${patternDetections.length} potential subscriptions via pattern matching`)
 
     // Detect subscriptions using frequency analysis (monthly recurring emails)
-    const frequencyDetections = detectRecurringEmails(messages)
+    const frequencyDetections = detectRecurringEmails(messages, user.homeCurrency)
     console.log(`Found ${frequencyDetections.length} potential subscriptions via frequency analysis`)
 
     // Merge both detection methods
@@ -187,16 +218,72 @@ export async function processScanJob(job: Job<ScanInboxJob>) {
       }
     }
 
-    console.log(`Scan complete for user ${userId}: ${createdCount} auto-created, ${pendingCount} pending review`)
+    // Detect trial-ending / renewal-upcoming notices — always lands in
+    // PendingSubscription for review, never auto-created (see notice-detector.ts)
+    const noticeDetections = await detectTrialAndRenewalNotices(messages)
+    console.log(`Found ${noticeDetections.length} potential trial/renewal notices`)
+
+    let noticePendingCount = 0
+    for (const notice of noticeDetections) {
+      if (existingPendingEmails.has(notice.rawData.emailId)) {
+        continue
+      }
+
+      // Skip if the user already has an active subscription tracking this merchant
+      const alreadyTracked = existingSubscriptions.some(s => s.serviceName === notice.merchant)
+      if (alreadyTracked) {
+        continue
+      }
+
+      try {
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 30)
+
+        await db.pendingSubscription.create({
+          data: {
+            userId,
+            serviceName: notice.merchant,
+            confidence: notice.confidence,
+            isTrial: notice.noticeType === 'trial_ending',
+            trialEndsAt: notice.noticeType === 'trial_ending' ? notice.deadlineDate : null,
+            nextBillingDate: notice.noticeType === 'renewal_upcoming' ? notice.deadlineDate : null,
+            sourceType: 'notice',
+            noticeType: notice.noticeType,
+            emailId: notice.rawData.emailId,
+            emailSubject: notice.rawData.subject,
+            emailFrom: notice.rawData.from,
+            emailDate: notice.rawData.date,
+            rawEmailData: notice.rawData,
+            expiresAt,
+          },
+        })
+        noticePendingCount++
+      } catch (error) {
+        console.error(`Failed to create pending notice for ${notice.merchant}:`, error)
+      }
+    }
+
+    console.log(`Scan complete for user ${userId}: ${createdCount} auto-created, ${pendingCount} pending review, ${noticePendingCount} notice pending review`)
 
     return {
       messagesScanned: messages.length,
       detectionsFound: allDetections.length,
       subscriptionsCreated: createdCount,
       subscriptionsPending: pendingCount,
+      noticesPending: noticePendingCount,
     }
   } catch (error) {
     console.error('Scan job error:', error)
+
+    const errData = (error as any)?.response?.data?.error ?? (error as any)?.cause?.message
+    if (errData === 'invalid_grant') {
+      console.warn(`Gmail refresh token revoked for user ${userId}, clearing stored tokens`)
+      await db.user.update({
+        where: { id: userId },
+        data: { oauthTokens: null, emailProvider: null },
+      })
+    }
+
     throw error
   }
 }

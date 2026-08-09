@@ -5,7 +5,7 @@ import { Inbox, Mail, Plus, Sparkles, ArrowRight } from 'lucide-react'
 
 export function EmptySubscriptionsState() {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 md:p-12">
+    <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
       <div className="max-w-2xl mx-auto text-center">
         {/* Icon */}
         <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 mb-6">
@@ -13,7 +13,7 @@ export function EmptySubscriptionsState() {
         </div>
 
         {/* Heading */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
           No subscriptions yet
         </h3>
         
@@ -24,22 +24,22 @@ export function EmptySubscriptionsState() {
         {/* Options */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
           {/* Option 1: Add Manually */}
-          <div className="bg-gray-50 rounded-lg p-6 text-left hover:bg-gray-100 transition-colors cursor-pointer group">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
             <div className="flex items-center justify-between mb-3">
               <Plus className="h-6 w-6 text-orange-500" />
               <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
             </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Add manually</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Add manually</h4>
             <p className="text-sm text-gray-600">Quickly add a subscription above</p>
           </div>
 
           {/* Option 2: Connect Gmail */}
-          <div className="bg-gray-50 rounded-lg p-6 text-left hover:bg-gray-100 transition-colors cursor-pointer group">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
             <div className="flex items-center justify-between mb-3">
               <Mail className="h-6 w-6 text-blue-500" />
               <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
             </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Scan Gmail</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Scan Gmail</h4>
             <p className="text-sm text-gray-600">Auto-detect from receipts</p>
           </div>
 
@@ -50,7 +50,7 @@ export function EmptySubscriptionsState() {
                 <Sparkles className="h-6 w-6 text-purple-500" />
                 <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-purple-500 transition-colors" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Import CSV</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Import CSV</h4>
               <p className="text-sm text-gray-600">Upload bank statement</p>
             </div>
           </Link>

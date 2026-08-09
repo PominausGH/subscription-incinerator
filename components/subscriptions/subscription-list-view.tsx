@@ -85,13 +85,13 @@ export function SubscriptionListView({
           </h2>
           {subscriptionTypeFilter}
           {categories.length > 0 && (
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
               <button
                 onClick={() => setCategoryFilter(null)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   categoryFilter === null
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 All
@@ -102,8 +102,8 @@ export function SubscriptionListView({
                   onClick={() => setCategoryFilter(cat.id)}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     categoryFilter === cat.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {cat.name}
@@ -112,18 +112,18 @@ export function SubscriptionListView({
             </div>
           )}
         </div>
-        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+        <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden">
           <button
             onClick={() => switchView('grid')}
             title="Grid view"
-            className={`p-2 ${view === 'grid' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+            className={`p-2 ${view === 'grid' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
           >
             <GridIcon />
           </button>
           <button
             onClick={() => switchView('table')}
             title="Table view"
-            className={`p-2 ${view === 'table' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+            className={`p-2 ${view === 'table' ? 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
           >
             <TableIcon />
           </button>

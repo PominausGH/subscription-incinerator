@@ -6,6 +6,7 @@ import {
   Solution,
   Features,
   TrustBar,
+  ScreenshotGallery,
   HowItWorks,
   Pricing,
   FAQ,
@@ -99,6 +100,7 @@ export default function Home() {
       <Solution />
       <Features />
       <TrustBar />
+      <ScreenshotGallery />
       <HowItWorks />
       <Pricing />
       <FAQ />

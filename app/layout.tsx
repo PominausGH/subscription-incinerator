@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CookieNotice } from "@/components/cookie-notice";
 import fs from 'fs';
 import path from 'path';
 import { getMarketingFixes } from "@/lib/marketing-sync";
@@ -53,11 +54,32 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Marketing OS - Injected Fixes */}
+        {/* Marketing OS - Injected Fixes.
+            fix.code is an arbitrary HTML fragment (a <script type="application/ld+json">,
+            a <meta> tag, etc.) — parse it and append real nodes to <head> instead of
+            blindly wrapping it in a plain <script> tag, which breaks non-JS payloads
+            like JSON-LD. */}
         {marketingFixes.map((fix: any) => (
           <script
             key={fix.fixId}
-            dangerouslySetInnerHTML={{ __html: fix.code.replace(/<\/?script[^>]*>/g, '') }}
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  const div = document.createElement('div');
+                  div.innerHTML = ${JSON.stringify(fix.code)};
+                  Array.from(div.childNodes).forEach(node => {
+                    if (node.tagName === 'SCRIPT') {
+                      const s = document.createElement('script');
+                      for (const attr of node.attributes) s.setAttribute(attr.name, attr.value);
+                      s.textContent = node.textContent;
+                      document.head.appendChild(s);
+                    } else if (node.nodeType === 1) {
+                      document.head.appendChild(node);
+                    }
+                  });
+                })();
+              `,
+            }}
           />
         ))}
 
@@ -96,6 +118,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <CookieNotice />
       </body>
     </html>
   );

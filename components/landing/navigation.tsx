@@ -16,9 +16,11 @@ export function Navigation() {
 
   const navItems = [
     { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '/pricing' },
-    { label: 'FAQ', href: '#faq' },
+    { label: 'Cancel Guide', href: '/cancel' },
+    { label: 'Open Source', href: '/open-source' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Resources', href: '/resources' },
   ]
 
   return (

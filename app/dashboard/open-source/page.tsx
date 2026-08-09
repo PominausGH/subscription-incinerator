@@ -25,12 +25,15 @@ export default async function OpenSourcePage() {
     activeSubs.map(s => s.serviceName.toLowerCase())
   )
 
-  // Group by category
+  // Group by category, deduplicating by alternativeName within each category
+  // (DB stores one row per serviceName+alternativeName pair, so Jellyfin appears
+  //  9 times for Netflix/Disney+/etc — we only want to show it once per category)
   const grouped: Record<string, typeof allAlternatives> = {}
   for (const alt of allAlternatives) {
     const cat = alt.category || 'Other'
     if (!grouped[cat]) grouped[cat] = []
-    grouped[cat].push(alt)
+    const alreadyShown = grouped[cat].some(a => a.alternativeName === alt.alternativeName)
+    if (!alreadyShown) grouped[cat].push(alt)
   }
 
   // Find which service names from the alternatives DB match the user's subscriptions

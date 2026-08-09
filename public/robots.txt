@@ -2,5 +2,87 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 Disallow: /api/
+Disallow: /import
+
+# Explicit allowlist for major AI / generative-search crawlers.
+# Default-allow above already covers them; the named blocks signal intent
+# and make it trivial to flip an individual bot off later without touching
+# the wildcard rule.
+#
+# Note: the Cloudflare zone for subscriptionincinerator.app currently allows
+# AI bots end-to-end (verified 2026-05-07). If a future "Manage AI bots"
+# managed rule starts blocking them, set that rule's action to Skip in the
+# Cloudflare dashboard — robots.txt has no effect on edge-level blocks.
+User-agent: GPTBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: GoogleOther
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
+
+User-agent: Bytespider
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /import
 
 Sitemap: https://subscriptionincinerator.app/sitemap.xml

@@ -49,48 +49,48 @@ function TableRow({ subscription }: { subscription: Subscription }) {
 
   return (
     <>
-      <tr className={`border-b border-gray-100 hover:bg-gray-50 ${isCancelled ? 'opacity-50' : ''}`}>
-        <td className="py-3 px-4 text-sm font-medium text-gray-900">
+      <tr className={`border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 ${isCancelled ? 'opacity-50' : ''}`}>
+        <td className="py-3 px-4 text-sm font-medium text-gray-900 dark:text-gray-100">
           {subscription.serviceName}
         </td>
         <td className="py-3 px-4">
           <span className={`px-2 py-0.5 text-xs rounded font-medium ${
             subscription.type === 'BUSINESS'
-              ? 'bg-purple-100 text-purple-700'
-              : 'bg-gray-100 text-gray-600'
+              ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'
+              : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
           }`}>
             {subscription.type === 'BUSINESS' ? 'Business' : 'Personal'}
           </span>
         </td>
         <td className="py-3 px-4">
           {subscription.category ? (
-            <span className="px-2 py-0.5 text-xs rounded font-medium bg-blue-50 text-blue-700">
+            <span className="px-2 py-0.5 text-xs rounded font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
               {getCategoryIcon(subscription.category.name)} {subscription.category.name}
             </span>
           ) : (
-            <span className="text-gray-400 text-xs">—</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs">—</span>
           )}
         </td>
-        <td className="py-3 px-4 text-sm text-gray-900">
+        <td className="py-3 px-4 text-sm text-gray-900 dark:text-gray-100">
           {subscription.amount != null
             ? `${getCurrencySymbol(subscription.currency)}${subscription.amount.toFixed(2)}${subscription.billingCycle ? `/${subscription.billingCycle}` : ''}`
-            : <span className="text-gray-400">—</span>
+            : <span className="text-gray-400 dark:text-gray-500">—</span>
           }
         </td>
         <td className="py-3 px-4">
           <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-            subscription.status === 'trial' ? 'bg-yellow-100 text-yellow-800' :
-            subscription.status === 'active' ? 'bg-green-100 text-green-800' :
-            subscription.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
+            subscription.status === 'trial' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' :
+            subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
+            subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' :
+            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
           }`}>
             {subscription.status}
           </span>
         </td>
-        <td className="py-3 px-4 text-sm text-gray-700">
+        <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
           {subscription.nextBillingDate
             ? new Date(subscription.nextBillingDate).toLocaleDateString()
-            : <span className="text-gray-400">—</span>
+            : <span className="text-gray-400 dark:text-gray-500">—</span>
           }
         </td>
         <td className="py-3 px-4">
@@ -126,17 +126,17 @@ function TableRow({ subscription }: { subscription: Subscription }) {
 
 export function SubscriptionTable({ subscriptions }: { subscriptions: Subscription[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow">
+    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow">
       <table className="w-full text-left">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Name</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Type</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Category</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Amount</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Next Billing</th>
-            <th className="py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wide">Actions</th>
+          <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Type</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Category</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Amount</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Status</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Next Billing</th>
+            <th className="py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Actions</th>
           </tr>
         </thead>
         <tbody>

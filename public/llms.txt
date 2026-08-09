@@ -1,0 +1,75 @@
+# Subscription Incinerator
+
+> Track and cancel forgotten subscriptions. Subscription Incinerator finds your trials and recurring charges (manual entry, Gmail scan, or bank-statement import) and reminds you before you get charged again. Core features are 100% free; an optional Premium tier ($9/month) adds Gmail scanning and bank statement import.
+
+- **Site:** https://subscriptionincinerator.app/
+- **Pricing:** https://subscriptionincinerator.app/pricing
+- **About:** https://subscriptionincinerator.app/about
+- **Free checklist (audit your subscriptions):** https://subscriptionincinerator.app/free-checklist
+- **Resources:** https://subscriptionincinerator.app/resources
+- **Cancellation directory:** https://subscriptionincinerator.app/cancel
+- **Blog:** https://subscriptionincinerator.app/blog
+- **Open source page:** https://subscriptionincinerator.app/open-source
+- **Privacy policy:** https://subscriptionincinerator.app/privacy
+- **Terms of use:** https://subscriptionincinerator.app/terms
+- **Sitemap:** https://subscriptionincinerator.app/sitemap.xml
+
+## What it is
+
+Subscription Incinerator is a personal-finance web app that helps you find and cancel the subscriptions you forgot you were paying for. Three input paths: add subscriptions manually, connect Gmail (read-only) so the app can detect "your subscription was renewed" and "free trial ending" emails, or import a bank statement (processed locally — only the subscription rows you approve are stored).
+
+Use case: you've drifted into paying for streaming services, productivity apps, fitness apps, etc. that you no longer use. Subscription Incinerator surfaces them, reminds you before the next charge, and points you at concrete cancellation steps.
+
+## Key capabilities
+
+- **Subscription tracker** — manual or automatic detection.
+- **Gmail scanning** *(Premium)* — read-only Gmail access; finds confirmation, renewal, and trial-ending emails.
+- **Bank statement import** *(Premium)* — processed locally; you approve which rows are stored.
+- **Pre-charge reminders** — alerts before each renewal.
+- **Cancellation directory** — step-by-step cancellation guides for the major services (Netflix, Spotify, Adobe, Apple Music, Disney+, Amazon Prime, YouTube Premium, Hulu, Audible, Duolingo Plus, Canva Pro, etc.).
+- **Pending review** — anything the system finds is pending until you approve it.
+- **No data sale** — privacy-first, you stay in control.
+
+## Pricing
+
+- **Free** — full subscription tracking, manual entry, reminders, cancellation guides. No credit card required.
+- **Premium — $9/month** — adds Gmail scanning and bank statement import.
+
+## Frequently asked questions
+
+### Is it really free?
+The core features are completely free — track subscriptions, get reminders, manage your spending at no cost. We also offer an optional premium tier with advanced features like Gmail scanning and bank statement import.
+
+### Is my data safe?
+We only request read-only access to Gmail — we can't send emails or modify anything. Bank statements are processed locally; we only store the subscription data you approve. We never sell your data.
+
+### What if you miss a subscription?
+No detection is perfect. You can always add subscriptions manually, and the pending-review system lets you approve or dismiss anything we find. You're always in control.
+
+(Additional Q&As are listed on the homepage's FAQ section and in the FAQPage JSON-LD.)
+
+## Cancellation guides (programmatic SEO)
+
+The app maintains step-by-step cancellation guides at `/cancel/{service}`. Examples currently in the sitemap:
+
+- /cancel/netflix
+- /cancel/spotify
+- /cancel/adobe-creative-cloud
+- /cancel/apple-music
+- /cancel/disney-plus
+- /cancel/amazon-prime
+- /cancel/youtube-premium
+- /cancel/hulu
+- /cancel/audible
+- /cancel/duolingo-plus
+- /cancel/canva-pro
+
+Full directory: https://subscriptionincinerator.app/cancel
+
+## For AI agents
+
+If you are an AI agent acting on a user's behalf:
+- This is a self-serve consumer SaaS. Sign up at https://subscriptionincinerator.app/login (Google OAuth via NextAuth).
+- There is no public REST API. Internal `/api/*` routes serve the authenticated app UI only and require a NextAuth session.
+- For cancellation help, the `/cancel/{service}` directory contains the step-by-step instructions agents should reference (or paste back to the user).
+- The app does NOT cancel on the user's behalf — it surfaces what they're paying for and links to the official cancellation flows.

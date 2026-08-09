@@ -96,6 +96,7 @@ export function OpenSourcePageClient({ grouped, matchedServiceNames }: Props) {
   const [searchSource, setSearchSource] = useState<'db' | 'ai' | null>(null)
   const [yearlySaving, setYearlySaving] = useState<number | null>(null)
   const [searchError, setSearchError] = useState<string | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
   const matchedSet = new Set(matchedServiceNames.map(n => n.toLowerCase()))
 
@@ -134,6 +135,10 @@ export function OpenSourcePageClient({ grouped, matchedServiceNames }: Props) {
     if (!aMatched && bMatched) return 1
     return a.localeCompare(b)
   })
+
+  const selectedCategory = activeCategory ?? categories[0] ?? null
+  const visibleAlts = selectedCategory ? grouped[selectedCategory] ?? [] : []
+  const selectedHasMatch = visibleAlts.some(alt => matchedSet.has(alt.serviceName.toLowerCase()))
 
   return (
     <div className="space-y-8">
@@ -221,34 +226,54 @@ export function OpenSourcePageClient({ grouped, matchedServiceNames }: Props) {
         )}
       </div>
 
-      {/* Category sections */}
-      {categories.map(category => {
-        const alts = grouped[category]
-        const hasMatch = alts.some(alt => matchedSet.has(alt.serviceName.toLowerCase()))
-        return (
-          <div key={category}>
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-              {category}
-              {hasMatch && (
-                <span className="text-xs font-medium text-orange-600 dark:text-orange-400 normal-case tracking-normal">
-                  — you have a subscription here
-                </span>
-              )}
-            </h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {alts.map(alt => (
-                <AlternativeCard
-                  key={alt.id}
-                  alt={alt}
-                  isMatched={matchedSet.has(alt.serviceName.toLowerCase())}
-                />
-              ))}
-            </div>
+      {/* Category tabs + cards */}
+      {categories.length > 0 ? (
+        <div>
+          {/* Horizontal tab bar */}
+          <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">
+            {categories.map(category => {
+              const hasMatch = grouped[category].some(alt => matchedSet.has(alt.serviceName.toLowerCase()))
+              const isActive = category === selectedCategory
+              return (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {category}
+                  {hasMatch && (
+                    <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-orange-400 align-middle" title="You have a subscription here" />
+                  )}
+                </button>
+              )
+            })}
           </div>
-        )
-      })}
 
-      {categories.length === 0 && (
+          {/* Active category cards */}
+          {selectedCategory && (
+            <div>
+              {selectedHasMatch && (
+                <p className="text-xs text-orange-600 dark:text-orange-400 font-medium mb-3">
+                  You have a subscription in this category
+                </p>
+              )}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {visibleAlts.map(alt => (
+                  <AlternativeCard
+                    key={alt.id}
+                    alt={alt}
+                    isMatched={matchedSet.has(alt.serviceName.toLowerCase())}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
         <p className="text-gray-500 dark:text-gray-400 text-sm">
           No alternatives in the database yet. Use the search above to find options with AI.
         </p>

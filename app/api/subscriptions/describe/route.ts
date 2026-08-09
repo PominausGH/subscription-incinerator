@@ -10,12 +10,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { serviceName } = await req.json()
+  const { serviceName, mode } = await req.json()
   if (!serviceName) {
     return NextResponse.json({ error: 'serviceName required' }, { status: 400 })
   }
 
   try {
+    if (mode === 'cancel-url') {
+      const message = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 100,
+        messages: [
+          {
+            role: 'user',
+            content: `What is the direct URL to cancel a subscription for "${serviceName}"? Reply with just the URL (e.g. https://example.com/account/cancel). If you don't know the exact URL, provide the account/billing settings page URL. Reply with only the URL, nothing else.`,
+          },
+        ],
+      })
+      const url = (message.content[0] as { type: string; text: string }).text.trim()
+      return NextResponse.json({ url })
+    }
+
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 200,

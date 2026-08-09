@@ -26,6 +26,29 @@ export function createGmailClient(accessToken: string, refreshToken: string): OA
   return oauth2Client
 }
 
+function extractEmailBody(payload: any): string {
+  if (!payload) return ''
+
+  let body = ''
+
+  // If this is the part with the body data
+  if (payload.body?.data) {
+    // Gmail uses base64url encoding
+    const data = payload.body.data.replace(/-/g, '+').replace(/_/g, '/')
+    body += Buffer.from(data, 'base64').toString('utf-8')
+  }
+
+  // If this part has sub-parts, recurse into them
+  if (payload.parts) {
+    // Collect all text content
+    for (const part of payload.parts) {
+      body += extractEmailBody(part)
+    }
+  }
+
+  return body
+}
+
 export async function fetchGmailMessages(
   oauth2Client: OAuth2Client,
   options: {
@@ -87,16 +110,8 @@ export async function fetchGmailMessages(
           const subject = headers.find((h) => h.name === 'Subject')?.value || ''
           const dateStr = headers.find((h) => h.name === 'Date')?.value || ''
 
-          // Get body
-          let body = ''
-          if (msg.payload?.body?.data) {
-            body = Buffer.from(msg.payload.body.data, 'base64').toString('utf-8')
-          } else if (msg.payload?.parts) {
-            const textPart = msg.payload.parts.find((part) => part.mimeType === 'text/plain')
-            if (textPart?.body?.data) {
-              body = Buffer.from(textPart.body.data, 'base64').toString('utf-8')
-            }
-          }
+          // Use the recursive body extraction
+          const body = extractEmailBody(msg.payload)
 
           return {
             id: msg.id || '',

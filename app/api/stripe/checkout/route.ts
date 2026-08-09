@@ -3,8 +3,12 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { stripe } from '@/lib/stripe'
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
+    const body = await req.json().catch(() => ({}))
+    const annual = body.annual === true
+    const trialDays = body.source === 'producthunt' ? 30 : 7
+
     const session = await auth()
 
     if (!session?.user?.id) {
@@ -41,18 +45,30 @@ export async function POST() {
       })
     }
 
+    const priceId = annual
+      ? process.env.STRIPE_PRICE_ID_ANNUAL
+      : process.env.STRIPE_PRICE_ID_MONTHLY
+
+    if (!priceId) {
+      return NextResponse.json({ error: 'Price not configured' }, { status: 500 })
+    }
+
     // Create checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
+      allow_promotion_codes: true,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID,
+          price: priceId,
           quantity: 1,
         },
       ],
+      subscription_data: {
+        trial_period_days: trialDays,
+      },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgraded=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
     })
 
     return NextResponse.json({ url: checkoutSession.url })

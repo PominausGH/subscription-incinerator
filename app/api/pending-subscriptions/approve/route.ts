@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
           currency: pending.currency,
           trialEndsAt: pending.trialEndsAt,
           nextBillingDate: pending.nextBillingDate,
-          detectedFrom: 'email_scan',
+          detectedFrom: pending.sourceType === 'notice' ? 'email_notice' : 'email_scan',
           rawEmailData: pending.rawEmailData as Prisma.InputJsonValue,
         }
       })

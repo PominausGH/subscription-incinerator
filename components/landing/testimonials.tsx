@@ -15,7 +15,7 @@ const testimonials = [
     quote: "That Adobe trial I forgot to cancel from 8 months ago? Gone. The reminder system is exactly what I needed — it fires before the charge hits.",
     name: "Sarah M.",
     location: "Manchester, UK",
-    saved: "$127/yr",
+    saved: "£127/yr",
     initials: "SM",
     color: "bg-purple-600",
   },

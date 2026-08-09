@@ -35,8 +35,11 @@ export async function GET() {
       select: { notificationPreferences: true },
     })
 
-    const preferences = (user?.notificationPreferences as unknown as NotificationPreferences) ||
-      DEFAULT_NOTIFICATION_PREFERENCES
+    const raw = user?.notificationPreferences as unknown as Record<string, unknown> | null
+    const isNewFormat = raw && typeof raw.channels === 'object'
+    const preferences: NotificationPreferences = isNewFormat
+      ? (raw as unknown as NotificationPreferences)
+      : DEFAULT_NOTIFICATION_PREFERENCES
 
     return NextResponse.json(preferences)
   } catch (error) {

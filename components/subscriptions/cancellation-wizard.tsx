@@ -69,6 +69,10 @@ export function CancellationWizard({ subscriptionId }: CancellationWizardProps) 
       const result = await response.json()
       setSavedAmount(result.savedAmount ?? null)
       setWizardState('confirmed')
+
+      if (typeof window !== 'undefined' && window.umami) {
+        window.umami.track('subscription_cancelled', { savedAmount: result.savedAmount ?? 0 })
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       setWizardState('steps')

@@ -13,11 +13,14 @@ interface PendingSubscriptionCardProps {
     amount: number | null
     currency: string
     billingCycle: string | null
+    trialEndsAt: Date | null
     nextBillingDate: Date | null
     emailFrom: string
     emailDate: Date
     emailId: string
     emailSubject: string
+    sourceType: string
+    noticeType: string | null
   }
   gmailEmail?: string
 }
@@ -83,6 +86,13 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
   const formattedBillingDate = item.nextBillingDate
     ? new Date(item.nextBillingDate).toLocaleDateString()
     : null
+  const isNotice = item.sourceType === 'notice'
+  const formattedTrialEndsAt = item.trialEndsAt
+    ? new Date(item.trialEndsAt).toLocaleDateString()
+    : null
+  const noticeDeadlineLabel = item.noticeType === 'trial_ending'
+    ? formattedTrialEndsAt && `Trial ends ${formattedTrialEndsAt}`
+    : formattedBillingDate && `Renews ${formattedBillingDate}`
 
   // Gmail link to view the original email (uses authuser param to open correct account)
   const gmailLink = gmailEmail
@@ -94,9 +104,15 @@ export function PendingSubscriptionCard({ item, gmailEmail }: PendingSubscriptio
       <div className="flex-1">
         <div className="flex items-center gap-3">
           <h3 className="font-medium text-gray-900">{item.serviceName}</h3>
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
-            {confidencePercent}% match
-          </span>
+          {isNotice ? (
+            <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded font-medium">
+              {noticeDeadlineLabel || (item.noticeType === 'trial_ending' ? 'Trial ending soon' : 'Renewing soon')}
+            </span>
+          ) : (
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
+              {confidencePercent}% match
+            </span>
+          )}
         </div>
 
         {(item.amount || item.billingCycle) && (

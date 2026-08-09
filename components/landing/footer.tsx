@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="py-12 bg-dark-900 border-t border-dark-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Logo column */}
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -43,6 +43,38 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Content column */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Content</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/blog" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href="/cancel" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Cancellation Guides
+                </Link>
+              </li>
+              <li>
+                <Link href="/resources" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Resources
+                </Link>
+              </li>
+              <li>
+                <Link href="/open-source" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Open Source Alternatives
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  About
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Legal column */}
           <div>
             <h4 className="text-white font-semibold mb-4">Support</h4>
@@ -68,7 +100,10 @@ export function Footer() {
 
         <div className="pt-8 border-t border-dark-700 text-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Subscription Incinerator. All rights reserved.
+            © {new Date().getFullYear()} Subscription Incinerator. All rights reserved. <span className="ml-3 opacity-70">ABN: 65 366 917 788</span>{' '}
+            <a href="https://daintytrading.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-500 hover:text-fire-400 transition-colors">
+              Built by Dainty Trading
+            </a>
           </p>
         </div>
       </div>

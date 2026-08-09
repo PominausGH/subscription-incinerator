@@ -156,12 +156,12 @@ export interface DetectionResult {
   }
 }
 
-export function detectSubscription(message: GmailMessage): DetectionResult | null {
+export function detectSubscription(message: GmailMessage, homeCurrency: string = 'USD'): DetectionResult | null {
   let bestMatch: DetectionResult | null = null
   let highestConfidence = 0
 
   for (const rule of DETECTION_RULES) {
-    const result = matchRule(message, rule)
+    const result = matchRule(message, rule, homeCurrency)
 
     if (result && result.confidence > highestConfidence) {
       highestConfidence = result.confidence
@@ -177,7 +177,7 @@ export function detectSubscription(message: GmailMessage): DetectionResult | nul
   return null
 }
 
-function matchRule(message: GmailMessage, rule: typeof DETECTION_RULES[0]): DetectionResult | null {
+function matchRule(message: GmailMessage, rule: typeof DETECTION_RULES[0], homeCurrency: string): DetectionResult | null {
   let confidence = 0
   let matchCount = 0
   const maxMatches = 5
@@ -226,11 +226,16 @@ function matchRule(message: GmailMessage, rule: typeof DETECTION_RULES[0]): Dete
   }
 
   // Extract currency
-  let currency = 'USD'
+  let currency = homeCurrency
   if (rule.currencyExtractor) {
     const currencyMatch = message.body.match(rule.currencyExtractor)
     if (currencyMatch && currencyMatch[1]) {
-      currency = getCurrencyCode(currencyMatch[1])
+      const matchedSymbol = currencyMatch[1]
+      if (matchedSymbol === '$') {
+        currency = homeCurrency
+      } else {
+        currency = getCurrencyCode(matchedSymbol)
+      }
     }
   }
 
@@ -305,7 +310,7 @@ export interface FrequencyDetectionResult extends DetectionResult {
   averageIntervalDays: number
 }
 
-export function detectRecurringEmails(messages: GmailMessage[]): FrequencyDetectionResult[] {
+export function detectRecurringEmails(messages: GmailMessage[], homeCurrency: string = 'USD'): FrequencyDetectionResult[] {
   // Group emails by sender domain
   const emailsBySender = new Map<string, GmailMessage[]>()
 
@@ -358,13 +363,18 @@ export function detectRecurringEmails(messages: GmailMessage[]): FrequencyDetect
 
     // Try to extract price from the most recent email
     let amount: number | null = null
-    let currency = 'USD'
+    let currency = homeCurrency
     const priceMatch = latestEmail.body.match(/(?:\$|USD\s*|€|EUR\s*|£|GBP\s*|A\$|AUD\s*)(\d+\.?\d{0,2})/i)
     if (priceMatch) {
       amount = parseFloat(priceMatch[1])
       const currencyMatch = latestEmail.body.match(/(\$|USD|€|EUR|£|GBP|AUD|A\$)/i)
       if (currencyMatch) {
-        currency = getCurrencyCode(currencyMatch[1])
+        const matchedSymbol = currencyMatch[1]
+        if (matchedSymbol === '$') {
+          currency = homeCurrency
+        } else {
+          currency = getCurrencyCode(matchedSymbol)
+        }
       }
     }
 

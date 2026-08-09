@@ -91,7 +91,7 @@ function UpgradeCTA({ annual, source }: { annual: boolean; source?: string }) {
       disabled={loading}
       className="w-full py-3.5 px-6 rounded-lg font-semibold text-white text-base bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      {loading ? 'Loading…' : `Start ${source === 'producthunt' ? 14 : 7}-Day Free Trial`}
+      {loading ? 'Loading…' : `Start ${source === 'producthunt' ? 30 : 7}-Day Free Trial`}
     </button>
   )
 }
@@ -103,7 +103,7 @@ export function Pricing({ source }: { source?: string } = {}) {
   const annualPrice = 50
   const annualMonthlyEquivalent = (annualPrice / 12).toFixed(2)
   const annualSavings = Math.round((1 - annualPrice / (monthlyPrice * 12)) * 100)
-  const trialDays = source === 'producthunt' ? 14 : 7
+  const trialDays = source === 'producthunt' ? 30 : 7
 
   return (
     <section id="pricing" className="py-24 bg-dark-900">

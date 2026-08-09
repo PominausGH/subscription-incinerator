@@ -10,11 +10,14 @@ interface PendingSubscriptionsSectionProps {
     amount: number | null
     currency: string
     billingCycle: string | null
+    trialEndsAt: Date | null
     nextBillingDate: Date | null
     emailFrom: string
     emailDate: Date
     emailId: string
     emailSubject: string
+    sourceType: string
+    noticeType: string | null
   }>
   gmailEmail?: string
 }

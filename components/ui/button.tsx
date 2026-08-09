@@ -19,7 +19,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           size === 'sm' && "px-3 py-1.5 text-xs",
           size === 'lg' && "px-6 py-3 text-base",
           variant === 'default' && "bg-blue-600 text-white hover:bg-blue-700",
-          variant === 'outline' && "border border-gray-300 bg-white hover:bg-gray-50",
+          variant === 'outline' && "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-700",
           variant === 'ghost' && "hover:bg-gray-100",
           variant === 'destructive' && "bg-red-600 text-white hover:bg-red-700",
           className

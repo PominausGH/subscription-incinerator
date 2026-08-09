@@ -108,12 +108,12 @@ export function ReminderPopover({
 
       <Popover.Portal>
         <Popover.Content
-          className="bg-white rounded-lg shadow-lg border border-gray-200 w-72 z-50"
+          className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 w-72 z-50"
           sideOffset={5}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-gray-900 text-sm">
+              <h3 className="font-medium text-gray-900 dark:text-white text-sm">
                 Reminders for {subscriptionName}
               </h3>
               <Popover.Close asChild>
@@ -134,8 +134,8 @@ export function ReminderPopover({
                   className="mt-1 text-orange-600 focus:ring-orange-500"
                 />
                 <div>
-                  <span className="text-sm text-gray-700">Use default settings</span>
-                  <p className="text-xs text-gray-700">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">Use default settings</span>
+                  <p className="text-xs text-gray-700 dark:text-gray-400">
                     ({defaultTimings.join(', ')} before)
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export function ReminderPopover({
                   disabled={saving}
                   className="mt-1 text-orange-600 focus:ring-orange-500"
                 />
-                <span className="text-sm text-gray-700">Custom for this subscription</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Custom for this subscription</span>
               </label>
 
               {mode === 'custom' && (
@@ -164,7 +164,7 @@ export function ReminderPopover({
                         disabled={saving}
                         className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
                       />
-                      <span className="text-sm text-gray-600">{option.label}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{option.label}</span>
                     </label>
                   ))}
                 </div>
@@ -179,7 +179,7 @@ export function ReminderPopover({
                   disabled={saving}
                   className="text-orange-600 focus:ring-orange-500"
                 />
-                <span className="text-sm text-gray-700">No reminders</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">No reminders</span>
               </label>
             </div>
           </div>

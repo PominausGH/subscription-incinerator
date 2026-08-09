@@ -1,10 +1,36 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { Navigation } from '@/components/landing/navigation'
+import { Footer } from '@/components/landing/footer'
+
+type Category = 'billing' | 'account' | 'bug' | 'feature' | 'feedback'
+
+const CATEGORY_COPY: Record<Category, { helper: string; placeholder: string }> = {
+  billing: {
+    helper: 'Question about a charge, invoice, or your plan?',
+    placeholder: "What's the billing question — a charge you don't recognize, invoice request, upgrade/downgrade, refund?",
+  },
+  account: {
+    helper: 'Trouble signing in, connecting accounts, or account settings?',
+    placeholder: "What's going on with your account — login issues, connecting Gmail/bank, profile settings?",
+  },
+  bug: {
+    helper: 'Tell us what broke — the more detail, the faster we can fix it.',
+    placeholder: 'What happened? What did you expect instead? Steps to reproduce, if you can.',
+  },
+  feature: {
+    helper: 'What should we build?',
+    placeholder: 'What do you want to be able to do, and why would it help?',
+  },
+  feedback: {
+    helper: 'Anything on your mind.',
+    placeholder: "Tell us what's working, what's not, or just say hi.",
+  },
+}
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', category: '' as Category | '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -14,11 +40,15 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+          pageUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+        }),
       })
       if (res.ok) {
         setStatus('success')
-        setForm({ name: '', email: '', subject: '', message: '' })
+        setForm({ name: '', email: '', category: '', message: '' })
       } else {
         setStatus('error')
       }
@@ -27,17 +57,13 @@ export default function ContactPage() {
     }
   }
 
+  const copy = form.category ? CATEGORY_COPY[form.category] : null
+
   return (
     <main className="min-h-screen bg-dark-900 flex flex-col">
-      {/* Nav */}
-      <div className="border-b border-dark-700 px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 w-fit">
-          <span className="text-2xl">🔥</span>
-          <span className="font-bold text-white">Subscription Incinerator</span>
-        </Link>
-      </div>
+      <Navigation />
 
-      <div className="flex-1 flex items-center justify-center px-4 py-16">
+      <div className="flex-1 flex items-center justify-center px-4 py-16 pt-32">
         <div className="w-full max-w-lg">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-white mb-3">Contact Us</h1>
@@ -84,20 +110,21 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1.5">Subject</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1.5">What&apos;s this about?</label>
                 <select
                   required
-                  value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value as Category })}
                   className="w-full px-4 py-2.5 rounded-lg bg-dark-800 border border-dark-600 text-white focus:outline-none focus:border-orange-500/60 transition-colors text-sm appearance-none"
                 >
                   <option value="">Select a topic…</option>
                   <option value="billing">Billing &amp; Payments</option>
                   <option value="account">Account Issue</option>
-                  <option value="feature">Feature Request</option>
                   <option value="bug">Bug Report</option>
-                  <option value="other">Other</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="feedback">General Feedback</option>
                 </select>
+                {copy && <p className="mt-1.5 text-xs text-gray-500">{copy.helper}</p>}
               </div>
 
               <div>
@@ -107,7 +134,7 @@ export default function ContactPage() {
                   rows={5}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder="Describe your issue or question…"
+                  placeholder={copy?.placeholder ?? 'Describe your issue or question…'}
                   className="w-full px-4 py-2.5 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-gray-600 focus:outline-none focus:border-orange-500/60 transition-colors text-sm resize-none"
                 />
               </div>
@@ -127,6 +154,8 @@ export default function ContactPage() {
           )}
         </div>
       </div>
+
+      <Footer />
     </main>
   )
 }

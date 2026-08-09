@@ -60,29 +60,29 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow p-6 relative">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 relative">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold text-gray-900">{subscription.serviceName}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{subscription.serviceName}</h3>
             <span className={`px-2 py-0.5 text-xs rounded font-medium ${
               subscription.type === 'BUSINESS'
-                ? 'bg-purple-100 text-purple-700'
-                : 'bg-gray-100 text-gray-600'
+                ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
             }`}>
               {subscription.type === 'BUSINESS' ? 'Business' : 'Personal'}
             </span>
             {subscription.category && (
-              <span className="px-2 py-0.5 text-xs rounded font-medium bg-blue-50 text-blue-700">
+              <span className="px-2 py-0.5 text-xs rounded font-medium bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
                 {getCategoryIcon(subscription.category.name)} {subscription.category.name}
               </span>
             )}
           </div>
           <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-            subscription.status === 'trial' ? 'bg-yellow-100 text-yellow-800' :
-            subscription.status === 'active' ? 'bg-green-100 text-green-800' :
-            subscription.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
+            subscription.status === 'trial' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300' :
+            subscription.status === 'active' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300' :
+            subscription.status === 'cancelled' ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' :
+            'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'
           }`}>
             {subscription.status}
           </span>
@@ -90,33 +90,33 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
         {/* Price */}
         {subscription.amount ? (
-          <p className="text-2xl font-bold text-gray-900 mb-2">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {formatCurrency(subscription.amount, subscription.currency)}
             {subscription.billingCycle && (
-              <span className="text-sm font-normal text-gray-700">/{subscription.billingCycle}</span>
+              <span className="text-sm font-normal text-gray-700 dark:text-gray-400">/{subscription.billingCycle}</span>
             )}
           </p>
         ) : (
-          <p className="text-sm text-gray-700 italic mb-2">No price set</p>
+          <p className="text-sm text-gray-700 dark:text-gray-400 italic mb-2">No price set</p>
         )}
 
         {/* Description */}
         {subscription.description && (
-          <p className="text-sm text-gray-700 mb-2 leading-snug">{subscription.description}</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 leading-snug">{subscription.description}</p>
         )}
 
         {/* Details */}
-        <div className="space-y-1 text-sm text-gray-800">
+        <div className="space-y-1 text-sm text-gray-800 dark:text-gray-300">
           {subscription.trialEndsAt && (
             <p>
-              <span className="text-gray-700">Trial ends:</span>{' '}
+              <span className="text-gray-700 dark:text-gray-400">Trial ends:</span>{' '}
               {new Date(subscription.trialEndsAt).toLocaleDateString()}
             </p>
           )}
 
           {subscription.nextBillingDate && (
             <p>
-              <span className="text-gray-700">Next billing:</span>{' '}
+              <span className="text-gray-700 dark:text-gray-400">Next billing:</span>{' '}
               {new Date(subscription.nextBillingDate).toLocaleDateString()}
             </p>
           )}
@@ -127,7 +127,7 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
                 href={subscription.cancellationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline inline-flex items-center gap-1"
+                className="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
               >
                 Cancel subscription
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -148,7 +148,7 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
         )}
 
         {/* Actions */}
-        <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
           <Button
             variant="outline"
             size="sm"

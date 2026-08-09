@@ -44,11 +44,14 @@ export default async function DashboardPage({
       amount: true,
       currency: true,
       billingCycle: true,
+      trialEndsAt: true,
       nextBillingDate: true,
       emailFrom: true,
       emailDate: true,
       emailId: true,
-      emailSubject: true
+      emailSubject: true,
+      sourceType: true,
+      noticeType: true
     }
   })
 

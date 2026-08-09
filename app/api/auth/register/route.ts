@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, password } = parsed.data
+    const { email, password, homeCurrency } = parsed.data
 
     const existingUser = await db.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
         email: email.toLowerCase(),
         passwordHash,
         emailVerified: new Date(),
+        homeCurrency: homeCurrency || 'USD',
       },
     })
 

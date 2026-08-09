@@ -64,6 +64,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
   }
 
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isGeneratingUrl, setIsGeneratingUrl] = useState(false)
   const [formData, setFormData] = useState({
     serviceName: subscription.serviceName,
     status: subscription.status as 'trial' | 'active' | 'cancelled',
@@ -77,6 +78,23 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
     categoryId: subscription.categoryId || '',
     description: subscription.description || '',
   })
+
+  async function generateCancelUrl() {
+    if (!formData.serviceName.trim()) return
+    setIsGeneratingUrl(true)
+    try {
+      const res = await fetch('/api/subscriptions/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceName: formData.serviceName, mode: 'cancel-url' }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.url) setFormData(f => ({ ...f, cancellationUrl: data.url }))
+      }
+    } catch {}
+    setIsGeneratingUrl(false)
+  }
 
   async function generateDescription() {
     if (!formData.serviceName.trim()) return
@@ -139,14 +157,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <form onSubmit={onSubmit} className="p-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Edit Subscription</h3>
+            <h3 className="text-lg font-semibold dark:text-white">Edit Subscription</h3>
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -162,7 +180,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="serviceName" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="serviceName" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Service Name
               </label>
               <Input
@@ -174,14 +192,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Category
               </label>
               <select
                 id="category"
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
               >
                 <option value="">No category</option>
                 {categories.map((cat) => (
@@ -195,7 +213,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Amount
               </label>
               <Input
@@ -209,14 +227,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
             </div>
 
             <div>
-              <label htmlFor="currency" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="currency" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Currency
               </label>
               <select
                 id="currency"
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
               >
                 {SUPPORTED_CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
@@ -227,14 +245,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="status" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Status
               </label>
               <select
                 id="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as 'trial' | 'active' | 'cancelled' })}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
               >
                 <option value="trial">Trial</option>
                 <option value="active">Active</option>
@@ -243,14 +261,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
             </div>
 
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="type" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Type
               </label>
               <select
                 id="type"
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as 'PERSONAL' | 'BUSINESS' })}
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
               >
                 <option value="PERSONAL">Personal</option>
                 <option value="BUSINESS">Business</option>
@@ -259,14 +277,14 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
           </div>
 
           <div>
-            <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-900 mb-1">
+            <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
               Billing Cycle
             </label>
             <select
               id="billingCycle"
               value={formData.billingCycle}
               onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value })}
-              className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+              className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
             >
               <option value="weekly">Weekly</option>
               <option value="fortnightly">Fortnightly</option>
@@ -281,7 +299,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
 
           {formData.status === 'trial' && (
             <div>
-              <label htmlFor="trialEndsAt" className="block text-sm font-medium text-gray-900 mb-1">
+              <label htmlFor="trialEndsAt" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
                 Trial Ends
               </label>
               <Input
@@ -294,7 +312,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
           )}
 
           <div>
-            <label htmlFor="nextBillingDate" className="block text-sm font-medium text-gray-900 mb-1">
+            <label htmlFor="nextBillingDate" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
               Next Billing Date
             </label>
             <Input
@@ -306,9 +324,19 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
           </div>
 
           <div>
-            <label htmlFor="cancellationUrl" className="block text-sm font-medium text-gray-900 mb-1">
-              Cancellation URL
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="cancellationUrl" className="block text-sm font-medium text-gray-900 dark:text-gray-200">
+                Cancellation URL
+              </label>
+              <button
+                type="button"
+                onClick={generateCancelUrl}
+                disabled={isGeneratingUrl || !formData.serviceName.trim()}
+                className="text-xs text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                {isGeneratingUrl ? 'Finding...' : '✨ Auto-fill with AI'}
+              </button>
+            </div>
             <Input
               id="cancellationUrl"
               type="url"
@@ -338,7 +366,7 @@ export function EditSubscriptionModal({ subscription, isOpen, onClose }: EditSub
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="What is this subscription for?"
               rows={2}
-              className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="flex w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
 

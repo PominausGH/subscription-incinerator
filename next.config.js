@@ -2,7 +2,16 @@
 const nextConfig = {
   // Enable standalone output for Docker
   output: 'standalone',
-  
+
+  // First-party proxy for Umami analytics (bypasses ad blockers + CSP).
+  // Routed to the umami container directly so we don't loop through Cloudflare.
+  async rewrites() {
+    return [
+      { source: '/stats/sc.js', destination: 'http://umami:3000/script.js' },
+      { source: '/stats/api/send', destination: 'http://umami:3000/api/send' },
+    ]
+  },
+
   // Security headers
   async headers() {
     return [
@@ -42,11 +51,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://static.cloudflareinsights.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://api.stripe.com https://api.frankfurter.app",
+              "connect-src 'self' https://api.stripe.com https://api.frankfurter.app https://cloudflareinsights.com",
               "frame-src 'self' https://js.stripe.com",
               "object-src 'none'",
               "base-uri 'self'",

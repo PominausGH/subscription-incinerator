@@ -30,6 +30,24 @@ export function AddSubscriptionForm() {
     description: '',
   })
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isGeneratingUrl, setIsGeneratingUrl] = useState(false)
+
+  async function generateCancelUrl() {
+    if (!formData.serviceName.trim()) return
+    setIsGeneratingUrl(true)
+    try {
+      const res = await fetch('/api/subscriptions/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceName: formData.serviceName, mode: 'cancel-url' }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.url) setFormData(f => ({ ...f, cancellationUrl: data.url }))
+      }
+    } catch {}
+    setIsGeneratingUrl(false)
+  }
 
   async function generateDescription() {
     if (!formData.serviceName.trim()) return
@@ -117,10 +135,10 @@ export function AddSubscriptionForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
+    <form onSubmit={onSubmit} className="space-y-4 bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
       <div>
-        <h3 className="text-lg font-medium">Add Subscription Manually</h3>
-        <p className="text-sm text-gray-700 mt-1">
+        <h3 className="text-lg font-medium dark:text-white">Add Subscription Manually</h3>
+        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
           Track a subscription that wasn&apos;t detected automatically. Common examples: Netflix, Spotify, ChatGPT Plus, Claude Pro, GitHub Copilot, Adobe Creative Cloud, Microsoft 365, etc.
         </p>
       </div>
@@ -133,7 +151,7 @@ export function AddSubscriptionForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="serviceName" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="serviceName" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Service Name *
           </label>
           <Input
@@ -146,14 +164,14 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="category" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Category
           </label>
           <select
             id="category"
             value={formData.categoryId}
             onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select category...</option>
             {categories.map((cat) => (
@@ -165,14 +183,14 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="status" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Status
           </label>
           <select
             id="status"
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as 'trial' | 'active' })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="trial">Free Trial</option>
             <option value="active">Active</option>
@@ -180,7 +198,7 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="amount" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Amount
           </label>
           <Input
@@ -194,14 +212,14 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
-          <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Billing Cycle
           </label>
           <select
             id="billingCycle"
             value={formData.billingCycle}
             onChange={(e) => setFormData({ ...formData, billingCycle: e.target.value as 'weekly' | 'fortnightly' | 'monthly' | 'bimonthly' | 'quarterly' | 'semi-annual' | 'yearly' | 'custom' })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="weekly">Weekly</option>
             <option value="fortnightly">Fortnightly</option>
@@ -215,14 +233,14 @@ export function AddSubscriptionForm() {
         </div>
 
         <div>
-          <label htmlFor="currency" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="currency" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Currency
           </label>
           <select
             id="currency"
             value={formData.currency}
             onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="USD">USD - US Dollar</option>
             <option value="EUR">EUR - Euro</option>
@@ -268,7 +286,7 @@ export function AddSubscriptionForm() {
 
         {formData.status === 'trial' && (
           <div>
-            <label htmlFor="trialEndsAt" className="block text-sm font-medium text-gray-900 mb-1">
+            <label htmlFor="trialEndsAt" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
               Trial Ends
             </label>
             <Input
@@ -281,7 +299,7 @@ export function AddSubscriptionForm() {
         )}
 
         <div>
-          <label htmlFor="nextBillingDate" className="block text-sm font-medium text-gray-900 mb-1">
+          <label htmlFor="nextBillingDate" className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
             Next Billing Date
           </label>
           <Input
@@ -293,9 +311,19 @@ export function AddSubscriptionForm() {
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="cancellationUrl" className="block text-sm font-medium text-gray-900 mb-1">
-            Cancellation URL
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label htmlFor="cancellationUrl" className="block text-sm font-medium text-gray-900 dark:text-gray-200">
+              Cancellation URL
+            </label>
+            <button
+              type="button"
+              onClick={generateCancelUrl}
+              disabled={isGeneratingUrl || !formData.serviceName.trim()}
+              className="text-xs text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed"
+            >
+              {isGeneratingUrl ? 'Finding...' : '✨ Auto-fill with AI'}
+            </button>
+          </div>
           <Input
             id="cancellationUrl"
             type="url"
@@ -303,7 +331,7 @@ export function AddSubscriptionForm() {
             onChange={(e) => setFormData({ ...formData, cancellationUrl: e.target.value })}
             placeholder="https://example.com/cancel"
           />
-          <p className="text-xs text-gray-600 mt-1">Link to cancel the subscription (optional)</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Link to cancel the subscription (optional)</p>
         </div>
 
         <div className="sm:col-span-2">
@@ -326,7 +354,7 @@ export function AddSubscriptionForm() {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="What is this subscription for? What do you use it for?"
             rows={2}
-            className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="flex w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
         </div>
       </div>
@@ -335,7 +363,7 @@ export function AddSubscriptionForm() {
         <Button type="submit" disabled={isLoading}>
           {isLoading ? 'Adding...' : 'Add Subscription'}
         </Button>
-        <p className="text-xs text-gray-600">Only service name is required</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400">Only service name is required</p>
       </div>
     </form>
   )

@@ -76,6 +76,14 @@ export function Navigation({ user }: NavigationProps) {
                 Dashboard
               </Link>
               <Link
+                href="/dashboard/email"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/dashboard/email' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Email
+              </Link>
+              <Link
                 href="/import"
                 className={`text-sm font-medium transition-colors ${
                   pathname === '/import' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -90,6 +98,14 @@ export function Navigation({ user }: NavigationProps) {
                 }`}
               >
                 Open Source
+              </Link>
+              <Link
+                href="/settings"
+                className={`text-sm font-medium transition-colors ${
+                  pathname === '/settings' ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Settings
               </Link>
             </div>
 
@@ -138,19 +154,27 @@ export function Navigation({ user }: NavigationProps) {
         </div>
 
         {/* Mobile Nav */}
-        <div className="md:hidden border-t border-gray-200">
-          <div className="flex">
-            <Link 
-              href="/dashboard" 
-              className={`flex-1 py-3 text-center text-sm font-medium ${
+        <div className="md:hidden border-t border-gray-200 overflow-x-auto">
+          <div className="flex min-w-max">
+            <Link
+              href="/dashboard"
+              className={`flex-1 px-4 py-3 text-center text-sm font-medium whitespace-nowrap ${
                 pathname === '/dashboard' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
               }`}
             >
               Dashboard
             </Link>
             <Link
+              href="/dashboard/email"
+              className={`flex-1 px-4 py-3 text-center text-sm font-medium whitespace-nowrap ${
+                pathname === '/dashboard/email' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
+              }`}
+            >
+              Email
+            </Link>
+            <Link
               href="/import"
-              className={`flex-1 py-3 text-center text-sm font-medium ${
+              className={`flex-1 px-4 py-3 text-center text-sm font-medium whitespace-nowrap ${
                 pathname === '/import' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
               }`}
             >
@@ -158,11 +182,19 @@ export function Navigation({ user }: NavigationProps) {
             </Link>
             <Link
               href="/dashboard/open-source"
-              className={`flex-1 py-3 text-center text-sm font-medium ${
+              className={`flex-1 px-4 py-3 text-center text-sm font-medium whitespace-nowrap ${
                 pathname === '/dashboard/open-source' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
               }`}
             >
               Open Source
+            </Link>
+            <Link
+              href="/settings"
+              className={`flex-1 px-4 py-3 text-center text-sm font-medium whitespace-nowrap ${
+                pathname === '/settings' ? 'text-gray-900 border-b-2 border-orange-500' : 'text-gray-500'
+              }`}
+            >
+              Settings
             </Link>
           </div>
         </div>
