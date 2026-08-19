@@ -78,3 +78,37 @@ export async function sendPasswordResetEmail(params: { toEmail: string; token: s
     html: template.html,
   })
 }
+
+/**
+ * Alert the site admin when Stripe webhook processing fails (e.g. signature ok but
+ * grant/entitlement logic threw). Best-effort: a failure here is logged but never
+ * thrown, so it can't mask the original webhook error or break the webhook response.
+ */
+export async function sendWebhookFailureAlert(params: {
+  eventType: string
+  eventId: string
+  error: unknown
+  customerEmail?: string | null
+}) {
+  const { eventType, eventId, error, customerEmail } = params
+  const adminEmail = process.env.ADMIN_EMAIL || 'genmailing@gmail.com'
+  const errorDetail = error instanceof Error ? error.stack || error.message : String(error)
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
+      to: adminEmail,
+      subject: 'subscription-incinerator webhook FAILED',
+      text: [
+        `Stripe event type: ${eventType}`,
+        `Stripe event ID: ${eventId}`,
+        `Customer email: ${customerEmail || 'unknown'}`,
+        '',
+        'Error:',
+        errorDetail,
+      ].join('\n'),
+    })
+  } catch (err) {
+    console.error('[sendWebhookFailureAlert] Failed to send webhook failure alert email:', err)
+  }
+}

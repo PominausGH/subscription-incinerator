@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { stripe } from '@/lib/stripe'
+import { sendWebhookFailureAlert } from '@/lib/notifications/email'
 import Stripe from 'stripe'
+
+/**
+ * Best-effort extraction of a customer email from a Stripe event payload,
+ * without making an extra API call. Not all event types carry one.
+ */
+function extractCustomerEmail(event: Stripe.Event): string | null {
+  const obj = event.data.object as {
+    customer_details?: { email?: string | null } | null
+    customer_email?: string | null
+  }
+  return obj?.customer_details?.email || obj?.customer_email || null
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -61,6 +74,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('Webhook processing error:', error)
+
+    await sendWebhookFailureAlert({
+      eventType: event.type,
+      eventId: event.id,
+      error,
+      customerEmail: extractCustomerEmail(event),
+    })
+
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
