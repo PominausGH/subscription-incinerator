@@ -39,7 +39,7 @@ export function FinalCTA() {
             Stop Paying for Subscriptions You Don&apos;t Use
           </h2>
           <p className="text-xl text-fire-100 mb-8">
-            Join thousands of users who&apos;ve taken control of their subscriptions.
+            Find out what you&apos;re forgetting to cancel — takes less than a minute.
           </p>
           <Link
             href="/login"
