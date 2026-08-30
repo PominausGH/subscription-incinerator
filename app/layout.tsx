@@ -114,7 +114,7 @@ export default function RootLayout({
             __html: `(function(){var t=localStorage.getItem('si-theme')||'dark';document.documentElement.classList.toggle('dark',t==='dark')})()`,
           }}
         />
-        <script defer src="/_a/script.js" data-website-id="60a4cf03-e028-457e-a6e0-a61b6ad4c083"></script>
+        <script defer src="/stats/sc.js" data-website-id="60a4cf03-e028-457e-a6e0-a61b6ad4c083"></script>
       </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
