@@ -48,10 +48,16 @@ const nextAuth = NextAuth({
           where: { email: email.toLowerCase() },
         });
 
-        if (!user || !user.passwordHash) return null;
+        if (!user || !user.passwordHash) {
+          console.log(`[auth] login failed reason=no_account email=${email.toLowerCase()}`);
+          return null;
+        }
 
         const isValid = await verifyPassword(password, user.passwordHash);
-        if (!isValid) return null;
+        if (!isValid) {
+          console.log(`[auth] login failed reason=bad_password email=${email.toLowerCase()}`);
+          return null;
+        }
 
         return {
           id: user.id,
@@ -76,6 +82,16 @@ const nextAuth = NextAuth({
         session.user.tier = (token.tier as string) || "free";
       }
       return session;
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (!user.id) return;
+      console.log(`[auth] login success userId=${user.id} email=${user.email}`);
+      await db.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      });
     },
   },
   trustHost: true,
