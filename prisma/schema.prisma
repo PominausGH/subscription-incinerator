@@ -294,6 +294,7 @@ model User {
   stripeCustomerId        String?               @unique @map("stripe_customer_id")
   homeCurrency            String                @default("USD") @map("home_currency")
   lastQuarterlyAuditEmailAt DateTime?           @map("last_quarterly_audit_email_at")
+  lastLoginAt             DateTime?             @map("last_login_at")
   householdOwnerId        String?               @map("household_owner_id")
   accounts                Account[]
   bankImports             BankImport[]
