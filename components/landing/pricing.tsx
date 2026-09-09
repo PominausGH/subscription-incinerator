@@ -34,6 +34,7 @@ const premiumFeatures = [
 function CheckIcon() {
   return (
     <svg
+      aria-hidden="true"
       className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
@@ -48,6 +49,7 @@ function CheckIcon() {
 function CrossIcon() {
   return (
     <svg
+      aria-hidden="true"
       className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5"
       fill="none"
       viewBox="0 0 24 24"
@@ -115,9 +117,9 @@ export function Pricing({ source }: { source?: string } = {}) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Simple, Transparent Pricing
-          </h2>
+          </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Start free. Upgrade when you&apos;re ready to go further.
           </p>
@@ -194,6 +196,7 @@ export function Pricing({ source }: { source?: string } = {}) {
                       feature.included ? 'text-gray-300' : 'text-gray-600'
                     }`}
                   >
+                    <span className="sr-only">{feature.included ? 'Included: ' : 'Not included: '}</span>
                     {feature.label}
                   </span>
                 </li>
