@@ -101,8 +101,8 @@ export function Footer() {
         <div className="pt-8 border-t border-dark-700 text-center">
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} Subscription Incinerator. All rights reserved. <span className="ml-3 opacity-70">ABN: 65 366 917 788</span>{' '}
-            <a href="https://daintytrading.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-500 hover:text-fire-400 transition-colors">
-              Built by Dainty Trading
+            <a href="https://telaloom.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-500 hover:text-fire-400 transition-colors">
+              Built by TelaLoom
             </a>
           </p>
         </div>
