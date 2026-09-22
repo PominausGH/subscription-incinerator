@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { stripe } from '@/lib/stripe'
-import { sendWebhookFailureAlert } from '@/lib/notifications/email'
+import { sendWebhookFailureAlert, sendCancellationEmail, sendPaymentFailedEmail } from '@/lib/notifications/email'
 import Stripe from 'stripe'
 
 /**
@@ -54,11 +54,15 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         if (subscription.customer) {
-          await db.user.update({
+          const user = await db.user.update({
             where: { stripeCustomerId: subscription.customer as string },
             data: { tier: 'free' },
           })
           console.log(`User downgraded to free: ${subscription.customer}`)
+
+          if (user.email) {
+            await sendCancellationEmail({ toEmail: user.email, name: user.name ?? 'there' })
+          }
         }
         break
       }
@@ -66,7 +70,15 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         console.log(`Payment failed for customer: ${invoice.customer}`)
-        // Could send email notification here
+
+        if (invoice.customer) {
+          const user = await db.user.findUnique({
+            where: { stripeCustomerId: invoice.customer as string },
+          })
+          if (user?.email) {
+            await sendPaymentFailedEmail({ toEmail: user.email, name: user.name ?? 'there' })
+          }
+        }
         break
       }
     }
