@@ -45,6 +45,14 @@ export class EmailService {
   }
 
   /**
+   * Welcome email sent on account registration
+   */
+  public async sendWelcome(userEmail: string, userName: string) {
+    const template = emailTemplates.welcome(userName)
+    return this.sendTemplateEmail(userEmail, template)
+  }
+
+  /**
    * Automate the Quarterly Audit Reminder
    */
   public async scheduleQuarterlyAudit(userEmail: string, userName: string) {

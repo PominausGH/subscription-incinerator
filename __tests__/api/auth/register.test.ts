@@ -5,6 +5,7 @@
 import { POST } from '@/app/api/auth/register/route'
 import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
+import { emailService } from '@/lib/services/email'
 import { NextRequest } from 'next/server'
 
 jest.mock('@/lib/db/client', () => ({
@@ -27,7 +28,14 @@ jest.mock('@/lib/rate-limit', () => ({
   RATE_LIMITS: { auth: { limit: 5, windowSeconds: 60 } },
 }))
 
+jest.mock('@/lib/services/email', () => ({
+  emailService: {
+    sendWelcome: jest.fn().mockResolvedValue(true),
+  },
+}))
+
 const mockDb = db as jest.Mocked<typeof db>
+const mockEmailService = emailService as jest.Mocked<typeof emailService>
 
 function createRequest(body: any) {
   return new NextRequest('http://localhost:3000/api/auth/register', {
@@ -57,6 +65,7 @@ describe('POST /api/auth/register', () => {
     expect(res.status).toBe(201)
     const data = await res.json()
     expect(data.message).toBe('Account created successfully')
+    expect(mockEmailService.sendWelcome).toHaveBeenCalledWith('new@example.com', 'there')
   })
 
   it('should reject duplicate email', async () => {
