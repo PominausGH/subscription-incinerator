@@ -3,6 +3,7 @@ import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
 import { registerSchema } from '@/lib/validations/auth'
 import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
+import { emailService } from '@/lib/services/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,6 +47,8 @@ export async function POST(request: NextRequest) {
         homeCurrency: homeCurrency || 'USD',
       },
     })
+
+    await emailService.sendWelcome(email.toLowerCase(), 'there')
 
     return NextResponse.json(
       { message: 'Account created successfully' },

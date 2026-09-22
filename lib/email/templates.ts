@@ -4,6 +4,24 @@ export interface EmailTemplate {
 }
 
 export const emailTemplates = {
+  // Signup (Activation)
+  welcome: (userName: string): EmailTemplate => ({
+    subject: `🔥 Welcome to Subscription Incinerator, ${userName}!`,
+    body: `
+      Hey ${userName},
+
+      You're in. Time to find out what's quietly draining your bank account every month.
+
+      Head to your dashboard and run your first scan:
+      https://subscriptionincinerator.app/dashboard
+
+      Most people find at least one subscription they forgot they were even paying for. Let's go burn it.
+
+      - Pax the Koala 🐨
+        Subscription Incinerator
+    `,
+  }),
+
   // Day 90: The Quarterly Audit (Retention)
   quarterlyAuditReminder: (userName: string): EmailTemplate => ({
     subject: `🕒 Time for your 90-day Subscription Audit, ${userName}!`,
