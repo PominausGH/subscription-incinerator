@@ -5,6 +5,8 @@ import {
   getBillingUpcomingEmailTemplate,
   getHouseholdInviteEmailTemplate,
   getPasswordResetEmailTemplate,
+  getCancellationEmailTemplate,
+  getPaymentFailedEmailTemplate,
 } from './templates'
 
 const transporter = nodemailer.createTransport({
@@ -70,6 +72,36 @@ export async function sendHouseholdInviteEmail(params: { toEmail: string; ownerE
  */
 export async function sendPasswordResetEmail(params: { toEmail: string; token: string }) {
   const template = getPasswordResetEmailTemplate({ token: params.token })
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
+    to: params.toEmail,
+    subject: template.subject,
+    html: template.html,
+  })
+}
+
+/**
+ * Send the customer-facing cancellation confirmation + exit-survey email,
+ * fired when a subscription actually ends (customer.subscription.deleted).
+ */
+export async function sendCancellationEmail(params: { toEmail: string; name: string }) {
+  const template = getCancellationEmailTemplate({ name: params.name })
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
+    to: params.toEmail,
+    subject: template.subject,
+    html: template.html,
+  })
+}
+
+/**
+ * Send a dunning email on a failed renewal charge (invoice.payment_failed),
+ * before Stripe's own retry schedule exhausts and cancels the subscription.
+ */
+export async function sendPaymentFailedEmail(params: { toEmail: string; name: string }) {
+  const template = getPaymentFailedEmailTemplate({ name: params.name })
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
