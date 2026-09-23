@@ -12,6 +12,17 @@ const nextConfig = {
     ]
   },
 
+  // Renamed blog slugs
+  async redirects() {
+    return [
+      {
+        source: '/blog/reader-found-1400-forgotten-subscriptions',
+        destination: '/blog/reader-found-480-forgotten-subscriptions',
+        permanent: true,
+      },
+    ]
+  },
+
   // Security headers
   async headers() {
     return [
