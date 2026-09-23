@@ -70,15 +70,16 @@ export function RegisterForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+        <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-md text-sm">
           {error}
         </div>
       )}
       <div>
-        <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="register-email" className="block text-sm font-medium text-gray-300 mb-1">
           Email address
         </label>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="register-email"
           type="email"
           placeholder="you@example.com"
@@ -93,10 +94,11 @@ export function RegisterForm() {
         />
       </div>
       <div>
-        <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="register-password" className="block text-sm font-medium text-gray-300 mb-1">
           Password
         </label>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="register-password"
           type="password"
           placeholder="At least 8 characters"
@@ -112,10 +114,11 @@ export function RegisterForm() {
         />
       </div>
       <div>
-        <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-1">
           Confirm password
         </label>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="confirm-password"
           type="password"
           placeholder="Confirm your password"
@@ -131,14 +134,14 @@ export function RegisterForm() {
         />
       </div>
       <div>
-        <label htmlFor="home-currency" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="home-currency" className="block text-sm font-medium text-gray-300 mb-1">
           Home Currency
         </label>
         <select
           id="home-currency"
           value={homeCurrency}
           onChange={(e) => setHomeCurrency(e.target.value)}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 w-full rounded-md border border-dark-600 bg-dark-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-fire-500/60 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={isLoading}
         >
           <option value="USD">United States (USD)</option>
@@ -148,11 +151,11 @@ export function RegisterForm() {
           <option value="CAD">Canada (CAD)</option>
           <option value="NZD">New Zealand (NZD)</option>
         </select>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-gray-400">
           This helps us correctly identify currency symbols like '$' in your emails.
         </p>
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full bg-fire-700 text-white hover:bg-fire-800" disabled={isLoading}>
         {isLoading ? 'Creating account...' : 'Create account'}
       </Button>
     </form>
