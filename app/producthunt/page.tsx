@@ -9,7 +9,6 @@ import {
   HowItWorks,
   Pricing,
   FAQ,
-  Testimonials,
   FinalCTA,
   Footer,
 } from '@/components/landing'
@@ -32,7 +31,6 @@ export default function ProductHuntPage() {
       <HowItWorks />
       <Pricing source="producthunt" headingLevel="h1" />
       <FAQ />
-      <Testimonials />
       <FinalCTA />
       <Footer />
     </main>
