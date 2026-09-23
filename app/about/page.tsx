@@ -100,7 +100,7 @@ export default function AboutPage() {
             </p>
             <Link
               href="/login"
-              className="inline-flex px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors"
+              className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
             >
               Start Free →
             </Link>

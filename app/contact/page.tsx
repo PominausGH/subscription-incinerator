@@ -150,7 +150,7 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="w-full py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-800 hover:to-orange-900 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {status === 'loading' ? 'Sending…' : 'Send Message'}
               </button>

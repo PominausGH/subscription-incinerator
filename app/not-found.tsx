@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Page Not Found',
-  robots: { index: false, follow: true },
 }
 
 export default function NotFound() {
@@ -23,16 +22,16 @@ export default function NotFound() {
         </div>
         <div className="space-y-3">
           <Link
-            href="/dashboard"
-            className="block w-full px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors"
-          >
-            Go to Dashboard
-          </Link>
-          <Link
             href="/"
-            className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-lg transition-colors"
+            className="block w-full px-4 py-2 bg-orange-700 hover:bg-orange-800 text-white font-medium rounded-lg transition-colors"
           >
             Go to Home
+          </Link>
+          <Link
+            href="/dashboard"
+            className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-lg transition-colors"
+          >
+            Go to Dashboard
           </Link>
         </div>
       </div>

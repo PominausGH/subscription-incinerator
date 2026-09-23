@@ -94,7 +94,7 @@ export function AcceptInviteForm({ token, inviteEmail, accountExists, sessionEma
         <button
           onClick={acceptAsLoggedInUser}
           disabled={isLoading}
-          className="w-full px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+          className="w-full px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
         >
           {isLoading ? 'Accepting...' : 'Accept Invite'}
         </button>
@@ -110,7 +110,7 @@ export function AcceptInviteForm({ token, inviteEmail, accountExists, sessionEma
         </p>
         <a
           href={`/login?callbackUrl=${encodeURIComponent(`/household/accept/${token}`)}`}
-          className="block text-center w-full px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors"
+          className="block text-center w-full px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Log in to accept
         </a>
@@ -143,7 +143,7 @@ export function AcceptInviteForm({ token, inviteEmail, accountExists, sessionEma
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+        className="w-full px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
       >
         {isLoading ? 'Joining...' : 'Create Account & Join'}
       </button>

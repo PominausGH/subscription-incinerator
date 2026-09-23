@@ -16,11 +16,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const service = cancellationServices.find((s) => s.slug === slug)
   if (!service) return {}
-  const title = `How to Cancel ${service.name} — Step-by-Step Guide`
-  const description = `Cancel your ${service.name} subscription in ${service.steps.length} steps. ${service.difficultyReason}`
+  // Absolute title: the layout's " — Subscription Incinerator" suffix pushed
+  // these past ~60 chars, truncating them in search results.
+  const title = `How to Cancel ${service.name} in ${service.steps.length} Steps`
+  const gotchas =
+    service.warnings.length > 0
+      ? ` and the ${service.warnings.length} gotchas that keep you getting charged`
+      : ''
+  const description = `Step-by-step: how to cancel ${service.name} (${service.steps.length} steps)${gotchas}. ${service.difficultyReason}`
   const path = `/cancel/${slug}`
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: path },
     openGraph: {
@@ -110,7 +116,7 @@ export default async function CancelServicePage({ params }: Props) {
             href={service.directCancelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors text-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors text-sm"
             data-tracking-action="direct_cancel_click"
             data-tracking-label={service.name}
           >
@@ -204,7 +210,7 @@ export default async function CancelServicePage({ params }: Props) {
         </p>
         <Link
           href="/login"
-          className="inline-flex px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors"
+          className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Start Free →
         </Link>

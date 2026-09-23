@@ -46,12 +46,12 @@ export function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {resetSuccess && !error && (
-        <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm" role="status">
+        <div className="p-3 bg-green-500/10 border border-green-500/30 text-green-300 rounded-md text-sm" role="status">
           Password reset! Sign in with your new password.
         </div>
       )}
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm" role="alert">
+        <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-md text-sm" role="alert">
           <div className="flex items-center gap-2">
             <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -61,10 +61,11 @@ export function LoginForm() {
         </div>
       )}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
           Email address
         </label>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="email"
           type="email"
           placeholder="you@example.com"
@@ -80,14 +81,15 @@ export function LoginForm() {
       </div>
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-300">
             Password
           </label>
-          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+          <Link href="/forgot-password" className="text-sm text-fire-400 hover:underline">
             Forgot password?
           </Link>
         </div>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="password"
           type="password"
           placeholder="Enter your password"
@@ -101,7 +103,7 @@ export function LoginForm() {
           autoComplete="current-password"
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full bg-fire-700 text-white hover:bg-fire-800" disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
     </form>

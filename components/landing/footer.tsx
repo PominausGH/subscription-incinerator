@@ -4,9 +4,9 @@ export function Footer() {
   return (
     <footer className="py-12 bg-dark-900 border-t border-dark-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Logo column */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <span className="text-2xl">🔥</span>
               <span className="font-bold text-white">Subscription Incinerator</span>
@@ -18,7 +18,7 @@ export function Footer() {
 
           {/* Navigation column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Product</h4>
+            <h2 className="text-white font-semibold mb-4">Product</h2>
             <ul className="space-y-2">
               <li>
                 <a href="/#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -45,7 +45,7 @@ export function Footer() {
 
           {/* Content column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Content</h4>
+            <h2 className="text-white font-semibold mb-4">Content</h2>
             <ul className="space-y-2">
               <li>
                 <Link href="/blog" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -68,6 +68,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/zombie-subscriptions" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Zombie Subscriptions
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   About
                 </Link>
@@ -75,9 +80,31 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Compare column */}
+          <div>
+            <h2 className="text-white font-semibold mb-4">Compare</h2>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/rocket-money-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Rocket Money Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/mint-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Mint Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/truebill-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Truebill Alternative
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Legal column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Support</h4>
+            <h2 className="text-white font-semibold mb-4">Support</h2>
             <ul className="space-y-2">
               <li>
                 <Link href="/contact" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -99,9 +126,9 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-dark-700 text-center">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Subscription Incinerator. All rights reserved. <span className="ml-3 opacity-70">ABN: 65 366 917 788</span>{' '}
-            <a href="https://telaloom.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-500 hover:text-fire-400 transition-colors">
+          <p className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} Subscription Incinerator. All rights reserved. <span className="ml-3">ABN: 65 366 917 788</span>{' '}
+            <a href="https://telaloom.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-400 hover:text-fire-400 transition-colors">
               Built by TelaLoom
             </a>
           </p>

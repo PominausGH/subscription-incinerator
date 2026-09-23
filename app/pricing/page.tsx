@@ -20,7 +20,7 @@ export default function PricingPage() {
     <main className="bg-dark-900 min-h-screen">
       <Navigation />
       <div className="pt-16">
-        <Pricing />
+        <Pricing headingLevel="h1" />
       </div>
       <Footer />
     </main>
