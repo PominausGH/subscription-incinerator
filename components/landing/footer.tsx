@@ -18,7 +18,7 @@ export function Footer() {
 
           {/* Navigation column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Product</h4>
+            <h2 className="text-white font-semibold mb-4">Product</h2>
             <ul className="space-y-2">
               <li>
                 <a href="/#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -45,7 +45,7 @@ export function Footer() {
 
           {/* Content column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Content</h4>
+            <h2 className="text-white font-semibold mb-4">Content</h2>
             <ul className="space-y-2">
               <li>
                 <Link href="/blog" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -82,7 +82,7 @@ export function Footer() {
 
           {/* Compare column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Compare</h4>
+            <h2 className="text-white font-semibold mb-4">Compare</h2>
             <ul className="space-y-2">
               <li>
                 <Link href="/rocket-money-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
@@ -104,7 +104,7 @@ export function Footer() {
 
           {/* Legal column */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Support</h4>
+            <h2 className="text-white font-semibold mb-4">Support</h2>
             <ul className="space-y-2">
               <li>
                 <Link href="/contact" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">

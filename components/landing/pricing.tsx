@@ -103,6 +103,7 @@ export function Pricing({
   headingLevel = 'h2',
 }: { source?: string; headingLevel?: 'h1' | 'h2' } = {}) {
   const Heading = headingLevel
+  const CardHeading = headingLevel === 'h1' ? 'h2' : 'h3'
   const [annual, setAnnual] = useState(false)
 
   const monthlyPrice = 9
@@ -176,7 +177,7 @@ export function Pricing({
             className="bg-[#121212] rounded-2xl border border-dark-600 p-8"
           >
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-1">Free</h3>
+              <CardHeading className="text-xl font-bold text-white mb-1">Free</CardHeading>
               <p className="text-gray-500 text-sm">For getting started</p>
               <div className="mt-4 flex items-end gap-1">
                 <span className="text-4xl font-bold text-white">$0</span>
@@ -224,7 +225,7 @@ export function Pricing({
             </div>
 
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-1">Premium</h3>
+              <CardHeading className="text-xl font-bold text-white mb-1">Premium</CardHeading>
               <p className="text-gray-500 text-sm">For full control</p>
               <div className="mt-4 flex items-end gap-1">
                 {annual ? (
