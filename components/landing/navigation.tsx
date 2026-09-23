@@ -36,10 +36,10 @@ export function Navigation() {
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2">
               <span className="text-2xl">🔥</span>
-              <span className="font-bold text-white">Subscription Incinerator</span>
+              <span className="font-bold text-white whitespace-nowrap">Subscription Incinerator</span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8">
               {navItems.map((item) => (
                 <a
                   key={item.href}
@@ -58,7 +58,7 @@ export function Navigation() {
             </div>
 
             <button
-              className="md:hidden text-white p-2"
+              className="lg:hidden text-white p-2"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
               aria-expanded={mobileOpen}
@@ -84,7 +84,7 @@ export function Navigation() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             id="mobile-menu"
-            className="fixed inset-x-0 top-16 z-40 md:hidden bg-dark-900/95 backdrop-blur-sm border-b border-dark-600"
+            className="fixed inset-x-0 top-16 z-40 lg:hidden bg-dark-900/95 backdrop-blur-sm border-b border-dark-600"
           >
             <div className="px-4 py-4 space-y-4">
               {navItems.map((item) => (
