@@ -61,6 +61,8 @@ export function Navigation() {
               className="md:hidden text-white p-2"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileOpen ? (
@@ -81,6 +83,7 @@ export function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
+            id="mobile-menu"
             className="fixed inset-x-0 top-16 z-40 md:hidden bg-dark-900/95 backdrop-blur-sm border-b border-dark-600"
           >
             <div className="px-4 py-4 space-y-4">
