@@ -23,13 +23,13 @@ export function CookieNotice() {
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-dark-700 border-t border-dark-500 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
       <p className="text-sm text-gray-400 flex-1">
         We use privacy-friendly analytics (self-hosted, no personal data collected).{' '}
-        <Link href="/privacy" className="text-fire-400 hover:underline">
+        <Link href="/privacy" className="text-fire-400 underline hover:no-underline">
           Privacy policy
         </Link>
       </p>
       <button
         onClick={dismiss}
-        className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold bg-fire-500 hover:bg-fire-600 text-white rounded-lg transition-colors"
+        className="flex-shrink-0 px-4 py-1.5 text-sm font-semibold bg-fire-700 hover:bg-fire-800 text-white rounded-lg transition-colors"
       >
         Got it
       </button>

@@ -55,7 +55,7 @@ export function FreeChecklistForm() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="px-6 py-3 bg-fire-500 hover:bg-fire-600 disabled:opacity-60 text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
+          className="px-6 py-3 bg-fire-700 hover:bg-fire-800 disabled:opacity-60 text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
         >
           {status === 'loading' ? 'Sending…' : 'Send My Checklist'}
         </button>

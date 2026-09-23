@@ -110,7 +110,7 @@ export default async function CancelServicePage({ params }: Props) {
             href={service.directCancelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors text-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors text-sm"
             data-tracking-action="direct_cancel_click"
             data-tracking-label={service.name}
           >
@@ -204,7 +204,7 @@ export default async function CancelServicePage({ params }: Props) {
         </p>
         <Link
           href="/login"
-          className="inline-flex px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors"
+          className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Start Free →
         </Link>

@@ -51,7 +51,7 @@ export function Navigation() {
               ))}
               <Link
                 href="/login"
-                className="px-4 py-2 bg-fire-500 hover:bg-fire-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-fire-700 hover:bg-fire-800 text-white rounded-lg transition-colors"
               >
                 Login
               </Link>
@@ -97,7 +97,7 @@ export function Navigation() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="block w-full text-center px-4 py-3 bg-fire-500 hover:bg-fire-600 text-white rounded-lg transition-colors"
+                className="block w-full text-center px-4 py-3 bg-fire-700 hover:bg-fire-800 text-white rounded-lg transition-colors"
               >
                 Login
               </Link>

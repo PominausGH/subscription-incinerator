@@ -19,7 +19,7 @@ export function BlogCTA({
       <p className="text-gray-400 text-sm mb-4">{description}</p>
       <Link
         href={href}
-        className="inline-flex px-6 py-3 bg-fire-500 hover:bg-fire-600 text-white font-semibold rounded-lg transition-colors"
+        className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
       >
         {buttonText}
       </Link>
