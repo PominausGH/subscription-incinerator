@@ -16,11 +16,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const service = cancellationServices.find((s) => s.slug === slug)
   if (!service) return {}
-  const title = `How to Cancel ${service.name} — Step-by-Step Guide`
-  const description = `Cancel your ${service.name} subscription in ${service.steps.length} steps. ${service.difficultyReason}`
+  // Absolute title: the layout's " — Subscription Incinerator" suffix pushed
+  // these past ~60 chars, truncating them in search results.
+  const title = `How to Cancel ${service.name} in ${service.steps.length} Steps`
+  const gotchas =
+    service.warnings.length > 0
+      ? ` and the ${service.warnings.length} gotchas that keep you getting charged`
+      : ''
+  const description = `Step-by-step: how to cancel ${service.name} (${service.steps.length} steps)${gotchas}. ${service.difficultyReason}`
   const path = `/cancel/${slug}`
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: path },
     openGraph: {
