@@ -4,9 +4,9 @@ export function Footer() {
   return (
     <footer className="py-12 bg-dark-900 border-t border-dark-700">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-8">
           {/* Logo column */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <span className="text-2xl">🔥</span>
               <span className="font-bold text-white">Subscription Incinerator</span>
@@ -68,8 +68,35 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/zombie-subscriptions" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Zombie Subscriptions
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   About
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Compare column */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Compare</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/rocket-money-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Rocket Money Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/mint-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Mint Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/truebill-alternative" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                  Truebill Alternative
                 </Link>
               </li>
             </ul>
