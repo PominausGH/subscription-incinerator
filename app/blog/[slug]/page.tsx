@@ -59,7 +59,7 @@ export default async function BlogPostPage({
           [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2
           [&_strong]:text-white
           [&_code]:bg-dark-700 [&_code]:px-2 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-fire-400 [&_code]:text-sm
-          [&_a]:text-fire-400 [&_a]:hover:underline"
+          [&_a]:text-fire-400 [&_a]:underline [&_a]:hover:no-underline"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
