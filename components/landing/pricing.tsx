@@ -98,7 +98,11 @@ function UpgradeCTA({ annual, source }: { annual: boolean; source?: string }) {
   )
 }
 
-export function Pricing({ source }: { source?: string } = {}) {
+export function Pricing({
+  source,
+  headingLevel = 'h2',
+}: { source?: string; headingLevel?: 'h1' | 'h2' } = {}) {
+  const Heading = headingLevel
   const [annual, setAnnual] = useState(false)
 
   const monthlyPrice = 9
@@ -117,9 +121,9 @@ export function Pricing({ source }: { source?: string } = {}) {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <Heading className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Simple, Transparent Pricing
-          </h1>
+          </Heading>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Start free. Upgrade when you&apos;re ready to go further.
           </p>
