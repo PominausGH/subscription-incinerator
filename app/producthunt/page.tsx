@@ -29,7 +29,7 @@ export default function ProductHuntPage() {
       <Features />
       <TrustBar />
       <HowItWorks />
-      <Pricing source="producthunt" headingLevel="h1" />
+      <Pricing source="producthunt" />
       <FAQ />
       <FinalCTA />
       <Footer />
