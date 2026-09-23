@@ -28,7 +28,8 @@ const softwareSchema = {
   "operatingSystem": "Web",
   "offers": [
     { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
-    { "@type": "Offer", "price": "9", "priceCurrency": "USD", "name": "Premium", "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" } }
+    { "@type": "Offer", "price": "9", "priceCurrency": "USD", "name": "Premium", "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1M" } },
+    { "@type": "Offer", "price": "50", "priceCurrency": "USD", "name": "Premium (Annual)", "priceSpecification": { "@type": "UnitPriceSpecification", "billingDuration": "P1Y" } }
   ],
   "description": "Track and cancel forgotten subscriptions. Automatically finds trials and recurring charges, then reminds you before you get charged.",
   "url": "https://subscriptionincinerator.app"

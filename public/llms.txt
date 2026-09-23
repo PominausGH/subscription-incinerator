@@ -1,6 +1,6 @@
 # Subscription Incinerator
 
-> Track and cancel forgotten subscriptions. Subscription Incinerator finds your trials and recurring charges (manual entry, Gmail scan, or bank-statement import) and reminds you before you get charged again. Core features are 100% free; an optional Premium tier ($9/month) adds Gmail scanning and bank statement import.
+> Track and cancel forgotten subscriptions. Subscription Incinerator finds your trials and recurring charges (manual entry, Gmail scan, or bank-statement import) and reminds you before you get charged again. Core features are 100% free; an optional Premium tier ($9/month or $50/year) adds Gmail scanning and bank statement import.
 
 - **Site:** https://subscriptionincinerator.app/
 - **Pricing:** https://subscriptionincinerator.app/pricing
@@ -33,7 +33,7 @@ Use case: you've drifted into paying for streaming services, productivity apps, 
 ## Pricing
 
 - **Free** — full subscription tracking, manual entry, reminders, cancellation guides. No credit card required.
-- **Premium — $9/month** — adds Gmail scanning and bank statement import.
+- **Premium — $9/month, or $50/year billed annually** (7-day free trial) — adds Gmail scanning and bank statement import.
 
 ## Frequently asked questions
 
