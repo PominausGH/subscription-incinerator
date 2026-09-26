@@ -1053,6 +1053,18 @@ const rawCategories: AlternativeCategory[] = [
         selfHosted: true,
       },
       {
+        name: 'n8n',
+        description: 'Visual workflow automation with hundreds of integrations, code steps, and AI agent nodes — the most popular self-hostable Zapier alternative.',
+        replaces: ['Zapier', 'Make', 'IFTTT'],
+        websiteUrl: 'https://n8n.io',
+        sourceCodeUrl: 'https://github.com/n8n-io/n8n',
+        stars: 206000,
+        license: 'Sustainable Use License',
+        licenseNote: 'Source-available (fair-code), not OSI open source: free to self-host for your own internal business or personal use, but you may not sell it or offer it to others as a hosted service. Files with `.ee.` in the name or directory are under a separate enterprise license.',
+        selfHosted: true,
+        installInstructions: 'Official self-hosting docs: docs.n8n.io/hosting.',
+      },
+      {
         name: 'Node-RED',
         description: 'Flow-based visual programming tool for wiring together APIs, devices, and online services.',
         replaces: ['Zapier', 'IFTTT'],
