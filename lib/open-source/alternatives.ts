@@ -42,12 +42,12 @@ const rawCategories: AlternativeCategory[] = [
     category: 'Media Streaming',
     emoji: '🎬',
     note: 'These tools replace the streaming app, not the catalogue: Jellyfin, Invidious, and PeerTube play your own media files or public videos; they don\'t include Netflix-style shows and films.',
-    paidServices: ['Netflix', 'Disney+', 'Max', 'Hulu', 'Paramount+', 'Peacock', 'Crunchyroll', 'Amazon Prime Video', 'YouTube Premium'],
+    paidServices: ['Netflix', 'Disney+', 'HBO Max', 'Hulu', 'Paramount+', 'Peacock', 'Crunchyroll', 'Amazon Prime Video', 'YouTube Premium'],
     alternatives: [
       {
         name: 'Jellyfin',
         description: 'Free media system that lets you stream your own movie, TV, and music collection from any device.',
-        replaces: ['Netflix', 'Disney+', 'Max', 'Hulu', 'Paramount+', 'Peacock', 'Crunchyroll', 'Amazon Prime Video'],
+        replaces: ['Netflix', 'Disney+', 'HBO Max', 'Hulu', 'Paramount+', 'Peacock', 'Crunchyroll', 'Amazon Prime Video'],
         websiteUrl: 'https://jellyfin.org',
         sourceCodeUrl: 'https://github.com/jellyfin/jellyfin',
         stars: 57500,

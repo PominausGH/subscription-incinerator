@@ -119,7 +119,7 @@ export default function ResourcesPage() {
                     <p className="text-white text-sm font-medium group-hover:text-fire-400 transition-colors">
                       Cancel {service.name}
                     </p>
-                    <p className="text-gray-500 text-xs">{service.monthlyPrice}</p>
+                    <p className="text-gray-500 text-xs">{service.monthlyPrice ?? `${service.difficulty} to cancel`}</p>
                   </div>
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${

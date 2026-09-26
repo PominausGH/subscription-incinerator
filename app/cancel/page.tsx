@@ -46,7 +46,7 @@ export default function CancelDirectoryPage() {
                 <p className="text-white font-semibold group-hover:text-fire-400 transition-colors">
                   {service.name}
                 </p>
-                <p className="text-gray-500 text-xs">{service.monthlyPrice}</p>
+                <p className="text-gray-500 text-xs">{service.monthlyPrice ?? `${service.difficulty} to cancel`}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">

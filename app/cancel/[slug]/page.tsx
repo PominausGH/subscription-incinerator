@@ -88,9 +88,12 @@ export default async function CancelServicePage({ params }: Props) {
           <span className="text-5xl">{service.logo}</span>
           <div>
             <h1 className="text-3xl font-bold text-white">How to Cancel {service.name}</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              {service.monthlyPrice} · {service.annualCost} annually
-            </p>
+            {service.monthlyPrice && (
+              <p className="text-gray-400 text-sm mt-1">
+                {service.monthlyPrice}
+                {service.annualCost && ` · ${service.annualCost} annually`}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -231,7 +234,7 @@ export default async function CancelServicePage({ params }: Props) {
                 <p className="text-white font-medium text-sm group-hover:text-fire-400 transition-colors">
                   How to Cancel {s.name}
                 </p>
-                <p className="text-gray-500 text-xs">{s.monthlyPrice}</p>
+                <p className="text-gray-500 text-xs">{s.monthlyPrice ?? `${s.difficulty} to cancel`}</p>
               </div>
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded-full ${difficultyColor[s.difficulty]}`}
