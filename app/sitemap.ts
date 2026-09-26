@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { getPosts } from '@/lib/blog'
 import { cancellationServices } from '@/lib/cancel/services'
 import { competitorAlternatives } from '@/lib/alternatives/competitors'
+import { dataVerifiedAt } from '@/lib/open-source/alternatives'
 
 const BASE_URL = 'https://subscriptionincinerator.app'
 
@@ -18,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/resources`,       lastModified: today, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${BASE_URL}/blog`,            lastModified: today, changeFrequency: 'weekly',  priority: 0.8 },
     { url: `${BASE_URL}/cancel`,          lastModified: today, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE_URL}/open-source`,     lastModified: today, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/open-source`,     lastModified: dataVerifiedAt, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/zombie-subscriptions`, lastModified: today, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/login`,           lastModified: today, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE_URL}/contact`,         lastModified: today, changeFrequency: 'yearly',  priority: 0.4 },
