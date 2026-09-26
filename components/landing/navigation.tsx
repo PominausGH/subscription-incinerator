@@ -51,6 +51,8 @@ export function Navigation() {
               ))}
               <Link
                 href="/login"
+                data-umami-event="cta_login"
+                data-umami-event-location="nav-desktop"
                 className="px-4 py-2 bg-fire-700 hover:bg-fire-800 text-white rounded-lg transition-colors"
               >
                 Login
@@ -99,6 +101,8 @@ export function Navigation() {
               ))}
               <Link
                 href="/login"
+                data-umami-event="cta_login"
+                data-umami-event-location="nav-mobile"
                 onClick={() => setMobileOpen(false)}
                 className="block w-full text-center px-4 py-3 bg-fire-700 hover:bg-fire-800 text-white rounded-lg transition-colors"
               >

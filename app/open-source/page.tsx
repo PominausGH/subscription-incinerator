@@ -10,6 +10,7 @@ import {
   totalAlternatives,
 } from '@/lib/open-source/alternatives'
 import { formatStars, slugify } from '@/lib/open-source/helpers'
+import { cancellationServices } from '@/lib/cancel/services'
 
 const BASE_URL = 'https://subscriptionincinerator.app'
 const PAGE_URL = `${BASE_URL}/open-source`
@@ -37,6 +38,19 @@ const verifiedLabel = new Date(`${dataVerifiedAt}T00:00:00Z`).toLocaleDateString
   year: 'numeric',
   timeZone: 'UTC',
 })
+
+// Directory names that differ from the cancel-guide service name.
+const CANCEL_GUIDE_ALIASES: Record<string, string> = {
+  'amazon prime video': 'amazon-prime',
+}
+
+/** Slug of the /cancel guide for a paid service, if we have one. */
+function cancelGuideSlug(service: string): string | undefined {
+  const key = service.toLowerCase()
+  const alias = CANCEL_GUIDE_ALIASES[key]
+  if (alias) return alias
+  return cancellationServices.find(s => s.name.toLowerCase() === key)?.slug
+}
 
 // Queries people actually search; each answer is generated from the data below so it can't drift.
 const FAQ_SERVICES = [
@@ -255,7 +269,19 @@ export default function OpenSourcePage() {
                                   key={service}
                                   className="flex items-baseline justify-between gap-4 py-2 border-t border-dark-700"
                                 >
-                                  <span className="text-gray-300">{service}</span>
+                                  <span className="text-gray-300">
+                                    {service}
+                                    {cancelGuideSlug(service) && (
+                                      <Link
+                                        href={`/cancel/${cancelGuideSlug(service)}`}
+                                        data-umami-event="oss_cancel_guide_click"
+                                        data-umami-event-service={service}
+                                        className="ml-2 text-xs text-gray-600 hover:text-fire-400 transition-colors"
+                                      >
+                                        cancel guide
+                                      </Link>
+                                    )}
+                                  </span>
                                   <span className="text-right text-gray-500">
                                     {tools.map((t, i) => (
                                       <span key={t.name}>
@@ -280,6 +306,25 @@ export default function OpenSourcePage() {
               ))}
             </div>
           </section>
+
+          {/* Contextual CTA: the reader has just browsed what they pay for */}
+          <div className="mb-16 p-6 bg-dark-800 border border-fire-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="text-white font-semibold">Recognise a subscription you&apos;re paying for?</p>
+              <p className="text-gray-400 text-sm mt-1">
+                Add it to Subscription Incinerator and get a reminder before the next charge — free,
+                no card needed. Switch to the open-source version whenever you&apos;re ready.
+              </p>
+            </div>
+            <Link
+              href="/login"
+              data-umami-event="cta_start_free"
+              data-umami-event-location="open-source-directory"
+              className="inline-flex flex-shrink-0 justify-center px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
+            >
+              Track it free →
+            </Link>
+          </div>
 
           {/* Categories */}
           <div className="space-y-16">
@@ -357,6 +402,9 @@ export default function OpenSourcePage() {
                           href={alt.websiteUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          data-umami-event="oss_link_click"
+                          data-umami-event-tool={alt.name}
+                          data-umami-event-kind="website"
                           className="text-fire-500 hover:text-fire-400 text-sm font-medium transition-colors"
                         >
                           Website →
@@ -365,6 +413,9 @@ export default function OpenSourcePage() {
                           href={alt.sourceCodeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          data-umami-event="oss_link_click"
+                          data-umami-event-tool={alt.name}
+                          data-umami-event-kind="source"
                           className="text-gray-500 hover:text-gray-300 text-sm transition-colors"
                         >
                           Source code
@@ -407,6 +458,8 @@ export default function OpenSourcePage() {
             </p>
             <Link
               href="/login"
+              data-umami-event="cta_start_free"
+              data-umami-event-location="open-source-footer"
               className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
             >
               Start Free →

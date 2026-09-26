@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics/track'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -111,6 +112,7 @@ export function AddSubscriptionForm() {
         throw new Error(typeof data?.error === 'string' ? data.error : 'Failed to create subscription')
       }
 
+      trackEvent('subscription_added', { billingCycle: formData.billingCycle })
       router.refresh()
 
       // Reset form

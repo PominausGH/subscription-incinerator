@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics/track'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -66,6 +67,7 @@ function UpgradeCTA({ annual, source }: { annual: boolean; source?: string }) {
 
   async function handleUpgrade() {
     setLoading(true)
+    trackEvent('checkout_start', { location: 'pricing', plan: annual ? 'annual' : 'monthly', source: source ?? 'none' })
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
@@ -187,6 +189,8 @@ export function Pricing({
 
             <Link
               href="/login"
+              data-umami-event="cta_start_free"
+              data-umami-event-location="pricing-free"
               className="block w-full py-3.5 px-6 rounded-lg font-semibold text-center text-gray-300 border border-dark-500 hover:border-orange-500/50 hover:text-white transition-all text-base"
             >
               Get Started Free

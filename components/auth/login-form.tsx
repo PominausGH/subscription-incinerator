@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics/track'
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
@@ -32,6 +33,7 @@ export function LoginForm() {
       if (result?.error) {
         setError('Invalid email or password.')
       } else {
+        trackEvent('login')
         router.push(callbackUrl)
         router.refresh()
       }

@@ -210,6 +210,8 @@ export default async function CancelServicePage({ params }: Props) {
         </p>
         <Link
           href="/login"
+          data-umami-event="cta_start_free"
+          data-umami-event-location="cancel-guide"
           className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Start Free →

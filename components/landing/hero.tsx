@@ -53,6 +53,8 @@ export function Hero() {
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link
                 href="/login"
+                data-umami-event="cta_start_free"
+                data-umami-event-location="hero"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-fire-700 hover:bg-fire-800 rounded-lg transition-all glow-fire hover:scale-105"
               >
                 Start Free

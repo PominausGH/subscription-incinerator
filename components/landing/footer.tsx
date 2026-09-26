@@ -36,7 +36,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <Link
+                  href="/login"
+                  data-umami-event="cta_login"
+                  data-umami-event-location="footer"
+                  className="text-gray-400 hover:text-fire-400 transition-colors text-sm"
+                >
                   Login
                 </Link>
               </li>

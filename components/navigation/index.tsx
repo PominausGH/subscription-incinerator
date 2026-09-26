@@ -34,13 +34,17 @@ export function Navigation({ user }: NavigationProps) {
             </Link>
             <div className="flex items-center space-x-4">
               <Link 
-                href="/login" 
+                href="/login"
+                data-umami-event="cta_login"
+                data-umami-event-location="nav-signin"
                 className="text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/10"
               >
                 Sign In
               </Link>
               <Link 
-                href="/login" 
+                href="/login"
+                data-umami-event="cta_start_free"
+                data-umami-event-location="nav-get-started"
                 className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-lg font-medium hover:from-amber-400 hover:to-orange-500 transition-all"
               >
                 Get Started
