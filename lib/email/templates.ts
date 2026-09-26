@@ -12,13 +12,37 @@ export const emailTemplates = {
 
       You're in. Time to find out what's quietly draining your bank account every month.
 
-      Head to your dashboard and run your first scan:
+      The fastest way to start: add the first subscription you can think of — Netflix, a gym, a software trial. It takes about 30 seconds and it's free:
       https://subscriptionincinerator.app/dashboard
 
-      Most people find at least one subscription they forgot they were even paying for. Let's go burn it.
+      Once it's in, we'll remind you before it renews so nothing charges you by surprise. Not sure how to cancel one? Our step-by-step guides are here:
+      https://subscriptionincinerator.app/cancel
+
+      (Automatic Gmail scanning is part of Premium. Manual tracking, reminders and cancellation guides are free.)
 
       - Pax the Koala 🐨
         Subscription Incinerator
+    `,
+  }),
+
+  // Day 2-14, no subscriptions added yet (Activation)
+  activationNudge: (userName: string, unsubscribeUrl: string): EmailTemplate => ({
+    subject: 'Add your first subscription (takes 30 seconds)',
+    body: `
+      Hey ${userName},
+
+      You signed up a few days ago but haven't added a subscription yet, so there's nothing for us to keep an eye on.
+
+      The easiest start is one you already know about: a streaming service, a gym, a software trial. All we need is the name, the amount and the renewal date:
+      https://subscriptionincinerator.app/dashboard
+
+      Then we'll remind you before it renews. If you've already decided to drop one, our guides walk you through cancelling it step by step:
+      https://subscriptionincinerator.app/cancel
+
+      - Pax the Koala 🐨
+        Subscription Incinerator
+
+      You're getting this because you created a Subscription Incinerator account. Don't want reminders like this? Unsubscribe: ${unsubscribeUrl}
     `,
   }),
 

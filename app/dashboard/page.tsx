@@ -228,7 +228,7 @@ export default async function DashboardPage({
         </div>
       )}
 
-      <div className="mb-8">
+      <div id="add-subscription" className="mb-8 scroll-mt-24">
         <AddSubscriptionForm />
       </div>
 
