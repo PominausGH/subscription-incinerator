@@ -92,6 +92,8 @@ export function CompetitorAlternativePage({ data }: { data: CompetitorAlternativ
         </p>
         <Link
           href="/login"
+          data-umami-event="cta_start_free"
+          data-umami-event-location="competitor-alternative"
           className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Start Free →

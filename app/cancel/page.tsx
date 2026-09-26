@@ -71,6 +71,8 @@ export default function CancelDirectoryPage() {
         </p>
         <Link
           href="/login"
+          data-umami-event="cta_start_free"
+          data-umami-event-location="cancel-directory"
           className="inline-flex px-6 py-3 bg-fire-700 hover:bg-fire-800 text-white font-semibold rounded-lg transition-colors"
         >
           Find My Subscriptions →

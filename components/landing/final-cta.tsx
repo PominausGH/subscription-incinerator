@@ -43,6 +43,8 @@ export function FinalCTA() {
           </p>
           <Link
             href="/login"
+            data-umami-event="cta_start_free"
+            data-umami-event-location="final-cta"
             className="inline-flex items-center justify-center px-10 py-5 text-xl font-semibold text-fire-900 bg-white hover:bg-fire-50 rounded-lg transition-all hover:scale-105"
           >
             Start Free - No Credit Card Required

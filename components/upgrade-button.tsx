@@ -1,5 +1,6 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics/track'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
@@ -39,6 +40,7 @@ export function UpgradeButton({
 
   async function handleUpgrade() {
     setLoading(true)
+    trackEvent('checkout_start', { location: 'upgrade-button' })
     try {
       const res = await fetch('/api/stripe/checkout', { method: 'POST' })
       const data = await res.json()
