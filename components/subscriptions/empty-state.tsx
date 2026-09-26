@@ -3,6 +3,14 @@
 import Link from 'next/link'
 import { Inbox, Mail, Plus, Sparkles, ArrowRight } from 'lucide-react'
 
+/** Scroll to the manual-add form and focus its first field. */
+function focusAddForm() {
+  const form = document.getElementById('add-subscription')
+  if (!form) return
+  form.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  document.getElementById('serviceName')?.focus({ preventScroll: true })
+}
+
 export function EmptySubscriptionsState() {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
@@ -23,25 +31,37 @@ export function EmptySubscriptionsState() {
 
         {/* Options */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
-          {/* Option 1: Add Manually */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+          {/* Option 1: Add Manually (free) */}
+          <button
+            type="button"
+            onClick={focusAddForm}
+            data-umami-event="empty_state_click"
+            data-umami-event-option="add-manually"
+            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group h-full"
+          >
             <div className="flex items-center justify-between mb-3">
               <Plus className="h-6 w-6 text-orange-500" />
               <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-orange-500 transition-colors" />
             </div>
             <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Add manually</h4>
-            <p className="text-sm text-gray-600">Quickly add a subscription above</p>
-          </div>
+            <p className="text-sm text-gray-600">Free — takes about 30 seconds</p>
+          </button>
 
-          {/* Option 2: Connect Gmail */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
-            <div className="flex items-center justify-between mb-3">
-              <Mail className="h-6 w-6 text-blue-500" />
-              <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          {/* Option 2: Connect Gmail (Premium) */}
+          <Link
+            href="/settings"
+            data-umami-event="empty_state_click"
+            data-umami-event-option="scan-gmail"
+          >
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer group h-full">
+              <div className="flex items-center justify-between mb-3">
+                <Mail className="h-6 w-6 text-blue-500" />
+                <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+              </div>
+              <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Scan Gmail</h4>
+              <p className="text-sm text-gray-600">Auto-detect from receipts (Premium)</p>
             </div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Scan Gmail</h4>
-            <p className="text-sm text-gray-600">Auto-detect from receipts</p>
-          </div>
+          </Link>
 
           {/* Option 3: Import Bank */}
           <Link href="/import">
@@ -63,8 +83,9 @@ export function EmptySubscriptionsState() {
             <div>
               <h4 className="font-medium text-blue-900 mb-1">Pro tip</h4>
               <p className="text-sm text-blue-800">
-                Connect your Gmail to automatically find subscriptions from receipt emails. 
-                We&apos;ll scan for Netflix, Spotify, AWS, and 100+ other services.
+                Adding your first subscription manually is free and takes 30 seconds. With Premium,
+                connecting Gmail automatically finds subscriptions from receipt emails — Netflix,
+                Spotify, AWS, and 100+ other services.
               </p>
             </div>
           </div>

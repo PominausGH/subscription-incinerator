@@ -72,6 +72,20 @@ export async function scheduleQuarterlyAuditJob() {
   )
 }
 
+export async function scheduleActivationNudgeJob() {
+  return await scanQueue.add(
+    'activation-nudge-check',
+    {},
+    {
+      jobId: 'activation-nudge-check-daily',
+      repeat: {
+        every: 24 * 60 * 60 * 1000 // Daily; the processor picks who is in the 2-14 day window
+      },
+      removeOnComplete: true,
+    }
+  )
+}
+
 export async function addPlaidSyncJob(plaidItemId: string) {
   await scanQueue.add(
     JobType.SYNC_PLAID,

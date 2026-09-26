@@ -3,6 +3,7 @@ import { processReminderJob } from './processors/reminder-sender'
 import { processScanJob } from './processors/email-scanner'
 import { cleanupExpiredPending } from './processors/cleanup-pending'
 import { processQuarterlyAudit } from './processors/quarterly-audit'
+import { processActivationNudge } from './processors/activation-nudge'
 import { processSyncPlaid } from './processors/plaid-sync'
 import { SendReminderJob, ScanInboxJob, JobType } from '@/lib/queue/jobs'
 import { connection } from '@/lib/queue/client'
@@ -22,6 +23,8 @@ const scanWorker = new Worker<ScanInboxJob | {}>(
       await cleanupExpiredPending()
     } else if (job.name === 'quarterly-audit-check') {
       await processQuarterlyAudit()
+    } else if (job.name === 'activation-nudge-check') {
+      await processActivationNudge()
     } else if (job.name === JobType.SYNC_PLAID) {
       await processSyncPlaid(job as Job<{ plaidItemId: string }>)
     } else {
@@ -56,13 +59,17 @@ scanWorker.on('failed', (job, err) => {
 console.log('Workers started successfully')
 
 // Schedule recurring jobs on startup
-import { scheduleCleanupJob, scheduleQuarterlyAuditJob } from '@/lib/queue/scan-queue'
+import { scheduleCleanupJob, scheduleQuarterlyAuditJob, scheduleActivationNudgeJob } from '@/lib/queue/scan-queue'
 scheduleCleanupJob().then(() => {
   console.log('Cleanup job scheduled')
 }).catch(console.error)
 
 scheduleQuarterlyAuditJob().then(() => {
   console.log('Quarterly audit check job scheduled')
+}).catch(console.error)
+
+scheduleActivationNudgeJob().then(() => {
+  console.log('Activation nudge check job scheduled')
 }).catch(console.error)
 
 // Graceful shutdown
