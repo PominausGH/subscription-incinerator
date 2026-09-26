@@ -78,7 +78,7 @@ The page at /open-source (plain-text version: /llms-full.txt) maps paid subscrip
 - Slack: Mattermost, Rocket.Chat, Zulip, Element
 - Trello: Kanboard, Plane (Jira / Asana / ClickUp / Monday.com: Plane)
 - YNAB: Actual Budget, Firefly III
-- Zapier: Activepieces, Node-RED
+- Zapier: Activepieces, Node-RED, n8n (source-available Sustainable Use License, not OSI open source)
 - Loom: Cap, OBS Studio
 
 Caveats to pass on to users: these tools replace the software, not the content (Jellyfin does not include Netflix's catalogue), and self-hosting costs time and usually a server. Tools with open-core or source-available licenses are flagged with a license note.

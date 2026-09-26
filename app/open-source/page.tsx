@@ -9,7 +9,7 @@ import {
   findAlternativesForService,
   totalAlternatives,
 } from '@/lib/open-source/alternatives'
-import { buildServiceIndex, formatStars, slugify } from '@/lib/open-source/helpers'
+import { formatStars, slugify } from '@/lib/open-source/helpers'
 
 const BASE_URL = 'https://subscriptionincinerator.app'
 const PAGE_URL = `${BASE_URL}/open-source`
@@ -103,7 +103,6 @@ function spdxUrl(license: string): string | undefined {
 
 export default function OpenSourcePage() {
   const faqs = buildFaqs()
-  const serviceIndex = buildServiceIndex()
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -216,28 +215,70 @@ export default function OpenSourcePage() {
             ))}
           </nav>
 
-          {/* Find your subscription: crawlable service -> alternative index */}
+          {/* Browse by subscription: one card per category, service -> free tool rows (crawlable list markup) */}
           <section id="find-your-subscription" className="mb-16 scroll-mt-24">
-            <h2 className="text-2xl font-bold text-white mb-2">Find the alternative to your subscription</h2>
-            <p className="text-gray-500 text-sm mb-6">
-              Every paid service on this page and the open-source tools that can replace it.
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Thinking of subscribing? See the free alternative first
+            </h2>
+            <p className="text-gray-500 text-sm mb-8">
+              Every paid service on this page next to the open-source tool that can replace it.
             </p>
-            <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-sm">
-              {serviceIndex.map(([service, tools]) => (
-                <li key={service} className="text-gray-400">
-                  <span className="text-gray-300 font-medium">{service}</span>
-                  {' → '}
-                  {tools.map((t, i) => (
-                    <span key={t.slug}>
-                      {i > 0 && ', '}
-                      <a href={`#tool-${t.slug}`} className="text-fire-500 hover:text-fire-400">
-                        {t.name}
-                      </a>
-                    </span>
-                  ))}
-                </li>
+            <div className="space-y-8">
+              {alternativeGroups.map(group => (
+                <div key={group.key}>
+                  <p className="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-3">
+                    {group.label}
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4 items-stretch">
+                    {alternativeCategories
+                      .filter(cat => cat.group === group.key)
+                      .map(cat => (
+                        <div
+                          key={cat.slug}
+                          className="bg-dark-800 border border-dark-600 hover:border-fire-500/40 rounded-xl p-5 transition-all h-full"
+                        >
+                          <h3 className="mb-2">
+                            <a
+                              href={`#${cat.slug}`}
+                              className="text-white font-semibold flex items-center gap-2 hover:text-fire-400 transition-colors"
+                            >
+                              <span className="text-xl">{cat.emoji}</span>
+                              {cat.category}
+                            </a>
+                          </h3>
+                          <ul className="text-sm">
+                            {cat.paidServices.map(service => {
+                              const tools = cat.alternatives.filter(a => a.replaces?.includes(service))
+                              if (tools.length === 0) return null
+                              return (
+                                <li
+                                  key={service}
+                                  className="flex items-baseline justify-between gap-4 py-2 border-t border-dark-700"
+                                >
+                                  <span className="text-gray-300">{service}</span>
+                                  <span className="text-right text-gray-500">
+                                    {tools.map((t, i) => (
+                                      <span key={t.name}>
+                                        {i > 0 && ', '}
+                                        <a
+                                          href={`#tool-${slugify(t.name)}`}
+                                          className="text-fire-500 hover:text-fire-400"
+                                        >
+                                          {t.name}
+                                        </a>
+                                      </span>
+                                    ))}
+                                  </span>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        </div>
+                      ))}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
 
           {/* Categories */}
