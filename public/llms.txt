@@ -64,6 +64,15 @@ The app maintains step-by-step cancellation guides at `/cancel/{service}`. Examp
 - /cancel/audible
 - /cancel/duolingo-plus
 - /cancel/canva-pro
+- /cancel/hbo-max
+- /cancel/dropbox
+- /cancel/microsoft-365
+- /cancel/google-one
+- /cancel/nordvpn
+- /cancel/expressvpn
+- /cancel/1password
+- /cancel/grammarly
+- /cancel/notion
 
 Full directory: https://subscriptionincinerator.app/cancel
 
