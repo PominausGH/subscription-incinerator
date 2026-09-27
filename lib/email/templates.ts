@@ -52,12 +52,12 @@ export const emailTemplates = {
     body: `
       Hey ${userName},
 
-      It's been 90 days since your last full scan. Statistics show the average user adds 1.2 new subscriptions every quarter without realising it.
+      It's been about 90 days since we last checked in on your subscriptions. New ones have a way of creeping in — a free trial that rolled into a paid plan, a streaming service you signed up for once.
 
       Don't let them turn into "Subscription Tax." Run your 10-minute checklist now:
       https://subscriptionincinerator.app/blog/subscription-audit-checklist
 
-      Or, jump straight to your dashboard to auto-scan your latest receipts:
+      Or jump straight to your dashboard to review what you're tracking and add anything new (Premium members can also re-scan Gmail from there):
       https://subscriptionincinerator.app/dashboard
 
       Let's keep your bank account clean.
