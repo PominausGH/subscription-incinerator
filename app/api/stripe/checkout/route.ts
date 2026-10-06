@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
+import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
+
+const PRODUCT_SLUG = 'subscription-incinerator'
+const PRODUCT_DISPLAY_NAME = 'Subscription Incinerator'
 
 export async function POST(req: Request) {
   try {
@@ -54,7 +58,10 @@ export async function POST(req: Request) {
     }
 
     // Create checkout session
-    const checkoutSession = await stripe.checkout.sessions.create({
+    // Subscription mode: payment_intent_data (and so statement_descriptor_suffix) is not
+    // allowed. Stripe derives subscription charge descriptors from the Invoice/Product,
+    // so no per-session descriptor is set here.
+    const params: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
       mode: 'subscription',
       allow_promotion_codes: true,
@@ -64,12 +71,30 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
+      metadata: { product: PRODUCT_SLUG },
       subscription_data: {
         trial_period_days: trialDays,
+        metadata: { product: PRODUCT_SLUG },
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgraded=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
-    })
+    }
+
+    let checkoutSession
+    try {
+      checkoutSession = await stripe.checkout.sessions.create({
+        ...params,
+        branding_settings: { display_name: PRODUCT_DISPLAY_NAME },
+      } as Stripe.Checkout.SessionCreateParams)
+    } catch (err) {
+      const e = err as { type?: string; param?: string; message?: string }
+      if (e?.type === 'StripeInvalidRequestError' && /branding_settings/.test(`${e.param ?? ''} ${e.message ?? ''}`)) {
+        console.warn('Stripe rejected branding_settings; retrying without it:', e.message)
+        checkoutSession = await stripe.checkout.sessions.create(params)
+      } else {
+        throw err
+      }
+    }
 
     return NextResponse.json({ url: checkoutSession.url })
   } catch (error) {
