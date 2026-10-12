@@ -16,7 +16,7 @@ export default function TermsPage() {
         </Link>
 
         <h1 className="text-4xl font-bold text-white mb-8">Terms of Service</h1>
-        <p className="text-gray-400 mb-8">Last updated: February 2026</p>
+        <p className="text-gray-400 mb-8">Last updated: October 2026</p>
 
         <div className="prose prose-invert max-w-none space-y-8">
           <section>
@@ -86,6 +86,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">8. Contact</h2>
             <p className="text-gray-300 leading-relaxed">
+              Subscription Incinerator is operated by TelaLoom (ABN 65 366 917 788), Australia.
               For questions about these terms, email us at{' '}
               <a href="mailto:support@subscriptionincinerator.app" className="text-fire-400 hover:text-fire-300">
                 support@subscriptionincinerator.app

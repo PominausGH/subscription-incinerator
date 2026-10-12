@@ -134,7 +134,7 @@ export function Footer() {
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Subscription Incinerator. All rights reserved. <span className="ml-3">ABN: 65 366 917 788</span>{' '}
             <a href="https://telaloom.com/services.html" target="_blank" rel="noopener" className="ml-3 text-gray-400 hover:text-fire-400 transition-colors">
-              Built by TelaLoom
+              A TelaLoom product
             </a>
           </p>
         </div>
