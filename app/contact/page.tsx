@@ -47,6 +47,9 @@ export default function ContactPage() {
         }),
       })
       if (res.ok) {
+        if (typeof window !== 'undefined' && window.umami) {
+          window.umami.track('contact_sent')
+        }
         setStatus('success')
         setForm({ name: '', email: '', category: '', message: '' })
       } else {
