@@ -43,7 +43,7 @@ export async function processReminderJob(job: Job<SendReminderJob>) {
     const channelsUsed: string[] = []
 
     // Send email if enabled
-    if (prefs?.channels?.email !== false) {
+    if (prefs?.channels?.email !== false && reminder.subscription.user.emailVerified) {
       await sendReminderEmail(reminder)
       channelsUsed.push('email')
     }
