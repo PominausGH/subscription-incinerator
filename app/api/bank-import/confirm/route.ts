@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
         {
           error: 'VALIDATION_ERROR',
           message: 'Invalid request data',
-          details: error.errors
+          details: error.issues
         },
         { status: 400 }
       )

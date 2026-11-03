@@ -6,12 +6,13 @@ import { OpenSourceAlternatives } from '@/components/subscriptions/open-source-a
 import { BackButton } from '@/components/ui/back-button'
 
 interface CancelPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default async function CancelPage({ params }: CancelPageProps) {
+export default async function CancelPage(props: CancelPageProps) {
+  const params = await props.params;
   const user = await getCurrentUser()
 
   // Explicit check for clarity (getCurrentUser redirects if not authenticated)
