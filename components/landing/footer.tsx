@@ -21,14 +21,14 @@ export function Footer() {
             <h2 className="text-white font-semibold mb-4">Product</h2>
             <ul className="space-y-2">
               <li>
-                <a href="/#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <Link href="/#features" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   Features
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/#how-it-works" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
+                <Link href="/#how-it-works" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">
                   How It Works
-                </a>
+                </Link>
               </li>
               <li>
                 <Link href="/pricing" className="text-gray-400 hover:text-fire-400 transition-colors text-sm">

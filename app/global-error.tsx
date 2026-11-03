@@ -54,6 +54,8 @@ export default function GlobalError({
               >
                 Try again
               </button>
+              {/* global-error renders outside the router; a full reload is intended */}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a
                 href="/"
                 className="block w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors"

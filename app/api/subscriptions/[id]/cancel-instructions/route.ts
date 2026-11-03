@@ -3,10 +3,8 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import { getCancellationSteps, getCancellationUrl } from '@/lib/services/cancellation'
 
-export async function GET(
-  _: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

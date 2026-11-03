@@ -5,10 +5,8 @@ import { toMonthlyAmount } from '@/lib/analytics/queries'
 import { emailService } from '@/lib/services/email'
 import { NotificationPreferences } from '@/lib/notifications/types'
 
-export async function POST(
-  _: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(_: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
