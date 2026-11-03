@@ -5,7 +5,8 @@
 import { POST } from '@/app/api/auth/register/route'
 import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
-import { emailService } from '@/lib/services/email'
+import { createVerificationToken } from '@/lib/email-verification'
+import { sendVerificationEmail } from '@/lib/notifications/email'
 import { NextRequest } from 'next/server'
 
 jest.mock('@/lib/db/client', () => ({
@@ -28,14 +29,17 @@ jest.mock('@/lib/rate-limit', () => ({
   RATE_LIMITS: { auth: { limit: 5, windowSeconds: 60 } },
 }))
 
-jest.mock('@/lib/services/email', () => ({
-  emailService: {
-    sendWelcome: jest.fn().mockResolvedValue(true),
-  },
+jest.mock('@/lib/email-verification', () => ({
+  createVerificationToken: jest.fn().mockResolvedValue('raw-token'),
+}))
+
+jest.mock('@/lib/notifications/email', () => ({
+  sendVerificationEmail: jest.fn().mockResolvedValue(undefined),
 }))
 
 const mockDb = db as jest.Mocked<typeof db>
-const mockEmailService = emailService as jest.Mocked<typeof emailService>
+const mockCreateToken = createVerificationToken as jest.Mock
+const mockSendVerification = sendVerificationEmail as jest.Mock
 
 function createRequest(body: any) {
   return new NextRequest('http://localhost:3000/api/auth/register', {
@@ -65,7 +69,20 @@ describe('POST /api/auth/register', () => {
     expect(res.status).toBe(201)
     const data = await res.json()
     expect(data.message).toBe('Account created successfully')
-    expect(mockEmailService.sendWelcome).toHaveBeenCalledWith('new@example.com', 'there')
+    // Account starts unverified; the welcome email waits until the link is clicked.
+    expect((mockDb.user.create as jest.Mock).mock.calls[0][0].data.emailVerified).toBeNull()
+    expect(mockCreateToken).toHaveBeenCalledWith('new@example.com')
+    expect(mockSendVerification).toHaveBeenCalledWith({ toEmail: 'new@example.com', token: 'raw-token' })
+  })
+
+  it('should still create the account if the verification email fails', async () => {
+    ;(mockDb.user.findUnique as jest.Mock).mockResolvedValue(null)
+    ;(mockDb.user.create as jest.Mock).mockResolvedValue({ id: 'user-2', email: 'new@example.com' })
+    mockSendVerification.mockRejectedValueOnce(new Error('smtp down'))
+
+    const res = await POST(createRequest({ email: 'new@example.com', password: 'SecurePass123!' }))
+
+    expect(res.status).toBe(201)
   })
 
   it('should reject duplicate email', async () => {

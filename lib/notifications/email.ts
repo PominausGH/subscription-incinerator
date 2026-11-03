@@ -5,6 +5,7 @@ import {
   getBillingUpcomingEmailTemplate,
   getHouseholdInviteEmailTemplate,
   getPasswordResetEmailTemplate,
+  getVerifyEmailTemplate,
   getCancellationEmailTemplate,
   getPaymentFailedEmailTemplate,
 } from './templates'
@@ -72,6 +73,20 @@ export async function sendHouseholdInviteEmail(params: { toEmail: string; ownerE
  */
 export async function sendPasswordResetEmail(params: { toEmail: string; token: string }) {
   const template = getPasswordResetEmailTemplate({ token: params.token })
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',
+    to: params.toEmail,
+    subject: template.subject,
+    html: template.html,
+  })
+}
+
+/**
+ * Send the email-verification link sent on registration / resend.
+ */
+export async function sendVerificationEmail(params: { toEmail: string; token: string }) {
+  const template = getVerifyEmailTemplate({ token: params.token })
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || 'Subscription Incinerator <noreply@subscriptionincinerator.app>',

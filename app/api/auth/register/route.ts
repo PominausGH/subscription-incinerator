@@ -3,7 +3,8 @@ import { db } from '@/lib/db/client'
 import { hashPassword } from '@/lib/password'
 import { registerSchema } from '@/lib/validations/auth'
 import { checkRateLimit, getClientIdentifier, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
-import { emailService } from '@/lib/services/email'
+import { createVerificationToken } from '@/lib/email-verification'
+import { sendVerificationEmail } from '@/lib/notifications/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,12 +44,19 @@ export async function POST(request: NextRequest) {
       data: {
         email: email.toLowerCase(),
         passwordHash,
-        emailVerified: new Date(),
+        // Not verified until the owner clicks the emailed link (see /api/auth/verify-email).
+        emailVerified: null,
         homeCurrency: homeCurrency || 'USD',
       },
     })
 
-    await emailService.sendWelcome(email.toLowerCase(), 'there')
+    // A mail failure must not fail signup: the dashboard banner offers a resend.
+    try {
+      const token = await createVerificationToken(email)
+      await sendVerificationEmail({ toEmail: email.toLowerCase(), token })
+    } catch (error) {
+      console.error('Failed to send verification email:', error)
+    }
 
     return NextResponse.json(
       { message: 'Account created successfully' },

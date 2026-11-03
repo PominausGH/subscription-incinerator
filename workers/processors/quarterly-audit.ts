@@ -9,6 +9,7 @@ export async function processQuarterlyAudit() {
 
   const dueUsers = await db.user.findMany({
     where: {
+      emailVerified: { not: null }, // never mail an address nobody has confirmed
       OR: [
         { lastQuarterlyAuditEmailAt: null, createdAt: { lte: cutoff } },
         { lastQuarterlyAuditEmailAt: { lte: cutoff } },

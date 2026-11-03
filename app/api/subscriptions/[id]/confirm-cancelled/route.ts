@@ -59,9 +59,9 @@ export async function POST(
 async function celebrateSavingsIfOptedIn(userId: string, savedAmount: number, currency: string) {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { email: true, name: true, notificationPreferences: true },
+    select: { email: true, name: true, notificationPreferences: true, emailVerified: true },
   })
-  if (!user) return
+  if (!user || !user.emailVerified) return
 
   const prefs = user.notificationPreferences as unknown as NotificationPreferences
   if (prefs?.channels?.email === false) return
