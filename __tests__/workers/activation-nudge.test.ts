@@ -58,13 +58,14 @@ describe('processActivationNudge', () => {
     expect(send).not.toHaveBeenCalled()
   })
 
-  it('selects signups 2-14 days old with no subscriptions', async () => {
+  it('selects verified signups 2-14 days old with no subscriptions', async () => {
     findMany.mockResolvedValue([])
     const before = Date.now()
     await processActivationNudge()
 
     const where = findMany.mock.calls[0][0].where
     expect(where.subscriptions).toEqual({ none: {} })
+    expect(where.emailVerified).toEqual({ not: null }) // unverified addresses are never nudged
     const day = 24 * 60 * 60 * 1000
     expect(before - where.createdAt.lte.getTime()).toBeGreaterThanOrEqual(2 * day - 1000)
     expect(before - where.createdAt.gte.getTime()).toBeGreaterThanOrEqual(14 * day - 1000)
