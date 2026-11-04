@@ -11,7 +11,7 @@ const sentKey = (userId: string) => `activation-nudge:sent:${userId}`
 
 /**
  * One-off nudge to signups who created an account 2-14 days ago and still have no
- * subscriptions. Sent at most once per user (Redis SET NX, so no schema change),
+ * subscriptions, and whose email is verified. Sent at most once per user (Redis SET NX, so no schema change),
  * never to unsubscribed emails or users who turned email notifications off.
  */
 export async function processActivationNudge() {
@@ -29,6 +29,7 @@ export async function processActivationNudge() {
         lte: new Date(now - MIN_AGE_DAYS * DAY_MS),
       },
       subscriptions: { none: {} },
+      emailVerified: { not: null }, // never mail an address nobody has confirmed
     },
     select: { id: true, email: true, name: true, notificationPreferences: true },
   })
