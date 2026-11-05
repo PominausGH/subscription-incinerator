@@ -73,8 +73,13 @@ export class EmailService {
    * Automate the Quarterly Audit Reminder
    */
   public async scheduleQuarterlyAudit(userEmail: string, userName: string) {
-    const template = emailTemplates.quarterlyAuditReminder(userName)
-    return this.sendTemplateEmail(userEmail, template)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://subscriptionincinerator.app'
+    const unsubUrl = unsubscribeUrl(userEmail, baseUrl)
+    const template = emailTemplates.quarterlyAuditReminder(userName, unsubUrl)
+    return this.sendTemplateEmail(userEmail, template, {
+      'List-Unsubscribe': `<${unsubUrl}>, <mailto:unsubscribe@subscriptionincinerator.app>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    })
   }
 
   /**

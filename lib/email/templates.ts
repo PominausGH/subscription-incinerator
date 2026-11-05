@@ -47,7 +47,7 @@ export const emailTemplates = {
   }),
 
   // Day 90: The Quarterly Audit (Retention)
-  quarterlyAuditReminder: (userName: string): EmailTemplate => ({
+  quarterlyAuditReminder: (userName: string, unsubscribeUrl: string): EmailTemplate => ({
     subject: `🕒 Time for your 90-day Subscription Audit, ${userName}!`,
     body: `
       Hey ${userName},
@@ -64,6 +64,8 @@ export const emailTemplates = {
 
       - Pax the Koala 🐨
         Subscription Incinerator
+
+      You're getting this because you created a Subscription Incinerator account. Don't want reminders like this? Unsubscribe: ${unsubscribeUrl}
     `,
   }),
 
