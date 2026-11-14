@@ -39,15 +39,16 @@ export function ResetPasswordForm({ token }: { token: string }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm" role="alert">
+        <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-md text-sm" role="alert">
           {error}
         </div>
       )}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
           New password
         </label>
         <Input
+          className="bg-dark-800 border-dark-600 text-white placeholder:text-gray-600 focus:ring-fire-500/60"
           id="password"
           type="password"
           value={password}
@@ -58,7 +59,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           autoComplete="new-password"
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" className="w-full bg-fire-700 text-white hover:bg-fire-800" disabled={isLoading}>
         {isLoading ? 'Resetting...' : 'Reset password'}
       </Button>
     </form>
