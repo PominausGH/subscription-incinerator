@@ -42,7 +42,7 @@
     "plaid": "^41.4.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-dropzone": "^14.3.8",
+    "react-dropzone": "^20.1.4",
     "react-plaid-link": "^4.1.1",
     "recharts": "^3.6.0",
     "resend": "^6.7.0",
