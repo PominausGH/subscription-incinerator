@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db/client'
 import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
+import { checkoutHardeningParams } from '@/lib/stripe-hardening'
 
 const PRODUCT_SLUG = 'subscription-incinerator'
 const PRODUCT_DISPLAY_NAME = 'Subscription Incinerator'
@@ -72,6 +73,8 @@ export async function POST(req: Request) {
         },
       ],
       metadata: { product: PRODUCT_SLUG },
+      // Anti-fraud: 3DS on every card, billing address, 31-min session (lib/stripe-hardening).
+      ...checkoutHardeningParams(),
       subscription_data: {
         trial_period_days: trialDays,
         metadata: { product: PRODUCT_SLUG },

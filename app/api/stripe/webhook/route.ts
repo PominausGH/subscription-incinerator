@@ -3,6 +3,9 @@ import { db } from '@/lib/db/client'
 import { stripe } from '@/lib/stripe'
 import { sendWebhookFailureAlert, sendCancellationEmail, sendPaymentFailedEmail } from '@/lib/notifications/email'
 import Stripe from 'stripe'
+import { clearCardFailures, customerIdOf, expireOpenSessions, recordCardFailure } from '@/lib/stripe-hardening'
+
+const PRODUCT_SLUG = 'subscription-incinerator'
 
 /**
  * Best-effort extraction of a customer email from a Stripe event payload,
@@ -41,6 +44,7 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
+        clearCardFailures(customerIdOf(session))
         if (session.customer && session.mode === 'subscription') {
           await db.user.update({
             where: { stripeCustomerId: session.customer as string },
@@ -77,6 +81,21 @@ export async function POST(req: NextRequest) {
           })
           if (user?.email) {
             await sendPaymentFailedEmail({ toEmail: user.email, name: user.name ?? 'there' })
+          }
+        }
+        break
+      }
+
+      case 'setup_intent.setup_failed':
+      case 'payment_intent.payment_failed': {
+        // Card-testing guard: after repeated failed cards, kill the customer's open checkout.
+        const customerId = customerIdOf(event.data.object as { customer?: string | { id?: string } | null })
+        if (customerId && recordCardFailure(customerId)) {
+          try {
+            const n = await expireOpenSessions(stripe, customerId, PRODUCT_SLUG)
+            if (n) console.warn(`[stripe-webhook] repeated card failures for ${customerId}; expired ${n} checkout session(s)`)
+          } catch (err) {
+            console.error('[stripe-webhook] failed to expire checkout session:', err)
           }
         }
         break
