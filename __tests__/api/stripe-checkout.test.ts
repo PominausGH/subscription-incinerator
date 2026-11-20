@@ -35,6 +35,9 @@ describe('POST /api/stripe/checkout', () => {
     expect(arg.subscription_data.metadata).toEqual({ product: 'subscription-incinerator' })
     expect(arg.branding_settings).toEqual({ display_name: 'Subscription Incinerator' })
     expect(arg.payment_intent_data).toBeUndefined()
+    expect(arg.payment_method_options).toEqual({ card: { request_three_d_secure: 'any' } })
+    expect(arg.billing_address_collection).toBe('required')
+    expect(arg.expires_at).toBeGreaterThan(Math.floor(Date.now() / 1000) + 30 * 60)
   })
 
   it('retries without branding_settings when Stripe rejects it', async () => {
