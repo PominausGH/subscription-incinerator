@@ -45,12 +45,29 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         clearCardFailures(customerIdOf(session))
+        // The Stripe account is shared across products, so this endpoint also
+        // receives other products' checkouts. Ignore those instead of 500ing
+        // (which triggers Stripe retries and a failure-alert email per retry).
+        const product = session.metadata?.product
+        if (product && product !== PRODUCT_SLUG) {
+          console.log(`Ignoring checkout for other product "${product}": ${session.id}`)
+          break
+        }
         if (session.customer && session.mode === 'subscription') {
-          await db.user.update({
+          const { count } = await db.user.updateMany({
             where: { stripeCustomerId: session.customer as string },
             data: { tier: 'premium' },
           })
-          console.log(`User upgraded to premium: ${session.customer}`)
+          if (count === 0) {
+            // Tagged as ours but no matching user = real problem: fail so it alerts.
+            if (product === PRODUCT_SLUG) {
+              throw new Error(`No user for Stripe customer ${session.customer} (checkout ${session.id})`)
+            }
+            // Untagged and unknown: almost certainly another product's checkout.
+            console.warn(`No user for untagged Stripe customer ${session.customer}; checkout ${session.id} ignored`)
+          } else {
+            console.log(`User upgraded to premium: ${session.customer}`)
+          }
         }
         break
       }
@@ -58,6 +75,14 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         if (subscription.customer) {
+          const existing = await db.user.findUnique({
+            where: { stripeCustomerId: subscription.customer as string },
+            select: { id: true },
+          })
+          if (!existing) {
+            console.log(`Ignoring subscription.deleted for non-user customer: ${subscription.customer}`)
+            break
+          }
           const user = await db.user.update({
             where: { stripeCustomerId: subscription.customer as string },
             data: { tier: 'free' },
