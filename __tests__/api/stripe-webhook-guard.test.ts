@@ -56,3 +56,59 @@ describe('webhook card-testing guard', () => {
     err.mockRestore()
   })
 })
+
+describe('webhook on a shared Stripe account', () => {
+  const { db } = jest.requireMock('@/lib/db/client') as {
+    db: { user: { update: jest.Mock; updateMany: jest.Mock; findUnique: jest.Mock } }
+  }
+  const { sendWebhookFailureAlert } = jest.requireMock('@/lib/notifications/email') as { sendWebhookFailureAlert: jest.Mock }
+
+  beforeEach(() => {
+    db.user.updateMany = jest.fn().mockResolvedValue({ count: 0 })
+    db.user.update.mockReset()
+    db.user.findUnique.mockReset()
+    sendWebhookFailureAlert.mockReset()
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  it("ignores another product's checkout without touching the DB", async () => {
+    const res = await send('checkout.session.completed', {
+      id: 'cs_bp', customer: 'cus_bp', mode: 'subscription', metadata: { product: 'brightpath' },
+    })
+    expect(res.status).toBe(200)
+    expect(db.user.updateMany).not.toHaveBeenCalled()
+    expect(sendWebhookFailureAlert).not.toHaveBeenCalled()
+  })
+
+  it('returns 200 for an untagged checkout with no matching user', async () => {
+    const res = await send('checkout.session.completed', { id: 'cs_x', customer: 'cus_x', mode: 'subscription' })
+    expect(res.status).toBe(200)
+    expect(sendWebhookFailureAlert).not.toHaveBeenCalled()
+  })
+
+  it('still alerts when our own tagged checkout has no matching user', async () => {
+    const res = await send('checkout.session.completed', {
+      id: 'cs_si', customer: 'cus_si', mode: 'subscription', metadata: { product: 'subscription-incinerator' },
+    })
+    expect(res.status).toBe(500)
+    expect(sendWebhookFailureAlert).toHaveBeenCalled()
+  })
+
+  it('upgrades a known user', async () => {
+    db.user.updateMany.mockResolvedValue({ count: 1 })
+    const res = await send('checkout.session.completed', {
+      id: 'cs_ok', customer: 'cus_ok', mode: 'subscription', metadata: { product: 'subscription-incinerator' },
+    })
+    expect(res.status).toBe(200)
+    expect(db.user.updateMany).toHaveBeenCalledWith({ where: { stripeCustomerId: 'cus_ok' }, data: { tier: 'premium' } })
+  })
+
+  it('ignores subscription.deleted for a non-user customer', async () => {
+    db.user.findUnique.mockResolvedValue(null)
+    const res = await send('customer.subscription.deleted', { id: 'sub_bp', customer: 'cus_bp' })
+    expect(res.status).toBe(200)
+    expect(db.user.update).not.toHaveBeenCalled()
+  })
+})
